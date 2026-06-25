@@ -2,7 +2,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import type { WeightAllocation } from '../api/types'
 
 const COLORS = [
-  '#6366f1',
+  '#3e7cb1',
   '#22d3ee',
   '#34d399',
   '#f59e0b',

@@ -12,15 +12,15 @@
         --border: #233152;
         --text: #e6ebf5;
         --muted: #8a97b4;
-        --accent: #6366f1;
-        --accent-hover: #818cf8;
+        --accent: #3e7cb1;
+        --accent-hover: #63a0d4;
         --mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Menlo, monospace;
         color-scheme: dark;
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        font-family: 'Times New Roman', Times, serif;
         background: radial-gradient(1200px 600px at 80% -10%, #1b2542 0%, var(--bg) 55%);
         color: var(--text);
         line-height: 1.65;
@@ -105,8 +105,8 @@
         font-family: var(--mono);
         font-size: 12px;
         color: var(--accent-hover);
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(99, 102, 241, 0.4);
+        background: rgba(62, 124, 177, 0.15);
+        border: 1px solid rgba(62, 124, 177, 0.4);
         border-radius: 999px;
         padding: 2px 9px;
         margin-right: 8px;
@@ -181,73 +181,42 @@
       <h2>3. Project Roadmap (Milestones)</h2>
 
       <div class="milestone">
-        <h3><span class="tag">Week 1</span>Skeleton Prototype</h3>
-        <p>A complete end-to-end slice: pick tickers → fetch real price history → estimate returns and
-          covariance → solve a Markowitz program → render the optimal allocation in the UI.</p>
+        <h3><span class="tag">Week 1</span>Walking skeleton</h3>
         <ul>
-          <li>Repo and tooling scaffold</li>
-          <li>Market data ingestion service</li>
-          <li>Optimizer core v1 (cvxpy)</li>
-          <li><code>/optimize</code> API endpoint</li>
-          <li>Frontend optimizer page</li>
-          <li>CI pipeline</li>
+          <li>Live mean-variance optimizer running end-to-end.</li>
+          <li>Real market data flowing from ingestion through to the UI.</li>
         </ul>
       </div>
 
       <div class="milestone">
-        <h3><span class="tag">Week 2</span>Efficient Frontier, Risk Models &amp; Constraints</h3>
-        <p>Efficient-frontier computation, shrinkage / EWMA risk models, and practical sector /
-          position constraints.</p>
+        <h3><span class="tag">Week 2</span>Frontier, risk models &amp; constraints</h3>
         <ul>
-          <li>Efficient frontier computation</li>
-          <li>Risk-model module (shrinkage / EWMA)</li>
-          <li>Constraints engine (sector / position limits)</li>
-          <li>Sector metadata ingestion</li>
-          <li>Frontend: interactive frontier + constraint builder</li>
-          <li>Frontend: portfolio detail view</li>
+          <li>Efficient frontier with shrinkage / EWMA risk models.</li>
+          <li>Sector / position constraint engine plus a risk questionnaire.</li>
         </ul>
       </div>
 
       <div class="milestone">
-        <h3><span class="tag">Week 3</span>Backtesting &amp; Benchmark Comparison</h3>
-        <p>Walk-forward backtesting, turnover / reduced-trading-frequency constraints, and comparison
-          against an index fund.</p>
+        <h3><span class="tag">Week 3</span>Backtesting &amp; benchmarks</h3>
         <ul>
-          <li>Walk-forward backtest engine</li>
-          <li>Reduced-trading-frequency / turnover constraints</li>
-          <li>Benchmark strategies (index, equal-weight, 60/40)</li>
-          <li>Performance analytics</li>
-          <li><code>/api/backtest</code> endpoint + persistence</li>
-          <li>Frontend: backtest dashboard</li>
+          <li>Backtest vs SPY &amp; 60/40 with turnover constraints.</li>
+          <li>Behavioral bias detection (e.g. &ldquo;you show loss aversion&rdquo;).</li>
         </ul>
       </div>
 
       <div class="milestone">
-        <h3><span class="tag">Week 4</span>Advanced &amp; Robust Optimization</h3>
-        <p>Transaction-cost-aware, robust, CVaR, and risk-parity optimization with async jobs streamed
-          over WebSockets.</p>
+        <h3><span class="tag">Week 4</span>Advanced &amp; robust optimization</h3>
         <ul>
-          <li>Transaction-cost-aware optimization</li>
-          <li>Robust optimization / Black-Litterman</li>
-          <li>CVaR (downside-risk) optimization</li>
-          <li>Alternative objectives (risk parity, max diversification)</li>
-          <li>Factor risk model</li>
-          <li>Async job runner + WebSocket progress</li>
-          <li>Frontend: strategy comparison &amp; parameter sweeps</li>
+          <li>Robust, CVaR, and risk-parity optimization.</li>
+          <li>Async optimization jobs with live progress.</li>
         </ul>
       </div>
 
       <div class="milestone">
-        <h3><span class="tag">Week 5</span>Persistence, Polish &amp; Deployment</h3>
-        <p>Authentication, saved portfolios and reporting, hardening, and a fully functional
-          deployment with complete documentation.</p>
+        <h3><span class="tag">Week 5</span>Persistence, polish &amp; deployment</h3>
         <ul>
-          <li>Auth + saved portfolios</li>
-          <li>Reporting &amp; export (PDF / CSV)</li>
-          <li>Hardening (rate limits, logging, errors)</li>
-          <li>Test coverage + CI/CD gates</li>
-          <li>Deployment (Render / Vercel)</li>
-          <li>Docs &amp; presentation</li>
+          <li>Auth, saved portfolios, and PDF export.</li>
+          <li>Deployed to a public URL.</li>
         </ul>
       </div>
 
