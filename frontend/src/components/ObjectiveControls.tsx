@@ -1,12 +1,14 @@
-import type { Objective } from '../api/types'
+import type { Objective, RiskModel } from '../api/types'
 
 interface Props {
   objective: Objective
+  riskModel: RiskModel
   targetReturnPct: number
   targetRiskPct: number
   maxWeightPct: number
   lookbackDays: number
   onObjective: (value: Objective) => void
+  onRiskModel: (value: RiskModel) => void
   onTargetReturnPct: (value: number) => void
   onTargetRiskPct: (value: number) => void
   onMaxWeightPct: (value: number) => void
@@ -18,6 +20,12 @@ const OBJECTIVES: { value: Objective; label: string }[] = [
   { value: 'min_variance', label: 'Minimum Variance' },
   { value: 'target_return', label: 'Target Return' },
   { value: 'target_risk', label: 'Target Risk' },
+]
+
+const RISK_MODELS: { value: RiskModel; label: string }[] = [
+  { value: 'sample', label: 'Sample covariance' },
+  { value: 'ledoit_wolf', label: 'Ledoit-Wolf shrinkage' },
+  { value: 'ewma', label: 'EWMA' },
 ]
 
 const LOOKBACKS: { value: number; label: string }[] = [
@@ -34,6 +42,17 @@ export function ObjectiveControls(props: Props) {
         <label>Objective</label>
         <select value={props.objective} onChange={(event) => props.onObjective(event.target.value as Objective)}>
           {OBJECTIVES.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Risk model</label>
+        <select value={props.riskModel} onChange={(event) => props.onRiskModel(event.target.value as RiskModel)}>
+          {RISK_MODELS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

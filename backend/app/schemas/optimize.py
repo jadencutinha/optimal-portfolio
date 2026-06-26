@@ -4,11 +4,26 @@ from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
 Objective = Literal["min_variance", "max_sharpe", "target_return", "target_risk"]
+RiskModel = Literal["sample", "ledoit_wolf", "ewma"]
+
+
+class AssetBound(BaseModel):
+    ticker: str
+    min_weight: float | None = Field(default=None, ge=-1.0, le=1.0)
+    max_weight: float | None = Field(default=None, gt=0.0, le=1.0)
+
+
+class SectorCap(BaseModel):
+    sector: str
+    max_weight: float | None = Field(default=None, gt=0.0, le=1.0)
+    min_weight: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class OptimizeRequest(BaseModel):
     tickers: list[str] = Field(min_length=2, max_length=50)
     objective: Objective = "max_sharpe"
+    risk_model: RiskModel = "sample"
+    ewma_lambda: float = Field(default=0.94, gt=0.5, lt=1.0)
     target_return: float | None = Field(default=None, ge=-1.0, le=2.0)
     target_risk: float | None = Field(default=None, gt=0.0, le=2.0)
     start: date | None = None
@@ -16,6 +31,8 @@ class OptimizeRequest(BaseModel):
     lookback_days: int | None = Field(default=None, ge=30, le=3650)
     min_weight: float = Field(default=0.0, ge=-1.0, le=1.0)
     max_weight: float = Field(default=1.0, gt=0.0, le=1.0)
+    asset_bounds: list[AssetBound] = Field(default_factory=list)
+    sector_caps: list[SectorCap] = Field(default_factory=list)
     risk_free_rate: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="after")
@@ -46,6 +63,7 @@ class OptimizeRequest(BaseModel):
 class WeightAllocation(BaseModel):
     ticker: str
     weight: float
+    sector: str | None = None
 
 
 class PortfolioMetrics(BaseModel):
@@ -57,11 +75,31 @@ class PortfolioMetrics(BaseModel):
 class OptimizeResponse(BaseModel):
     objective: Objective
     provider: str
+    risk_model: RiskModel
     as_of_start: date
     as_of_end: date
     n_assets: int
     solver_status: str
     risk_free_rate: float
+    covariance_shrinkage: float | None = None
     weights: list[WeightAllocation]
     metrics: PortfolioMetrics
     run_id: int | None = None
+
+
+class FrontierPointSchema(BaseModel):
+    expected_return: float
+    volatility: float
+    sharpe_ratio: float
+    weights: list[WeightAllocation]
+
+
+class FrontierResponse(BaseModel):
+    provider: str
+    risk_model: RiskModel
+    as_of_start: date
+    as_of_end: date
+    risk_free_rate: float
+    points: list[FrontierPointSchema]
+    min_variance_index: int
+    tangency_index: int

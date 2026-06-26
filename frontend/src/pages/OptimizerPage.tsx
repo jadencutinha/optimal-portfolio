@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { useOptimize, useUniverse } from '../api/queries'
-import type { Objective, OptimizeRequest } from '../api/types'
+import { useFrontier, useOptimize, useUniverse } from '../api/queries'
+import type { AssetBound, Objective, OptimizeRequest, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
+import { ConstraintBuilder } from '../components/ConstraintBuilder'
+import { FrontierChart } from '../components/FrontierChart'
 import { ObjectiveControls } from '../components/ObjectiveControls'
+import { PortfolioDetail } from '../components/PortfolioDetail'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
@@ -12,13 +15,18 @@ const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', '
 export function OptimizerPage() {
   const universe = useUniverse()
   const optimize = useOptimize()
+  const frontier = useFrontier()
 
   const [tickers, setTickers] = useState<string[]>(DEFAULT_TICKERS)
   const [objective, setObjective] = useState<Objective>('max_sharpe')
+  const [riskModel, setRiskModel] = useState<RiskModel>('sample')
   const [targetReturnPct, setTargetReturnPct] = useState(15)
   const [targetRiskPct, setTargetRiskPct] = useState(18)
   const [maxWeightPct, setMaxWeightPct] = useState(35)
   const [lookbackDays, setLookbackDays] = useState(756)
+  const [sectorCaps, setSectorCaps] = useState<SectorCap[]>([])
+  const [assetBounds, setAssetBounds] = useState<AssetBound[]>([])
+  const [selectedFrontierIndex, setSelectedFrontierIndex] = useState<number | null>(null)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -26,17 +34,33 @@ export function OptimizerPage() {
     const request: OptimizeRequest = {
       tickers,
       objective,
+      risk_model: riskModel,
       lookback_days: lookbackDays,
       min_weight: 0,
       max_weight: maxWeightPct / 100,
       target_return: objective === 'target_return' ? targetReturnPct / 100 : null,
       target_risk: objective === 'target_risk' ? targetRiskPct / 100 : null,
+      asset_bounds: assetBounds,
+      sector_caps: sectorCaps,
     }
+    setSelectedFrontierIndex(null)
     optimize.mutate(request)
+    frontier.mutate({
+      tickers,
+      lookback_days: lookbackDays,
+      min_weight: 0,
+      max_weight: maxWeightPct / 100,
+      risk_model: riskModel,
+      points: 25,
+    })
   }
 
   const result = optimize.data
+  const frontierData = frontier.data
   const errorMessage = optimize.isError ? extractError(optimize.error) : null
+
+  const selectedPoint =
+    frontierData && selectedFrontierIndex !== null ? frontierData.points[selectedFrontierIndex] : null
 
   return (
     <div className="optimizer">
@@ -45,15 +69,25 @@ export function OptimizerPage() {
         <TickerInput tickers={tickers} suggestions={universe.data?.assets ?? []} onChange={setTickers} />
         <ObjectiveControls
           objective={objective}
+          riskModel={riskModel}
           targetReturnPct={targetReturnPct}
           targetRiskPct={targetRiskPct}
           maxWeightPct={maxWeightPct}
           lookbackDays={lookbackDays}
           onObjective={setObjective}
+          onRiskModel={setRiskModel}
           onTargetReturnPct={setTargetReturnPct}
           onTargetRiskPct={setTargetRiskPct}
           onMaxWeightPct={setMaxWeightPct}
           onLookbackDays={setLookbackDays}
+        />
+        <ConstraintBuilder
+          tickers={tickers}
+          universe={universe.data?.assets ?? []}
+          sectorCaps={sectorCaps}
+          assetBounds={assetBounds}
+          onSectorCaps={setSectorCaps}
+          onAssetBounds={setAssetBounds}
         />
         <button className="primary" disabled={!canSubmit} onClick={submit}>
           {optimize.isPending ? 'Optimizing…' : 'Optimize Portfolio'}
@@ -75,9 +109,40 @@ export function OptimizerPage() {
               <WeightsTable weights={result.weights} />
             </div>
             <p className="provenance">
-              {result.n_assets} assets · {result.provider} data · {result.as_of_start} → {result.as_of_end} · solver{' '}
-              {result.solver_status}
+              {result.n_assets} assets · {result.provider} data · {result.risk_model} ·{' '}
+              {result.as_of_start} → {result.as_of_end} · solver {result.solver_status}
+              {result.covariance_shrinkage !== null && ` · shrinkage ${result.covariance_shrinkage.toFixed(2)}`}
             </p>
+
+            {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
+            {frontierData && (
+              <div className="frontier-section">
+                <h3>Efficient Frontier</h3>
+                <FrontierChart
+                  frontier={frontierData}
+                  portfolio={result.metrics}
+                  selectedIndex={selectedFrontierIndex}
+                  onSelect={setSelectedFrontierIndex}
+                />
+                {selectedPoint ? (
+                  <PortfolioDetail
+                    title="Selected frontier portfolio"
+                    weights={selectedPoint.weights}
+                    expectedReturn={selectedPoint.expected_return}
+                    volatility={selectedPoint.volatility}
+                    sharpe={selectedPoint.sharpe_ratio}
+                  />
+                ) : (
+                  <PortfolioDetail
+                    title="Your optimized portfolio"
+                    weights={result.weights}
+                    expectedReturn={result.metrics.expected_return}
+                    volatility={result.metrics.volatility}
+                    sharpe={result.metrics.sharpe_ratio}
+                  />
+                )}
+              </div>
+            )}
           </div>
         )}
       </section>

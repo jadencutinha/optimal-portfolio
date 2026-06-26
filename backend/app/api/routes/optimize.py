@@ -4,11 +4,13 @@ from app.api.deps import (
     get_optimization_repository,
     get_price_repository,
     get_provider,
+    get_sector_provider,
     get_settings,
 )
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.repository import PriceRepository
+from app.data.sectors import SectorProvider
 from app.optimizer.repository import OptimizationRepository
 from app.optimizer.service import OptimizationServiceError, run_optimization
 from app.schemas.common import OptimizationRunDetail, OptimizationRunSummary
@@ -22,11 +24,13 @@ async def optimize(
     request: OptimizeRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
+    sector_provider: SectorProvider = Depends(get_sector_provider),
     optimization_repository: OptimizationRepository = Depends(get_optimization_repository),
     price_repository: PriceRepository = Depends(get_price_repository),
 ) -> OptimizeResponse:
+    sectors = await sector_provider.resolve(request.tickers)
     try:
-        response, frame = await run_optimization(request, provider, settings)
+        response, frame = await run_optimization(request, provider, settings, sectors)
     except OptimizationServiceError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
 
