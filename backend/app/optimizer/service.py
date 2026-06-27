@@ -62,7 +62,12 @@ def _estimate(
 
 
 def _dispatch(
-    request: OptimizeRequest, mu: np.ndarray, covariance: np.ndarray, risk_free_rate: float, bounds
+    request: OptimizeRequest,
+    mu: np.ndarray,
+    covariance: np.ndarray,
+    returns: np.ndarray,
+    risk_free_rate: float,
+    bounds,
 ) -> tuple[np.ndarray, str]:
     if request.objective == "min_variance":
         return markowitz.min_variance(mu, covariance, bounds=bounds)
@@ -70,7 +75,13 @@ def _dispatch(
         return markowitz.max_sharpe(mu, covariance, risk_free_rate=risk_free_rate, bounds=bounds)
     if request.objective == "target_return":
         return markowitz.target_return(mu, covariance, target=request.target_return, bounds=bounds)
-    return markowitz.target_risk(mu, covariance, target_volatility=request.target_risk, bounds=bounds)
+    if request.objective == "target_risk":
+        return markowitz.target_risk(mu, covariance, target_volatility=request.target_risk, bounds=bounds)
+    if request.objective == "risk_parity":
+        return markowitz.risk_parity(covariance, bounds=bounds)
+    if request.objective == "max_diversification":
+        return markowitz.max_diversification(covariance, bounds=bounds)
+    return markowitz.min_cvar(returns, request.cvar_alpha, bounds=bounds)
 
 
 def _allocations(
@@ -95,7 +106,12 @@ async def run_optimization(
     start, end = _resolve_dates(request.start, request.end, request.lookback_days, settings)
     frame = await _price_frame(request.tickers, start, end, provider, settings)
     tickers = list(frame.columns)
-    mu, covariance, shrinkage = _estimate(frame, settings, request.risk_model, request.ewma_lambda)
+    returns_frame = daily_returns(frame)
+    mu = annualized_mean(returns_frame, settings.trading_days).to_numpy()
+    covariance, shrinkage = estimate_covariance(
+        returns_frame, settings.trading_days, request.risk_model, request.ewma_lambda
+    )
+    returns_matrix = returns_frame.to_numpy()
     risk_free_rate = request.risk_free_rate if request.risk_free_rate is not None else settings.risk_free_rate
 
     try:
@@ -111,7 +127,7 @@ async def run_optimization(
         raise OptimizationServiceError(str(error), 422) from error
 
     try:
-        weights, status = _dispatch(request, mu, covariance, risk_free_rate, bounds)
+        weights, status = _dispatch(request, mu, covariance, returns_matrix, risk_free_rate, bounds)
     except markowitz.OptimizationError as error:
         raise OptimizationServiceError(str(error), 422) from error
 

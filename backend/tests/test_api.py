@@ -46,6 +46,21 @@ def test_optimize_rejects_single_ticker(client: TestClient) -> None:
     assert response.status_code == 422
 
 
+def test_optimize_advanced_objectives(client: TestClient) -> None:
+    for objective in ("risk_parity", "max_diversification", "cvar"):
+        payload = {
+            "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"],
+            "objective": objective,
+            "lookback_days": 500,
+        }
+        response = client.post("/api/optimize", json=payload)
+        assert response.status_code == 200, f"{objective}: {response.text}"
+        body = response.json()
+        total = sum(allocation["weight"] for allocation in body["weights"])
+        assert abs(total - 1.0) < 1e-2
+        assert body["objective"] == objective
+
+
 def test_optimize_with_ledoit_wolf_reports_shrinkage(client: TestClient) -> None:
     payload = {
         "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "JNJ"],

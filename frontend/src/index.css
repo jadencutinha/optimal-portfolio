@@ -621,6 +621,15 @@ button.primary.modal-submit {
   gap: 0 16px;
 }
 
+.bt-form .field {
+  min-width: 0;
+}
+
+.bt-form select,
+.bt-form input[type='range'] {
+  width: 100%;
+}
+
 .bt-benchmarks {
   display: flex;
   flex-wrap: wrap;

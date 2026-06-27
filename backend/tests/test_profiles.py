@@ -2,8 +2,19 @@ import asyncio
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from app.auth.plans import PLANS, entitlements_for
 from app.auth.repository import ProfileRepository
 from app.db.models import Base
+
+
+def test_entitlements_resolve_per_plan() -> None:
+    for plan in PLANS:
+        entitlements = entitlements_for(plan)
+        assert "max_tickers" in entitlements
+        assert "risk_models" in entitlements
+    assert entitlements_for("pro")["advanced_optimizers"] is True
+    assert entitlements_for("free")["advanced_optimizers"] is False
+    assert entitlements_for("unknown-plan") == entitlements_for("free")
 
 
 def _run(coro):

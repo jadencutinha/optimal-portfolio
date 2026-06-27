@@ -150,6 +150,57 @@ def max_sharpe(
     return _finalize(scaled.value / kappa.value, resolved.long_only), problem.status
 
 
+def max_diversification(
+    covariance: np.ndarray, w_min: float = 0.0, w_max: float = 1.0, *, bounds: WeightBounds | None = None
+) -> tuple[np.ndarray, str]:
+    n = covariance.shape[0]
+    resolved = _resolve(n, w_min, w_max, bounds)
+    sigma = np.sqrt(np.clip(np.diag(covariance), 1e-12, None))
+    scaled = cp.Variable(n)
+    kappa = cp.Variable(nonneg=True)
+    constraints = [sigma @ scaled == 1] + _base_constraints(scaled, resolved, scale=kappa)
+    problem = cp.Problem(cp.Minimize(cp.quad_form(scaled, _psd(covariance))), constraints)
+    problem.solve()
+    if problem.status not in _OPTIMAL or kappa.value is None or kappa.value <= 1e-10:
+        raise OptimizationError("Maximum diversification optimization failed to converge.")
+    return _finalize(scaled.value / kappa.value, resolved.long_only), problem.status
+
+
+def risk_parity(covariance: np.ndarray, *, bounds: WeightBounds | None = None) -> tuple[np.ndarray, str]:
+    n = covariance.shape[0]
+    weights = cp.Variable(n, nonneg=True)
+    objective = 0.5 * cp.quad_form(weights, _psd(covariance)) - cp.sum(cp.log(weights))
+    problem = cp.Problem(cp.Minimize(objective))
+    problem.solve()
+    _check(problem.status, "risk parity")
+    if weights.value is None:
+        raise OptimizationError("Risk parity optimization failed to converge.")
+    return _finalize(weights.value, True), problem.status
+
+
+def min_cvar(
+    returns: np.ndarray,
+    alpha: float = 0.95,
+    w_min: float = 0.0,
+    w_max: float = 1.0,
+    *,
+    bounds: WeightBounds | None = None,
+) -> tuple[np.ndarray, str]:
+    periods, n = returns.shape
+    resolved = _resolve(n, w_min, w_max, bounds)
+    weights = cp.Variable(n)
+    value_at_risk = cp.Variable()
+    shortfall = cp.Variable(periods, nonneg=True)
+    losses = -(returns @ weights)
+    constraints = _base_constraints(weights, resolved) + [shortfall >= losses - value_at_risk]
+    objective = value_at_risk + (1.0 / ((1.0 - alpha) * periods)) * cp.sum(shortfall)
+    problem = cp.Problem(cp.Minimize(objective), constraints)
+    problem.solve()
+    if problem.status not in _OPTIMAL or weights.value is None:
+        raise OptimizationError("CVaR optimization failed to converge.")
+    return _finalize(weights.value, resolved.long_only), problem.status
+
+
 def portfolio_metrics(
     weights: np.ndarray, mu: np.ndarray, covariance: np.ndarray, risk_free_rate: float
 ) -> tuple[float, float, float]:

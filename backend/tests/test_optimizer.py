@@ -58,3 +58,35 @@ def test_max_weight_bound_enforced() -> None:
     mu, covariance = make_problem()
     weights, _ = markowitz.min_variance(mu, covariance, 0.0, 0.5)
     assert (weights <= 0.5 + 1e-6).all()
+
+
+def test_risk_parity_equalizes_risk_contributions() -> None:
+    _, covariance = make_problem()
+    weights, status = markowitz.risk_parity(covariance)
+    assert status in markowitz._OPTIMAL
+    assert abs(weights.sum() - 1.0) < 1e-6
+    assert (weights >= -1e-9).all()
+    contributions = weights * (covariance @ weights)
+    assert contributions.std() / contributions.mean() < 0.2
+
+
+def test_max_diversification_beats_equal_weight() -> None:
+    _, covariance = make_problem()
+    weights, _ = markowitz.max_diversification(covariance)
+    sigma = np.sqrt(np.diag(covariance))
+    equal_weight = np.ones(len(sigma)) / len(sigma)
+
+    def diversification_ratio(w: np.ndarray) -> float:
+        return (w @ sigma) / np.sqrt(w @ covariance @ w)
+
+    assert diversification_ratio(weights) >= diversification_ratio(equal_weight) - 1e-6
+    assert abs(weights.sum() - 1.0) < 1e-6
+
+
+def test_min_cvar_is_fully_invested_and_long_only() -> None:
+    rng = np.random.default_rng(0)
+    returns = rng.normal(0.0005, 0.01, (300, 4))
+    weights, status = markowitz.min_cvar(returns, 0.95)
+    assert status in markowitz._OPTIMAL
+    assert abs(weights.sum() - 1.0) < 1e-6
+    assert (weights >= -1e-9).all()

@@ -5,12 +5,14 @@ interface Props {
   riskModel: RiskModel
   targetReturnPct: number
   targetRiskPct: number
+  cvarConfidencePct: number
   maxWeightPct: number
   lookbackDays: number
   onObjective: (value: Objective) => void
   onRiskModel: (value: RiskModel) => void
   onTargetReturnPct: (value: number) => void
   onTargetRiskPct: (value: number) => void
+  onCvarConfidencePct: (value: number) => void
   onMaxWeightPct: (value: number) => void
   onLookbackDays: (value: number) => void
 }
@@ -18,6 +20,9 @@ interface Props {
 const OBJECTIVES: { value: Objective; label: string }[] = [
   { value: 'max_sharpe', label: 'Maximum Sharpe' },
   { value: 'min_variance', label: 'Minimum Variance' },
+  { value: 'risk_parity', label: 'Risk Parity' },
+  { value: 'max_diversification', label: 'Max Diversification' },
+  { value: 'cvar', label: 'Minimum CVaR' },
   { value: 'target_return', label: 'Target Return' },
   { value: 'target_risk', label: 'Target Risk' },
 ]
@@ -82,6 +87,19 @@ export function ObjectiveControls(props: Props) {
             max={50}
             value={props.targetRiskPct}
             onChange={(event) => props.onTargetRiskPct(Number(event.target.value))}
+          />
+        </div>
+      )}
+
+      {props.objective === 'cvar' && (
+        <div className="field">
+          <label>CVaR confidence: {props.cvarConfidencePct}%</label>
+          <input
+            type="range"
+            min={80}
+            max={99}
+            value={props.cvarConfidencePct}
+            onChange={(event) => props.onCvarConfidencePct(Number(event.target.value))}
           />
         </div>
       )}

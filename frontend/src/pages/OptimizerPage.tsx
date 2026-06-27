@@ -22,6 +22,7 @@ export function OptimizerPage() {
   const [riskModel, setRiskModel] = useState<RiskModel>('sample')
   const [targetReturnPct, setTargetReturnPct] = useState(15)
   const [targetRiskPct, setTargetRiskPct] = useState(18)
+  const [cvarConfidencePct, setCvarConfidencePct] = useState(95)
   const [maxWeightPct, setMaxWeightPct] = useState(35)
   const [lookbackDays, setLookbackDays] = useState(756)
   const [sectorCaps, setSectorCaps] = useState<SectorCap[]>([])
@@ -40,6 +41,7 @@ export function OptimizerPage() {
       max_weight: maxWeightPct / 100,
       target_return: objective === 'target_return' ? targetReturnPct / 100 : null,
       target_risk: objective === 'target_risk' ? targetRiskPct / 100 : null,
+      cvar_alpha: cvarConfidencePct / 100,
       asset_bounds: assetBounds,
       sector_caps: sectorCaps,
     }
@@ -72,12 +74,14 @@ export function OptimizerPage() {
           riskModel={riskModel}
           targetReturnPct={targetReturnPct}
           targetRiskPct={targetRiskPct}
+          cvarConfidencePct={cvarConfidencePct}
           maxWeightPct={maxWeightPct}
           lookbackDays={lookbackDays}
           onObjective={setObjective}
           onRiskModel={setRiskModel}
           onTargetReturnPct={setTargetReturnPct}
           onTargetRiskPct={setTargetRiskPct}
+          onCvarConfidencePct={setCvarConfidencePct}
           onMaxWeightPct={setMaxWeightPct}
           onLookbackDays={setLookbackDays}
         />

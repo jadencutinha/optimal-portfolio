@@ -3,7 +3,15 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-Objective = Literal["min_variance", "max_sharpe", "target_return", "target_risk"]
+Objective = Literal[
+    "min_variance",
+    "max_sharpe",
+    "target_return",
+    "target_risk",
+    "risk_parity",
+    "max_diversification",
+    "cvar",
+]
 RiskModel = Literal["sample", "ledoit_wolf", "ewma"]
 
 
@@ -24,6 +32,7 @@ class OptimizeRequest(BaseModel):
     objective: Objective = "max_sharpe"
     risk_model: RiskModel = "sample"
     ewma_lambda: float = Field(default=0.94, gt=0.5, lt=1.0)
+    cvar_alpha: float = Field(default=0.95, ge=0.8, lt=1.0)
     target_return: float | None = Field(default=None, ge=-1.0, le=2.0)
     target_risk: float | None = Field(default=None, gt=0.0, le=2.0)
     start: date | None = None

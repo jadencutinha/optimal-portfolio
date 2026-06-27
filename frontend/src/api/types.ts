@@ -1,4 +1,11 @@
-export type Objective = 'min_variance' | 'max_sharpe' | 'target_return' | 'target_risk'
+export type Objective =
+  | 'min_variance'
+  | 'max_sharpe'
+  | 'target_return'
+  | 'target_risk'
+  | 'risk_parity'
+  | 'max_diversification'
+  | 'cvar'
 export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma'
 
 export interface UniverseAsset {
@@ -27,6 +34,7 @@ export interface OptimizeRequest {
   tickers: string[]
   objective: Objective
   risk_model: RiskModel
+  cvar_alpha?: number
   target_return?: number | null
   target_risk?: number | null
   lookback_days?: number | null
