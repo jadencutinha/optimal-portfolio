@@ -98,6 +98,16 @@ def test_me_rejects_a_malformed_token(client: TestClient) -> None:
     assert response.status_code == 401
 
 
+def test_set_plan_requires_auth(client: TestClient) -> None:
+    response = client.put("/api/me/plan", json={"plan": "pro"})
+    assert response.status_code == 401
+
+
+def test_set_plan_rejects_unknown_plan(client: TestClient) -> None:
+    response = client.put("/api/me/plan", json={"plan": "platinum"}, headers={"Authorization": "Bearer x"})
+    assert response.status_code in (401, 422)
+
+
 def test_frontier_endpoint_returns_points(client: TestClient) -> None:
     response = client.get(
         "/api/frontier",

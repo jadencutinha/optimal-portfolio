@@ -1,6 +1,5 @@
 import { AuthBar } from './components/AuthBar'
-import { Greeting } from './components/Greeting'
-import { OptimizerPage } from './pages/OptimizerPage'
+import { Home } from './pages/Home'
 
 export default function App() {
   return (
@@ -8,7 +7,7 @@ export default function App() {
       <header className="app-header">
         <div className="brand">
           <div>
-            <h1>Optimal Portfolio</h1>
+            <h1>PortfolioU</h1>
             <p>Convex portfolio optimization on real market data</p>
           </div>
         </div>
@@ -20,8 +19,7 @@ export default function App() {
         </div>
       </header>
       <main className="app-main">
-        <Greeting />
-        <OptimizerPage />
+        <Home />
       </main>
     </div>
   )

@@ -10,6 +10,7 @@ class ProfileData:
     id: str
     email: str | None
     plan: str
+    plan_selected: bool = False
 
 
 class ProfileRepository:
@@ -26,4 +27,14 @@ class ProfileRepository:
             elif email and profile.email != email:
                 profile.email = email
                 await session.commit()
-            return ProfileData(id=profile.id, email=profile.email, plan=profile.plan)
+            return ProfileData(profile.id, profile.email, profile.plan, profile.plan_selected)
+
+    async def set_plan(self, user_id: str, plan: str) -> ProfileData | None:
+        async with self._session_factory() as session:
+            profile = await session.get(Profile, user_id)
+            if profile is None:
+                return None
+            profile.plan = plan
+            profile.plan_selected = True
+            await session.commit()
+            return ProfileData(profile.id, profile.email, profile.plan, profile.plan_selected)

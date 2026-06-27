@@ -1,3 +1,6 @@
+import ssl
+
+import certifi
 import jwt
 from jwt import PyJWKClient
 
@@ -14,7 +17,8 @@ class SupabaseVerifier:
         self._jwks_client: PyJWKClient | None = None
         if settings.supabase_url:
             jwks_url = f"{settings.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
-            self._jwks_client = PyJWKClient(jwks_url)
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            self._jwks_client = PyJWKClient(jwks_url, ssl_context=ssl_context)
 
     def verify(self, token: str) -> dict:
         try:

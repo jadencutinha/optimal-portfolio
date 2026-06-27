@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/useAuth'
 import { apiClient } from './client'
 import type {
@@ -7,6 +7,7 @@ import type {
   MeResponse,
   OptimizeRequest,
   OptimizeResponse,
+  Plan,
   UniverseResponse,
 } from './types'
 
@@ -16,6 +17,14 @@ export function useMe() {
     queryKey: ['me', session?.user?.id ?? 'anon'],
     enabled: Boolean(session),
     queryFn: async () => (await apiClient.get<MeResponse>('/api/me')).data,
+  })
+}
+
+export function useSetPlan() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (plan: Plan) => (await apiClient.put<MeResponse>('/api/me/plan', { plan })).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
   })
 }
 

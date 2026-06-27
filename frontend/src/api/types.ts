@@ -81,10 +81,13 @@ export interface FrontierResponse {
   tangency_index: number
 }
 
+export type Plan = 'free' | 'pro' | 'course'
+
 export interface MeResponse {
   id: string
   email: string | null
-  plan: string
+  plan: Plan
+  plan_selected: boolean
   entitlements: Record<string, unknown>
 }
 
