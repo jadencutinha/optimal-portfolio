@@ -99,3 +99,72 @@ export interface FrontierParams {
   risk_model: RiskModel
   points: number
 }
+
+export type BacktestObjective = 'min_variance' | 'max_sharpe'
+export type RebalanceCadence = 'monthly' | 'quarterly' | 'annual'
+export type BenchmarkName = 'index' | 'equal_weight' | 'sixty_forty'
+
+export interface BacktestRequest {
+  tickers: string[]
+  objective: BacktestObjective
+  risk_model: RiskModel
+  history_days?: number | null
+  estimation_window: number
+  rebalance: RebalanceCadence
+  cost_bps: number
+  turnover_budget?: number | null
+  no_trade_band: number
+  min_weight: number
+  max_weight: number
+  benchmarks: BenchmarkName[]
+}
+
+export interface CurvePoint {
+  date: string
+  equity: number
+  drawdown: number
+}
+
+export interface RollingPoint {
+  date: string
+  sharpe: number
+}
+
+export interface StrategyStats {
+  total_return: number
+  cagr: number
+  annual_volatility: number
+  sharpe_ratio: number
+  sortino_ratio: number
+  max_drawdown: number
+  calmar_ratio: number
+  avg_turnover: number
+  transaction_cost: number
+}
+
+export interface RelativeStats {
+  alpha: number
+  beta: number
+  tracking_error: number
+  information_ratio: number
+}
+
+export interface StrategyResult {
+  name: string
+  kind: 'strategy' | 'benchmark'
+  stats: StrategyStats
+  relative: RelativeStats | null
+  curve: CurvePoint[]
+  rolling_sharpe: RollingPoint[]
+}
+
+export interface BacktestResponse {
+  provider: string
+  as_of_start: string
+  as_of_end: string
+  rebalance: RebalanceCadence
+  cost_bps: number
+  risk_free_rate: number
+  strategies: StrategyResult[]
+  run_id: number | null
+}

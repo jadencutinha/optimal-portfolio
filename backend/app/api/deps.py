@@ -2,6 +2,7 @@ from fastapi import Depends, Header, HTTPException, Request
 
 from app.auth.repository import ProfileData, ProfileRepository
 from app.auth.supabase import AuthError, SupabaseVerifier
+from app.backtest.repository import BacktestRepository
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.repository import PriceRepository
@@ -19,6 +20,10 @@ def get_provider(request: Request) -> DataProvider:
 
 def get_sector_provider(request: Request) -> SectorProvider:
     return request.app.state.sector_provider
+
+
+def get_backtest_repository(request: Request) -> BacktestRepository:
+    return request.app.state.backtest_repository
 
 
 def get_verifier(request: Request) -> SupabaseVerifier:

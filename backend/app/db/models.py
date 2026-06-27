@@ -40,3 +40,13 @@ class OptimizationRun(Base):
     request: Mapped[dict] = mapped_column(JSON)
     weights: Mapped[dict] = mapped_column(JSON)
     metrics: Mapped[dict] = mapped_column(JSON)
+
+
+class BacktestRun(Base):
+    __tablename__ = "backtest_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    tickers: Mapped[list] = mapped_column(JSON)
+    config: Mapped[dict] = mapped_column(JSON)
+    result: Mapped[dict] = mapped_column(JSON)

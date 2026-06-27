@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     default_lookback_days: int = 756
     min_observations: int = 60
 
+    backtest_history_days: int = 1260
+    backtest_estimation_window: int = 252
+
     cors_origins: list[str] = Field(
         default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"]
     )

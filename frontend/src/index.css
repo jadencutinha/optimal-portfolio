@@ -579,11 +579,93 @@ button.primary.modal-submit {
   font-size: 14px;
 }
 
-.optimizer {
+.optimizer,
+.backtest {
   display: grid;
   grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tab {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.bt-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.bt-benchmarks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.inline-check input {
+  width: auto;
+}
+
+.backtest-results h3 {
+  margin: 22px 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+.bt-chart {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 6px 2px;
+}
+
+.bt-table-wrap {
+  overflow-x: auto;
+}
+
+.backtest-metrics {
+  font-size: 13px;
+  min-width: 720px;
+}
+
+.backtest-metrics th,
+.backtest-metrics td {
+  padding-right: 14px;
+  white-space: nowrap;
 }
 
 .panel {
@@ -632,6 +714,10 @@ input:focus {
 }
 
 input[type='range'] {
+  accent-color: var(--accent);
+}
+
+input[type='checkbox'] {
   accent-color: var(--accent);
 }
 
@@ -1018,7 +1104,8 @@ table.weights td {
 }
 
 @media (max-width: 920px) {
-  .optimizer {
+  .optimizer,
+  .backtest {
     grid-template-columns: 1fr;
   }
   .results-row {

@@ -119,3 +119,43 @@ def test_frontier_endpoint_returns_points(client: TestClient) -> None:
     volatilities = [point["volatility"] for point in body["points"]]
     assert body["min_variance_index"] == min(range(len(volatilities)), key=lambda i: volatilities[i])
     assert 0 <= body["tangency_index"] < len(body["points"])
+
+
+def test_backtest_runs_persists_and_retrieves(client: TestClient) -> None:
+    payload = {
+        "tickers": ["AAPL", "MSFT", "GOOGL", "JPM"],
+        "objective": "min_variance",
+        "estimation_window": 120,
+        "history_days": 500,
+        "rebalance": "quarterly",
+        "benchmarks": ["index", "equal_weight"],
+    }
+    response = client.post("/api/backtest", json=payload)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    names = [strategy["name"] for strategy in body["strategies"]]
+    assert "Optimized portfolio" in names
+    assert any(strategy["kind"] == "benchmark" for strategy in body["strategies"])
+    assert body["run_id"] is not None
+
+    strategy = body["strategies"][0]
+    assert strategy["name"] == "Optimized portfolio"
+    assert len(strategy["curve"]) > 0
+    assert "sharpe_ratio" in strategy["stats"]
+    assert strategy["relative"] is not None
+    assert any(s["relative"] is not None for s in body["strategies"] if s["kind"] == "benchmark")
+
+    run_id = body["run_id"]
+    retrieved = client.get(f"/api/backtest/runs/{run_id}")
+    assert retrieved.status_code == 200
+    assert retrieved.json()["run_id"] == run_id
+
+
+def test_backtest_rejects_single_ticker(client: TestClient) -> None:
+    response = client.post("/api/backtest", json={"tickers": ["AAPL"]})
+    assert response.status_code == 422
+
+
+def test_backtest_missing_run_returns_404(client: TestClient) -> None:
+    response = client.get("/api/backtest/runs/999999")
+    assert response.status_code == 404

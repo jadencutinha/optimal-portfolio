@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/useAuth'
 import { apiClient } from './client'
 import type {
+  BacktestRequest,
+  BacktestResponse,
   FrontierParams,
   FrontierResponse,
   MeResponse,
@@ -39,6 +41,13 @@ export function useOptimize() {
   return useMutation({
     mutationFn: async (request: OptimizeRequest) =>
       (await apiClient.post<OptimizeResponse>('/api/optimize', request)).data,
+  })
+}
+
+export function useBacktest() {
+  return useMutation({
+    mutationFn: async (request: BacktestRequest) =>
+      (await apiClient.post<BacktestResponse>('/api/backtest', request)).data,
   })
 }
 

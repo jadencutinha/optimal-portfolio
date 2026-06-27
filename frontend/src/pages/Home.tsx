@@ -6,7 +6,7 @@ import { PlanSelection } from '../components/PlanSelection'
 import { CoursePage } from './CoursePage'
 import { FreePage } from './FreePage'
 import { Landing } from './Landing'
-import { OptimizerPage } from './OptimizerPage'
+import { ProWorkspace } from './ProWorkspace'
 
 export function Home() {
   const { session } = useAuth()
@@ -59,7 +59,7 @@ export function Home() {
       </div>
       {plan === 'course' && <CoursePage />}
       {plan === 'free' && <FreePage />}
-      {plan === 'pro' && <OptimizerPage />}
+      {plan === 'pro' && <ProWorkspace />}
     </>
   )
 }
