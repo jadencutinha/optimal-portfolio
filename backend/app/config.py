@@ -22,6 +22,10 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite+aiosqlite:///./optimal_portfolio.db"
 
+    supabase_url: str = ""
+    supabase_jwt_secret: str | None = None
+    supabase_service_role_key: str | None = None
+
     risk_free_rate: float = 0.02
     trading_days: int = 252
     default_lookback_days: int = 756

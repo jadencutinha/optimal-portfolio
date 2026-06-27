@@ -19,6 +19,15 @@ class PriceBar(Base):
     close: Mapped[float] = mapped_column(Float)
 
 
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    email: Mapped[str | None] = mapped_column(String(320), nullable=True)
+    plan: Mapped[str] = mapped_column(String(16), default="free", server_default="free")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class OptimizationRun(Base):
     __tablename__ = "optimization_runs"
 

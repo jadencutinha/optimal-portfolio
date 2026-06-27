@@ -88,6 +88,16 @@ def test_optimize_infeasible_sector_cap_returns_422(client: TestClient) -> None:
     assert response.status_code == 422
 
 
+def test_me_requires_a_token(client: TestClient) -> None:
+    response = client.get("/api/me")
+    assert response.status_code == 401
+
+
+def test_me_rejects_a_malformed_token(client: TestClient) -> None:
+    response = client.get("/api/me", headers={"Authorization": "Bearer not-a-real-jwt"})
+    assert response.status_code == 401
+
+
 def test_frontier_endpoint_returns_points(client: TestClient) -> None:
     response = client.get(
         "/api/frontier",

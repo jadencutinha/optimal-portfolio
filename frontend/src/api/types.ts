@@ -81,6 +81,13 @@ export interface FrontierResponse {
   tangency_index: number
 }
 
+export interface MeResponse {
+  id: string
+  email: string | null
+  plan: string
+  entitlements: Record<string, unknown>
+}
+
 export interface FrontierParams {
   tickers: string[]
   lookback_days: number

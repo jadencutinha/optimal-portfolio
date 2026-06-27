@@ -1,3 +1,5 @@
+import { AuthBar } from './components/AuthBar'
+import { Greeting } from './components/Greeting'
 import { OptimizerPage } from './pages/OptimizerPage'
 
 export default function App() {
@@ -10,11 +12,15 @@ export default function App() {
             <p>Convex portfolio optimization on real market data</p>
           </div>
         </div>
-        <a className="whitepaper-link" href="/whitepaper.html" target="_blank" rel="noreferrer">
-          Whitepaper
-        </a>
+        <div className="header-actions">
+          <AuthBar />
+          <a className="whitepaper-link" href="/whitepaper.html" target="_blank" rel="noreferrer">
+            Whitepaper
+          </a>
+        </div>
       </header>
       <main className="app-main">
+        <Greeting />
         <OptimizerPage />
       </main>
     </div>

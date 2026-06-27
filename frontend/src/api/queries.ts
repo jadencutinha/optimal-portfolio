@@ -1,12 +1,23 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useAuth } from '../auth/useAuth'
 import { apiClient } from './client'
 import type {
   FrontierParams,
   FrontierResponse,
+  MeResponse,
   OptimizeRequest,
   OptimizeResponse,
   UniverseResponse,
 } from './types'
+
+export function useMe() {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['me', session?.user?.id ?? 'anon'],
+    enabled: Boolean(session),
+    queryFn: async () => (await apiClient.get<MeResponse>('/api/me')).data,
+  })
+}
 
 export function useUniverse() {
   return useQuery({

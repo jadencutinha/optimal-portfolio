@@ -3,7 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import frontier, health, optimize, prices, universe
+from app.api.routes import frontier, health, me, optimize, prices, universe
+from app.auth.repository import ProfileRepository
+from app.auth.supabase import SupabaseVerifier
 from app.config import get_settings
 from app.data.cache import build_cache
 from app.data.provider import CachingDataProvider, build_inner_provider
@@ -31,6 +33,8 @@ async def lifespan(app: FastAPI):
     app.state.cache = cache
     app.state.provider = provider
     app.state.sector_provider = SectorProvider(cache, settings)
+    app.state.verifier = SupabaseVerifier(settings)
+    app.state.profile_repository = ProfileRepository(session_factory)
     app.state.optimization_repository = OptimizationRepository(session_factory)
     app.state.price_repository = PriceRepository(session_factory)
 
@@ -57,6 +61,7 @@ def create_app() -> FastAPI:
     app.include_router(prices.router, prefix=settings.api_prefix)
     app.include_router(optimize.router, prefix=settings.api_prefix)
     app.include_router(frontier.router, prefix=settings.api_prefix)
+    app.include_router(me.router, prefix=settings.api_prefix)
     return app
 
 

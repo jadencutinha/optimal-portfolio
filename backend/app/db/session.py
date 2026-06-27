@@ -4,7 +4,8 @@ from app.db.models import Base
 
 
 def create_engine(database_url: str) -> AsyncEngine:
-    return create_async_engine(database_url, future=True)
+    connect_args = {"statement_cache_size": 0} if "asyncpg" in database_url else {}
+    return create_async_engine(database_url, future=True, connect_args=connect_args)
 
 
 def create_session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
