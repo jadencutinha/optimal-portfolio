@@ -6,7 +6,9 @@ export type Objective =
   | 'risk_parity'
   | 'max_diversification'
   | 'cvar'
-export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma'
+  | 'cost_aware'
+export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma' | 'factor'
+export type ReturnModel = 'historical' | 'black_litterman'
 
 export interface UniverseAsset {
   ticker: string
@@ -34,7 +36,10 @@ export interface OptimizeRequest {
   tickers: string[]
   objective: Objective
   risk_model: RiskModel
+  return_model: ReturnModel
   cvar_alpha?: number
+  transaction_cost_bps?: number
+  risk_aversion?: number
   target_return?: number | null
   target_risk?: number | null
   lookback_days?: number | null
@@ -66,6 +71,8 @@ export interface OptimizeResponse {
   solver_status: string
   risk_free_rate: number
   covariance_shrinkage: number | null
+  turnover: number | null
+  transaction_cost: number | null
   weights: WeightAllocation[]
   metrics: PortfolioMetrics
   run_id: number | null
@@ -175,4 +182,62 @@ export interface BacktestResponse {
   risk_free_rate: number
   strategies: StrategyResult[]
   run_id: number | null
+}
+
+export interface CourseSummary {
+  id: string
+  title: string
+  summary: string
+  topic_count: number
+  enrolled: boolean
+  completed: boolean
+}
+
+export interface TopicQuiz {
+  prompt: string
+  options: string[]
+}
+
+export interface CourseTopic {
+  id: string
+  title: string
+  body: string
+  quiz: TopicQuiz
+}
+
+export interface ExamQuestion {
+  id: string
+  prompt: string
+  options: string[]
+}
+
+export interface CourseDetail {
+  id: string
+  title: string
+  summary: string
+  topics: CourseTopic[]
+  exam_question_count: number
+}
+
+export interface AnswerResult {
+  correct: boolean
+  answer: number
+}
+
+export interface ExamResult {
+  score: number
+  total: number
+  percent: number
+  passed: boolean
+  credential_id: string | null
+}
+
+export interface SweepCell {
+  objective: Objective
+  risk_model: RiskModel
+  status: 'ok' | 'error'
+  expected_return: number | null
+  volatility: number | null
+  sharpe_ratio: number | null
+  message?: string
 }

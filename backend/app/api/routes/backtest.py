@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.deps import get_backtest_repository, get_provider, get_settings
+from app.api.deps import get_access, get_backtest_repository, get_provider, get_settings
+from app.auth.gating import Access, require_pro
 from app.backtest.repository import BacktestRepository
 from app.backtest.service import BacktestServiceError, run_backtest
 from app.config import Settings
@@ -15,8 +16,10 @@ async def backtest(
     request: BacktestRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
+    access: Access = Depends(get_access),
     repository: BacktestRepository = Depends(get_backtest_repository),
 ) -> BacktestResponse:
+    require_pro(access.entitlements, "Backtesting")
     try:
         response = await run_backtest(request, provider, settings)
     except BacktestServiceError as error:

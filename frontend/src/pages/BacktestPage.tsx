@@ -79,6 +79,7 @@ export function BacktestPage() {
               <option value="sample">Sample covariance</option>
               <option value="ledoit_wolf">Ledoit-Wolf shrinkage</option>
               <option value="ewma">EWMA</option>
+              <option value="factor">Factor model (PCA)</option>
             </select>
           </div>
 

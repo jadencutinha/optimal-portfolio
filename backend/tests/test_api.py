@@ -61,6 +61,43 @@ def test_optimize_advanced_objectives(client: TestClient) -> None:
         assert body["objective"] == objective
 
 
+def test_optimize_factor_risk_model(client: TestClient) -> None:
+    payload = {
+        "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"],
+        "objective": "min_variance",
+        "risk_model": "factor",
+        "lookback_days": 500,
+    }
+    response = client.post("/api/optimize", json=payload)
+    assert response.status_code == 200, response.text
+    assert response.json()["risk_model"] == "factor"
+
+
+def test_optimize_black_litterman_return_model(client: TestClient) -> None:
+    payload = {
+        "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"],
+        "objective": "max_sharpe",
+        "return_model": "black_litterman",
+        "lookback_days": 500,
+    }
+    response = client.post("/api/optimize", json=payload)
+    assert response.status_code == 200, response.text
+
+
+def test_optimize_cost_aware_reports_turnover(client: TestClient) -> None:
+    payload = {
+        "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"],
+        "objective": "cost_aware",
+        "transaction_cost_bps": 25,
+        "lookback_days": 500,
+    }
+    response = client.post("/api/optimize", json=payload)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["turnover"] is not None
+    assert body["transaction_cost"] is not None
+
+
 def test_optimize_with_ledoit_wolf_reports_shrinkage(client: TestClient) -> None:
     payload = {
         "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "JNJ"],

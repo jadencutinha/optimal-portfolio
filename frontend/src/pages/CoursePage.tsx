@@ -1,30 +1,121 @@
-export function CoursePage() {
-  return (
-    <div className="platform-landing">
-      <h1>Course platform</h1>
-      <p className="lead">Learn portfolio construction by doing — from the basics of investing to convex optimization.</p>
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { apiClient } from '../api/client'
+import { useCourses } from '../api/queries'
+import type { CourseSummary } from '../api/types'
+import { useAuth } from '../auth/useAuth'
+import { CourseModule } from '../components/CourseModule'
+import { FinalExam } from '../components/FinalExam'
+import { displayName } from '../lib/displayName'
 
-      <div className="landing-grid">
-        <section>
-          <h3>What you'll learn</h3>
-          <ul>
-            <li>Investing fundamentals: risk, return, diversification</li>
-            <li>Expected return, volatility, and the Sharpe ratio</li>
-            <li>The Markowitz mean-variance model</li>
-            <li>Risk models and portfolio constraints</li>
-          </ul>
-        </section>
-        <section>
-          <h3>Coming soon</h3>
-          <ul>
-            <li>Interactive lessons wired to the live optimizer</li>
-            <li>Quizzes and progress tracking</li>
-            <li>A verifiable certificate on completion</li>
-          </ul>
-        </section>
+type View = { kind: 'catalog' } | { kind: 'module'; course: CourseSummary } | { kind: 'exam'; course: CourseSummary }
+
+export function CoursePage() {
+  const courses = useCourses()
+  const { session } = useAuth()
+  const queryClient = useQueryClient()
+
+  const [view, setView] = useState<View>({ kind: 'catalog' })
+  const [search, setSearch] = useState('')
+  const [confirming, setConfirming] = useState<CourseSummary | null>(null)
+  const [enrolling, setEnrolling] = useState(false)
+
+  const learner = session ? displayName(session.user) : 'Learner'
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['courses'] })
+
+  const enroll = async (course: CourseSummary) => {
+    setEnrolling(true)
+    await apiClient.post(`/api/courses/${course.id}/enroll`)
+    setEnrolling(false)
+    setConfirming(null)
+    await refresh()
+    setView({ kind: 'module', course })
+  }
+
+  if (view.kind === 'module') {
+    return (
+      <CourseModule
+        courseId={view.course.id}
+        onExam={() => setView({ kind: 'exam', course: view.course })}
+        onBack={() => {
+          refresh()
+          setView({ kind: 'catalog' })
+        }}
+      />
+    )
+  }
+
+  if (view.kind === 'exam') {
+    return (
+      <FinalExam
+        courseId={view.course.id}
+        courseTitle={view.course.title}
+        learner={learner}
+        onClose={() => {
+          refresh()
+          setView({ kind: 'catalog' })
+        }}
+      />
+    )
+  }
+
+  const list = (courses.data ?? []).filter((course) =>
+    `${course.title} ${course.summary}`.toLowerCase().includes(search.toLowerCase()),
+  )
+
+  return (
+    <div className="course-catalog">
+      <h1>Courses</h1>
+      <input
+        className="course-search"
+        placeholder="Search courses…"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
+
+      {courses.isLoading && <p className="muted">Loading courses…</p>}
+
+      <div className="course-grid">
+        {list.map((course) => (
+          <div key={course.id} className={`course-card${course.completed ? ' completed' : ''}`}>
+            {course.completed && <span className="course-badge">✓ Complete</span>}
+            <h3>{course.title}</h3>
+            <p className="muted">{course.summary}</p>
+            <p className="course-meta">{course.topic_count} topics · final exam</p>
+            {course.completed ? (
+              <button className="primary" onClick={() => setView({ kind: 'module', course })}>
+                Review
+              </button>
+            ) : course.enrolled ? (
+              <button className="primary" onClick={() => setView({ kind: 'module', course })}>
+                Continue
+              </button>
+            ) : (
+              <button className="primary" onClick={() => setConfirming(course)}>
+                Enroll
+              </button>
+            )}
+          </div>
+        ))}
+        {!courses.isLoading && list.length === 0 && <p className="muted">No courses match your search.</p>}
       </div>
 
-      <p className="muted">Lessons are in development. Use “Switch platform” above to try Free or Pro in the meantime.</p>
+      {confirming && (
+        <div className="modal-overlay" onClick={() => setConfirming(null)}>
+          <div className="modal-card" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <h2>Enroll in {confirming.title}?</h2>
+            <p className="modal-sub">
+              {confirming.topic_count} topics and a final exam. You can start right away and earn a certificate at 90%.
+            </p>
+            <button className="primary" disabled={enrolling} onClick={() => enroll(confirming)}>
+              {enrolling ? 'Enrolling…' : 'Confirm enrollment'}
+            </button>
+            <button type="button" className="modal-toggle" onClick={() => setConfirming(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

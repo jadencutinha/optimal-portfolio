@@ -11,8 +11,10 @@ Objective = Literal[
     "risk_parity",
     "max_diversification",
     "cvar",
+    "cost_aware",
 ]
-RiskModel = Literal["sample", "ledoit_wolf", "ewma"]
+RiskModel = Literal["sample", "ledoit_wolf", "ewma", "factor"]
+ReturnModel = Literal["historical", "black_litterman"]
 
 
 class AssetBound(BaseModel):
@@ -31,8 +33,13 @@ class OptimizeRequest(BaseModel):
     tickers: list[str] = Field(min_length=2, max_length=50)
     objective: Objective = "max_sharpe"
     risk_model: RiskModel = "sample"
+    return_model: ReturnModel = "historical"
     ewma_lambda: float = Field(default=0.94, gt=0.5, lt=1.0)
     cvar_alpha: float = Field(default=0.95, ge=0.8, lt=1.0)
+    bl_risk_aversion: float = Field(default=2.5, gt=0.0, le=50.0)
+    risk_aversion: float = Field(default=5.0, gt=0.0, le=100.0)
+    transaction_cost_bps: float = Field(default=10.0, ge=0.0, le=200.0)
+    prev_weights: dict[str, float] | None = None
     target_return: float | None = Field(default=None, ge=-1.0, le=2.0)
     target_risk: float | None = Field(default=None, gt=0.0, le=2.0)
     start: date | None = None
@@ -91,6 +98,8 @@ class OptimizeResponse(BaseModel):
     solver_status: str
     risk_free_rate: float
     covariance_shrinkage: float | None = None
+    turnover: float | None = None
+    transaction_cost: float | None = None
     weights: list[WeightAllocation]
     metrics: PortfolioMetrics
     run_id: int | None = None

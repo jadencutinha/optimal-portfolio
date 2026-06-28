@@ -4,6 +4,8 @@ import { apiClient } from './client'
 import type {
   BacktestRequest,
   BacktestResponse,
+  CourseDetail,
+  CourseSummary,
   FrontierParams,
   FrontierResponse,
   MeResponse,
@@ -12,6 +14,21 @@ import type {
   Plan,
   UniverseResponse,
 } from './types'
+
+export function useCourses() {
+  return useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => (await apiClient.get<CourseSummary[]>('/api/courses')).data,
+  })
+}
+
+export function useCourseDetail(courseId: string | null) {
+  return useQuery({
+    queryKey: ['course', courseId],
+    enabled: Boolean(courseId),
+    queryFn: async () => (await apiClient.get<CourseDetail>(`/api/courses/${courseId}`)).data,
+  })
+}
 
 export function useMe() {
   const { session } = useAuth()

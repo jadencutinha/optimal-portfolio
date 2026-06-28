@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useFrontier, useOptimize, useUniverse } from '../api/queries'
-import type { AssetBound, Objective, OptimizeRequest, RiskModel, SectorCap } from '../api/types'
+import { useFrontier, useMe, useOptimize, useUniverse } from '../api/queries'
+import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
 import { FrontierChart } from '../components/FrontierChart'
@@ -16,13 +16,22 @@ export function OptimizerPage() {
   const universe = useUniverse()
   const optimize = useOptimize()
   const frontier = useFrontier()
+  const me = useMe()
+
+  const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
+  const pro = Boolean(entitlements.advanced_optimizers)
+  const maxTickers = typeof entitlements.max_tickers === 'number' ? entitlements.max_tickers : null
+  const dailyOptimizations = entitlements.daily_optimizations
 
   const [tickers, setTickers] = useState<string[]>(DEFAULT_TICKERS)
   const [objective, setObjective] = useState<Objective>('max_sharpe')
   const [riskModel, setRiskModel] = useState<RiskModel>('sample')
+  const [returnModel, setReturnModel] = useState<ReturnModel>('historical')
   const [targetReturnPct, setTargetReturnPct] = useState(15)
   const [targetRiskPct, setTargetRiskPct] = useState(18)
   const [cvarConfidencePct, setCvarConfidencePct] = useState(95)
+  const [costBps, setCostBps] = useState(10)
+  const [riskAversion, setRiskAversion] = useState(5)
   const [maxWeightPct, setMaxWeightPct] = useState(35)
   const [lookbackDays, setLookbackDays] = useState(756)
   const [sectorCaps, setSectorCaps] = useState<SectorCap[]>([])
@@ -36,12 +45,15 @@ export function OptimizerPage() {
       tickers,
       objective,
       risk_model: riskModel,
+      return_model: returnModel,
       lookback_days: lookbackDays,
       min_weight: 0,
       max_weight: maxWeightPct / 100,
       target_return: objective === 'target_return' ? targetReturnPct / 100 : null,
       target_risk: objective === 'target_risk' ? targetRiskPct / 100 : null,
       cvar_alpha: cvarConfidencePct / 100,
+      transaction_cost_bps: costBps,
+      risk_aversion: riskAversion,
       asset_bounds: assetBounds,
       sector_caps: sectorCaps,
     }
@@ -68,20 +80,33 @@ export function OptimizerPage() {
     <div className="optimizer">
       <section className="panel controls">
         <h2>Configuration</h2>
+        {!pro && (
+          <div className="free-banner">
+            Free plan{maxTickers ? ` · up to ${maxTickers} tickers` : ''}
+            {typeof dailyOptimizations === 'number' ? ` · ${dailyOptimizations} runs/day` : ''}
+          </div>
+        )}
         <TickerInput tickers={tickers} suggestions={universe.data?.assets ?? []} onChange={setTickers} />
         <ObjectiveControls
           objective={objective}
           riskModel={riskModel}
+          pro={pro}
+          returnModel={returnModel}
           targetReturnPct={targetReturnPct}
           targetRiskPct={targetRiskPct}
           cvarConfidencePct={cvarConfidencePct}
+          costBps={costBps}
+          riskAversion={riskAversion}
           maxWeightPct={maxWeightPct}
           lookbackDays={lookbackDays}
           onObjective={setObjective}
           onRiskModel={setRiskModel}
+          onReturnModel={setReturnModel}
           onTargetReturnPct={setTargetReturnPct}
           onTargetRiskPct={setTargetRiskPct}
           onCvarConfidencePct={setCvarConfidencePct}
+          onCostBps={setCostBps}
+          onRiskAversion={setRiskAversion}
           onMaxWeightPct={setMaxWeightPct}
           onLookbackDays={setLookbackDays}
         />
@@ -116,6 +141,7 @@ export function OptimizerPage() {
               {result.n_assets} assets · {result.provider} data · {result.risk_model} ·{' '}
               {result.as_of_start} → {result.as_of_end} · solver {result.solver_status}
               {result.covariance_shrinkage !== null && ` · shrinkage ${result.covariance_shrinkage.toFixed(2)}`}
+              {result.turnover !== null && ` · turnover ${(result.turnover * 100).toFixed(1)}%`}
             </p>
 
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}

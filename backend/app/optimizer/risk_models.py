@@ -3,9 +3,9 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 
-RiskModel = Literal["sample", "ledoit_wolf", "ewma"]
+RiskModel = Literal["sample", "ledoit_wolf", "ewma", "factor"]
 
-RISK_MODELS: tuple[RiskModel, ...] = ("sample", "ledoit_wolf", "ewma")
+RISK_MODELS: tuple[RiskModel, ...] = ("sample", "ledoit_wolf", "ewma", "factor")
 
 
 def _symmetrize(matrix: np.ndarray) -> np.ndarray:
@@ -59,8 +59,23 @@ def _ledoit_wolf(returns: np.ndarray) -> tuple[np.ndarray, float]:
     return shrinkage * prior + (1.0 - shrinkage) * sample, shrinkage
 
 
+def _factor(returns: np.ndarray, n_factors: int) -> np.ndarray:
+    sample = _sample(returns)
+    n = sample.shape[0]
+    if n < 2:
+        return sample
+    k = max(1, min(n_factors, n - 1))
+    eigenvalues, eigenvectors = np.linalg.eigh(sample)
+    order = np.argsort(eigenvalues)[::-1][:k]
+    top_values = np.clip(eigenvalues[order], 0.0, None)
+    top_vectors = eigenvectors[:, order]
+    low_rank = (top_vectors * top_values) @ top_vectors.T
+    idiosyncratic = np.clip(np.diag(sample) - np.diag(low_rank), 0.0, None)
+    return low_rank + np.diag(idiosyncratic)
+
+
 def estimate_covariance(
-    returns: pd.DataFrame, trading_days: int, model: RiskModel, ewma_lambda: float = 0.94
+    returns: pd.DataFrame, trading_days: int, model: RiskModel, ewma_lambda: float = 0.94, factor_count: int = 3
 ) -> tuple[np.ndarray, float | None]:
     values = returns.to_numpy(dtype=float)
     if model == "ledoit_wolf":
@@ -68,4 +83,6 @@ def estimate_covariance(
         return _symmetrize(daily) * trading_days, shrinkage
     if model == "ewma":
         return _symmetrize(_ewma(values, ewma_lambda)) * trading_days, None
+    if model == "factor":
+        return _symmetrize(_factor(values, factor_count)) * trading_days, None
     return _symmetrize(_sample(values)) * trading_days, None

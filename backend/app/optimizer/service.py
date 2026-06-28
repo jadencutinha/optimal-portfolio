@@ -7,6 +7,7 @@ from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.returns import annualized_mean, build_price_frame, daily_returns
 from app.optimizer import markowitz
+from app.optimizer.black_litterman import black_litterman
 from app.optimizer.constraints import ConstraintError, build_bounds, uniform_bounds
 from app.optimizer.risk_models import RiskModel, estimate_covariance
 from app.schemas.optimize import (
@@ -61,11 +62,21 @@ def _estimate(
     return mu, covariance, shrinkage
 
 
+def _previous_vector(tickers: list[str], prev_weights: dict[str, float] | None) -> np.ndarray:
+    n = len(tickers)
+    if not prev_weights:
+        return np.ones(n) / n
+    vector = np.array([float(prev_weights.get(ticker, 0.0)) for ticker in tickers])
+    total = vector.sum()
+    return vector / total if total > 0 else np.ones(n) / n
+
+
 def _dispatch(
     request: OptimizeRequest,
     mu: np.ndarray,
     covariance: np.ndarray,
     returns: np.ndarray,
+    previous: np.ndarray,
     risk_free_rate: float,
     bounds,
 ) -> tuple[np.ndarray, str]:
@@ -81,7 +92,16 @@ def _dispatch(
         return markowitz.risk_parity(covariance, bounds=bounds)
     if request.objective == "max_diversification":
         return markowitz.max_diversification(covariance, bounds=bounds)
-    return markowitz.min_cvar(returns, request.cvar_alpha, bounds=bounds)
+    if request.objective == "cvar":
+        return markowitz.min_cvar(returns, request.cvar_alpha, bounds=bounds)
+    return markowitz.cost_aware(
+        mu,
+        covariance,
+        previous,
+        request.transaction_cost_bps / 10000.0,
+        request.risk_aversion,
+        bounds=bounds,
+    )
 
 
 def _allocations(
@@ -114,6 +134,12 @@ async def run_optimization(
     returns_matrix = returns_frame.to_numpy()
     risk_free_rate = request.risk_free_rate if request.risk_free_rate is not None else settings.risk_free_rate
 
+    if request.return_model == "black_litterman":
+        market_weights = np.ones(len(tickers)) / len(tickers)
+        mu = black_litterman(covariance, market_weights, request.bl_risk_aversion)
+
+    previous = _previous_vector(tickers, request.prev_weights)
+
     try:
         bounds = build_bounds(
             tickers,
@@ -127,9 +153,16 @@ async def run_optimization(
         raise OptimizationServiceError(str(error), 422) from error
 
     try:
-        weights, status = _dispatch(request, mu, covariance, returns_matrix, risk_free_rate, bounds)
+        weights, status = _dispatch(request, mu, covariance, returns_matrix, previous, risk_free_rate, bounds)
     except markowitz.OptimizationError as error:
         raise OptimizationServiceError(str(error), 422) from error
+
+    turnover = None
+    transaction_cost = None
+    if request.objective == "cost_aware":
+        traded = float(np.abs(weights - previous).sum())
+        turnover = traded / 2.0
+        transaction_cost = (request.transaction_cost_bps / 10000.0) * traded
 
     expected, volatility, sharpe = markowitz.portfolio_metrics(weights, mu, covariance, risk_free_rate)
     response = OptimizeResponse(
@@ -142,6 +175,8 @@ async def run_optimization(
         solver_status=status,
         risk_free_rate=risk_free_rate,
         covariance_shrinkage=shrinkage,
+        turnover=turnover,
+        transaction_cost=transaction_cost,
         weights=_allocations(tickers, weights, sectors),
         metrics=PortfolioMetrics(
             expected_return=expected,

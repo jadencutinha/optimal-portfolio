@@ -201,6 +201,31 @@ def min_cvar(
     return _finalize(weights.value, resolved.long_only), problem.status
 
 
+def cost_aware(
+    mu: np.ndarray,
+    covariance: np.ndarray,
+    previous: np.ndarray,
+    cost: float,
+    risk_aversion: float = 5.0,
+    w_min: float = 0.0,
+    w_max: float = 1.0,
+    *,
+    bounds: WeightBounds | None = None,
+) -> tuple[np.ndarray, str]:
+    n = len(mu)
+    resolved = _resolve(n, w_min, w_max, bounds)
+    weights = cp.Variable(n)
+    objective = (
+        mu @ weights
+        - risk_aversion * cp.quad_form(weights, _psd(covariance))
+        - cost * cp.norm1(weights - previous)
+    )
+    problem = cp.Problem(cp.Maximize(objective), _base_constraints(weights, resolved))
+    problem.solve()
+    _check(problem.status, "cost-aware")
+    return _finalize(weights.value, resolved.long_only), problem.status
+
+
 def portfolio_metrics(
     weights: np.ndarray, mu: np.ndarray, covariance: np.ndarray, risk_free_rate: float
 ) -> tuple[float, float, float]:
