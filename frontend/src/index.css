@@ -1,12 +1,12 @@
 :root {
-  --bg: #e7f6e7;
-  --bg-elevated: #d8eed9;
-  --panel: #d0ead1;
-  --border: #a8d5aa;
-  --text: #10210f;
-  --muted: #3f5a45;
-  --accent: #2e7d32;
-  --accent-hover: #1b5e20;
+  --bg: #ffffff;
+  --bg-elevated: #afdaeb;
+  --panel: #dcf5fb;
+  --border: #006a7f;
+  --text: #0f211e;
+  --muted: #005a62;
+  --accent: #e09743;
+  --accent-hover: #4a9bd5;
   --danger: #c0392b;
   --mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Menlo, monospace;
   color-scheme: light;
@@ -32,7 +32,7 @@ body {
 .app-header {
   padding: 24px 32px;
   border-bottom: 1px solid var(--border);
-  background: rgba(231, 246, 231, 0.6);
+  background: #daf1f8;
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
