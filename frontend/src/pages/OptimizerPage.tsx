@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useFrontier, useMe, useOptimize, useUniverse } from '../api/queries'
+import { useFrontier, useMe, useOptimize, useSavePortfolio, useUniverse } from '../api/queries'
+import { downloadCsv } from '../lib/csv'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
@@ -17,6 +18,7 @@ export function OptimizerPage() {
   const optimize = useOptimize()
   const frontier = useFrontier()
   const me = useMe()
+  const save = useSavePortfolio()
 
   const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
   const pro = Boolean(entitlements.advanced_optimizers)
@@ -75,6 +77,33 @@ export function OptimizerPage() {
 
   const selectedPoint =
     frontierData && selectedFrontierIndex !== null ? frontierData.points[selectedFrontierIndex] : null
+
+  const savePortfolio = () => {
+    if (!result) return
+    const name = window.prompt('Name this portfolio', `${result.objective} · ${new Date().toLocaleDateString()}`)
+    if (!name) return
+    save.mutate({
+      name,
+      objective: result.objective,
+      risk_model: result.risk_model,
+      tickers: result.weights.map((allocation) => allocation.ticker),
+      weights: Object.fromEntries(result.weights.map((allocation) => [allocation.ticker, allocation.weight])),
+      metrics: {
+        sharpe_ratio: result.metrics.sharpe_ratio,
+        expected_return: result.metrics.expected_return,
+        volatility: result.metrics.volatility,
+      },
+    })
+  }
+
+  const exportCsv = () => {
+    if (!result) return
+    const rows: (string | number)[][] = [['Ticker', 'Weight', 'Sector']]
+    result.weights.forEach((allocation) =>
+      rows.push([allocation.ticker, allocation.weight, allocation.sector ?? '']),
+    )
+    downloadCsv('portfolio-weights.csv', rows)
+  }
 
   return (
     <div className="optimizer">
@@ -143,6 +172,18 @@ export function OptimizerPage() {
               {result.covariance_shrinkage !== null && ` · shrinkage ${result.covariance_shrinkage.toFixed(2)}`}
               {result.turnover !== null && ` · turnover ${(result.turnover * 100).toFixed(1)}%`}
             </p>
+            <div className="result-actions">
+              <button type="button" className="signin-trigger" onClick={savePortfolio}>
+                {save.isSuccess ? 'Saved ✓' : 'Save portfolio'}
+              </button>
+              <button type="button" className="signin-trigger" onClick={exportCsv}>
+                Export CSV
+              </button>
+              <button type="button" className="signin-trigger" onClick={() => window.print()}>
+                PDF report
+              </button>
+            </div>
+            {save.isError && <p className="error">Could not save — you may have hit your plan's saved-portfolio limit.</p>}
 
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (

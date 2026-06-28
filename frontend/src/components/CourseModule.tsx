@@ -57,9 +57,42 @@ export function CourseModule({ courseId, onExam, onBack }: Props) {
 
       <article className="topic-card">
         <h2>{topic.title}</h2>
-        <p className="topic-body">{topic.body.replace(/\*\*/g, '')}</p>
+        <div className="lesson">
+          {topic.body.map((block, blockIndex) => {
+            const key = `${topic.id}-${blockIndex}`
+            if (block.type === 'h') {
+              return (
+                <h3 key={key} className="lesson-h">
+                  {block.text}
+                </h3>
+              )
+            }
+            if (block.type === 'formula') {
+              return (
+                <pre key={key} className="lesson-formula">
+                  {block.text}
+                </pre>
+              )
+            }
+            if (block.type === 'ul') {
+              return (
+                <ul key={key} className="lesson-ul">
+                  {(block.items ?? []).map((item, itemIndex) => (
+                    <li key={`${key}-${itemIndex}`}>{item}</li>
+                  ))}
+                </ul>
+              )
+            }
+            return (
+              <p key={key} className="lesson-p">
+                {block.text}
+              </p>
+            )
+          })}
+        </div>
 
         <div className="topic-quiz">
+          <h3 className="quiz-heading">Knowledge check</h3>
           <p className="quiz-prompt">{topic.quiz.prompt}</p>
           {topic.quiz.options.map((option, optionIndex) => {
             let state = ''

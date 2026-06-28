@@ -1,14 +1,18 @@
 import { useState } from 'react'
+import { BehavioralCoach } from '../components/BehavioralCoach'
+import { SavedPortfolios } from '../components/SavedPortfolios'
 import { BacktestPage } from './BacktestPage'
 import { OptimizerPage } from './OptimizerPage'
 import { SweepPage } from './SweepPage'
 
-type Tab = 'optimizer' | 'backtest' | 'compare'
+type Tab = 'optimizer' | 'backtest' | 'compare' | 'behavioral' | 'saved'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'optimizer', label: 'Optimizer' },
   { id: 'backtest', label: 'Backtest' },
   { id: 'compare', label: 'Compare' },
+  { id: 'behavioral', label: 'Behavioral' },
+  { id: 'saved', label: 'My Portfolios' },
 ]
 
 export function ProWorkspace() {
@@ -30,6 +34,8 @@ export function ProWorkspace() {
       {tab === 'optimizer' && <OptimizerPage />}
       {tab === 'backtest' && <BacktestPage />}
       {tab === 'compare' && <SweepPage />}
+      {tab === 'behavioral' && <BehavioralCoach />}
+      {tab === 'saved' && <SavedPortfolios />}
     </div>
   )
 }

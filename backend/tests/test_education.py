@@ -100,3 +100,17 @@ def test_exam_fail_issues_no_certificate(client: TestClient) -> None:
 
 def test_unknown_course_returns_404(client: TestClient) -> None:
     assert client.get("/api/courses/nope").status_code == 404
+
+
+def test_credential_verification(client: TestClient) -> None:
+    as_user(client, "u-verify")
+    course = COURSES[0]
+    answers = {question["id"]: question["answer"] for question in course["final_exam"]}
+    credential = client.post(f"/api/courses/{course['id']}/exam", json={"answers": answers}).json()["credential_id"]
+    clear(client)
+
+    verified = client.get(f"/api/verify/{credential}").json()
+    assert verified["valid"] is True
+    assert verified["course"] == course["title"]
+
+    assert client.get("/api/verify/not-a-real-credential").json()["valid"] is False

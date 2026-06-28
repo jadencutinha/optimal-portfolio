@@ -1017,6 +1017,257 @@ button.primary.modal-submit {
   font-family: var(--mono);
 }
 
+.lesson {
+  max-width: 680px;
+}
+
+.lesson-p {
+  font-size: 16px;
+  line-height: 1.75;
+  margin: 0 0 16px;
+}
+
+.lesson-h {
+  font-size: 17px;
+  margin: 26px 0 10px;
+  color: var(--text);
+}
+
+.lesson-formula {
+  font-family: var(--mono);
+  font-size: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0 0 16px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  color: var(--accent-hover);
+}
+
+.lesson-ul {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.lesson-ul li {
+  margin: 6px 0;
+}
+
+.quiz-heading {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.saved-main {
+  flex: 1;
+  min-width: 180px;
+}
+
+.saved-main h3 {
+  margin: 0 0 2px;
+  font-size: 16px;
+}
+
+.saved-metrics {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.verify-page {
+  max-width: 520px;
+  margin: 56px auto;
+  text-align: center;
+}
+
+.verify-card {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elevated) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  margin: 18px 0;
+}
+
+.verify-card.valid {
+  border-color: var(--accent);
+}
+
+.verify-card.invalid {
+  border-color: var(--danger);
+}
+
+.checkout {
+  max-width: 440px;
+  margin: 32px auto;
+}
+
+.checkout-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 26px;
+}
+
+.checkout-card h2 {
+  margin: 0 0 4px;
+}
+
+.checkout-row {
+  display: flex;
+  gap: 12px;
+}
+
+.checkout-row label {
+  flex: 1;
+}
+
+.bypass-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--bg);
+  border: 1px dashed var(--accent);
+  color: var(--accent-hover);
+  border-radius: 12px;
+  padding: 11px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkout-note {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.cert-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.cert-link {
+  color: var(--accent-hover);
+  font-size: 14px;
+}
+
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.behavioral-result,
+.behavioral-quiz {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.compare-heading {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin: 24px 0 10px;
+}
+
+.behavioral-chart {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 6px 2px;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.compare-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.compare-card.you {
+  border-color: #f59e0b;
+}
+
+.compare-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.compare-card p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.cost-of-bias {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media print {
+  .app-header,
+  .platform-bar,
+  .tabs,
+  .cert-actions,
+  .result-actions,
+  .controls,
+  .modal-toggle {
+    display: none !important;
+  }
+  .optimizer {
+    grid-template-columns: 1fr !important;
+  }
+  body {
+    background: #fff;
+  }
+  .certificate {
+    box-shadow: none;
+  }
+}
+
 .panel {
   background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elevated) 100%);
   border: 1px solid var(--border);

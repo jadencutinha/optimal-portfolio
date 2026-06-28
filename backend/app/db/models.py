@@ -52,6 +52,20 @@ class BacktestRun(Base):
     result: Mapped[dict] = mapped_column(JSON)
 
 
+class SavedPortfolio(Base):
+    __tablename__ = "saved_portfolios"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    objective: Mapped[str] = mapped_column(String(32))
+    risk_model: Mapped[str] = mapped_column(String(32))
+    tickers: Mapped[list] = mapped_column(JSON)
+    weights: Mapped[dict] = mapped_column(JSON)
+    metrics: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class Enrollment(Base):
     __tablename__ = "enrollments"
     __table_args__ = (UniqueConstraint("user_id", "course_id", name="uq_enrollment"),)

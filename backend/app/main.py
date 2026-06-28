@@ -1,9 +1,23 @@
+import logging
+import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from app.api.routes import backtest, courses, frontier, health, jobs, me, optimize, prices, universe
+from app.api.routes import (
+    backtest,
+    courses,
+    frontier,
+    health,
+    jobs,
+    me,
+    optimize,
+    portfolios,
+    prices,
+    universe,
+)
 from app.auth.repository import ProfileRepository
 from app.auth.supabase import SupabaseVerifier
 from app.backtest.repository import BacktestRepository
@@ -16,6 +30,10 @@ from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
 from app.jobs.manager import JobManager
 from app.optimizer.repository import OptimizationRepository
+from app.portfolios.repository import PortfolioRepository
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+logger = logging.getLogger("optimal_portfolio")
 
 
 @asynccontextmanager
@@ -42,6 +60,7 @@ async def lifespan(app: FastAPI):
     app.state.price_repository = PriceRepository(session_factory)
     app.state.backtest_repository = BacktestRepository(session_factory)
     app.state.course_repository = CourseRepository(session_factory)
+    app.state.portfolio_repository = PortfolioRepository(session_factory)
     app.state.job_manager = JobManager()
 
     try:
@@ -62,6 +81,20 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        start = time.perf_counter()
+        response = await call_next(request)
+        elapsed = (time.perf_counter() - start) * 1000
+        logger.info("%s %s -> %s (%.1fms)", request.method, request.url.path, response.status_code, elapsed)
+        return response
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+        logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+        return JSONResponse(status_code=500, content={"detail": "An unexpected error occurred."})
+
     app.include_router(health.router, prefix=settings.api_prefix)
     app.include_router(universe.router, prefix=settings.api_prefix)
     app.include_router(prices.router, prefix=settings.api_prefix)
@@ -71,6 +104,7 @@ def create_app() -> FastAPI:
     app.include_router(backtest.router, prefix=settings.api_prefix)
     app.include_router(jobs.router, prefix=settings.api_prefix)
     app.include_router(courses.router, prefix=settings.api_prefix)
+    app.include_router(portfolios.router, prefix=settings.api_prefix)
     return app
 
 

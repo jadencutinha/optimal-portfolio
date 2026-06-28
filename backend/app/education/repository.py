@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.db.models import Certificate, Enrollment, ExamResult, TopicProgress
+from app.db.models import Certificate, Enrollment, ExamResult, Profile, TopicProgress
 
 
 class CourseRepository:
@@ -82,3 +82,15 @@ class CourseRepository:
         async with self._session_factory() as session:
             result = await session.execute(select(Certificate.course_id).where(Certificate.user_id == user_id))
             return set(result.scalars().all())
+
+    async def get_certificate_by_credential(self, credential_id: str) -> Certificate | None:
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(Certificate).where(Certificate.credential_id == credential_id)
+            )
+            return result.scalar_one_or_none()
+
+    async def get_profile_email(self, user_id: str) -> str | None:
+        async with self._session_factory() as session:
+            result = await session.execute(select(Profile.email).where(Profile.id == user_id))
+            return result.scalar_one_or_none()

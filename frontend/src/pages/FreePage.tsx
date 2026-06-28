@@ -1,15 +1,14 @@
-import { useSetPlan } from '../api/queries'
 import { OptimizerPage } from './OptimizerPage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
 
 interface Props {
   onOpenRiskQ: () => void
+  onUpgrade: () => void
 }
 
-export function FreePage({ onOpenRiskQ }: Props) {
+export function FreePage({ onOpenRiskQ, onUpgrade }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
-  const setPlan = useSetPlan()
 
   return (
     <div className="free-platform">
@@ -20,13 +19,8 @@ export function FreePage({ onOpenRiskQ }: Props) {
             Core portfolio optimization, free. Upgrade to Pro for advanced models, backtesting, and live comparison.
           </p>
         </div>
-        <button
-          type="button"
-          className="primary upgrade-btn"
-          disabled={setPlan.isPending}
-          onClick={() => setPlan.mutate('pro')}
-        >
-          {setPlan.isPending ? 'Upgrading…' : 'Upgrade to Pro'}
+        <button type="button" className="primary upgrade-btn" onClick={onUpgrade}>
+          Upgrade to Pro
         </button>
       </div>
 

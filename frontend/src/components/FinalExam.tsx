@@ -50,6 +50,14 @@ export function FinalExam({ courseId, courseTitle, learner, onClose }: Props) {
             Final exam: {result.score}/{result.total} ({Math.round(result.percent * 100)}%)
           </p>
           <p className="cert-id muted">Credential {result.credential_id}</p>
+          <div className="cert-actions">
+            <button type="button" className="signin-trigger" onClick={() => window.print()}>
+              Download / Print
+            </button>
+            <a className="cert-link" href={`/verify/${result.credential_id}`} target="_blank" rel="noreferrer">
+              Verify credential
+            </a>
+          </div>
           <button className="primary" onClick={onClose}>
             Back to courses
           </button>

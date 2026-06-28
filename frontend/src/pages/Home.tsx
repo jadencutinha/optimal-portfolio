@@ -4,6 +4,7 @@ import { useAuth } from '../auth/useAuth'
 import { Greeting } from '../components/Greeting'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
+import { CheckoutPage } from './CheckoutPage'
 import { CoursePage } from './CoursePage'
 import { FreePage } from './FreePage'
 import { Landing } from './Landing'
@@ -17,6 +18,7 @@ export function Home() {
   const setPlan = useSetPlan()
   const [switching, setSwitching] = useState(false)
   const [showRiskQ, setShowRiskQ] = useState(false)
+  const [checkout, setCheckout] = useState(false)
 
   if (!session) {
     return <Landing />
@@ -39,12 +41,17 @@ export function Home() {
 
   const { plan, plan_selected: planSelected } = me.data
 
+  if (checkout) {
+    return <CheckoutPage onDone={() => setCheckout(false)} onCancel={() => setCheckout(false)} />
+  }
+
   if (!planSelected || switching) {
     return (
       <PlanSelection
         current={planSelected ? plan : undefined}
         pending={setPlan.isPending}
         onCancel={planSelected ? () => setSwitching(false) : undefined}
+        onUpgradeToPro={() => setCheckout(true)}
         onChoose={async (choice) => {
           await setPlan.mutateAsync(choice)
           setSwitching(false)
@@ -76,7 +83,7 @@ export function Home() {
         </button>
       </div>
       {plan === 'course' && <CoursePage />}
-      {plan === 'free' && <FreePage onOpenRiskQ={() => setShowRiskQ(true)} />}
+      {plan === 'free' && <FreePage onOpenRiskQ={() => setShowRiskQ(true)} onUpgrade={() => setCheckout(true)} />}
       {plan === 'pro' && <ProWorkspace />}
     </>
   )

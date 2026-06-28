@@ -1,4 +1,14 @@
+from datetime import datetime
+
 from pydantic import BaseModel
+
+
+class VerificationResult(BaseModel):
+    valid: bool
+    course: str | None = None
+    issued_to: str | None = None
+    issued_at: datetime | None = None
+    credential_id: str | None = None
 
 
 class CourseSummary(BaseModel):
@@ -18,7 +28,7 @@ class TopicQuiz(BaseModel):
 class Topic(BaseModel):
     id: str
     title: str
-    body: str
+    body: list[dict]
     quiz: TopicQuiz
 
 

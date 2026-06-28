@@ -21,9 +21,29 @@ from app.schemas.education import (
     ExamQuestion,
     ExamResultSchema,
     ExamSubmission,
+    VerificationResult,
 )
 
 router = APIRouter(tags=["courses"])
+
+
+@router.get("/verify/{credential_id}", response_model=VerificationResult)
+async def verify_credential(
+    credential_id: str,
+    repository: CourseRepository = Depends(get_course_repository),
+) -> VerificationResult:
+    certificate = await repository.get_certificate_by_credential(credential_id)
+    if certificate is None:
+        return VerificationResult(valid=False)
+    course = get_course(certificate.course_id)
+    issued_to = await repository.get_profile_email(certificate.user_id)
+    return VerificationResult(
+        valid=True,
+        course=course["title"] if course else certificate.course_id,
+        issued_to=issued_to,
+        issued_at=certificate.issued_at,
+        credential_id=certificate.credential_id,
+    )
 
 
 def _course_or_404(course_id: str) -> dict:

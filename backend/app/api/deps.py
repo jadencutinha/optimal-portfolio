@@ -13,6 +13,7 @@ from app.data.sectors import SectorProvider
 from app.education.repository import CourseRepository
 from app.jobs.manager import JobManager
 from app.optimizer.repository import OptimizationRepository
+from app.portfolios.repository import PortfolioRepository
 
 
 def get_settings(request: Request) -> Settings:
@@ -41,6 +42,10 @@ def get_job_manager(request: Request) -> JobManager:
 
 def get_course_repository(request: Request) -> CourseRepository:
     return request.app.state.course_repository
+
+
+def get_portfolio_repository(request: Request) -> PortfolioRepository:
+    return request.app.state.portfolio_repository
 
 
 def get_verifier(request: Request) -> SupabaseVerifier:
