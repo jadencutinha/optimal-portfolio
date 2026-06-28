@@ -3,16 +3,20 @@ import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
 import { Greeting } from '../components/Greeting'
 import { PlanSelection } from '../components/PlanSelection'
+import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
 import { CoursePage } from './CoursePage'
 import { FreePage } from './FreePage'
 import { Landing } from './Landing'
 import { ProWorkspace } from './ProWorkspace'
+
+const RISK_PROFILE_KEY = 'risk_profile'
 
 export function Home() {
   const { session } = useAuth()
   const me = useMe()
   const setPlan = useSetPlan()
   const [switching, setSwitching] = useState(false)
+  const [showRiskQ, setShowRiskQ] = useState(false)
 
   if (!session) {
     return <Landing />
@@ -44,6 +48,20 @@ export function Home() {
         onChoose={async (choice) => {
           await setPlan.mutateAsync(choice)
           setSwitching(false)
+          if (choice === 'free' && !localStorage.getItem(RISK_PROFILE_KEY)) {
+            setShowRiskQ(true)
+          }
+        }}
+      />
+    )
+  }
+
+  if (plan === 'free' && showRiskQ) {
+    return (
+      <RiskQuestionnaire
+        onComplete={(profile) => {
+          localStorage.setItem(RISK_PROFILE_KEY, profile)
+          setShowRiskQ(false)
         }}
       />
     )
@@ -58,7 +76,7 @@ export function Home() {
         </button>
       </div>
       {plan === 'course' && <CoursePage />}
-      {plan === 'free' && <FreePage />}
+      {plan === 'free' && <FreePage onOpenRiskQ={() => setShowRiskQ(true)} />}
       {plan === 'pro' && <ProWorkspace />}
     </>
   )

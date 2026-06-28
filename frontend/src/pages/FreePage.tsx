@@ -1,4 +1,12 @@
-export function FreePage() {
+const RISK_PROFILE_KEY = 'risk_profile'
+
+interface Props {
+  onOpenRiskQ: () => void
+}
+
+export function FreePage({ onOpenRiskQ }: Props) {
+  const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
+
   return (
     <div className="platform-landing">
       <h1>Free platform</h1>
@@ -18,13 +26,29 @@ export function FreePage() {
           <h3>Upgrade to Pro for</h3>
           <ul>
             <li>All risk models (shrinkage, EWMA) and objectives</li>
-            <li>Sector & position constraints, efficient frontier</li>
+            <li>Sector &amp; position constraints, efficient frontier</li>
             <li>Live analysis and unlimited saves</li>
           </ul>
         </section>
       </div>
 
-      <p className="muted">The full free optimizer is coming next. Use “Switch platform” above to explore Pro.</p>
+      <div className="risk-profile-bar">
+        {savedProfile ? (
+          <div className="risk-profile-saved">
+            <span className="muted">Your risk profile:</span>
+            <span className="risk-profile-badge">{savedProfile}</span>
+            <button type="button" className="retake-btn" onClick={onOpenRiskQ}>
+              Retake assessment
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="primary risk-q-btn" onClick={onOpenRiskQ}>
+            Take risk assessment
+          </button>
+        )}
+      </div>
+
+      <p className="muted">The full free optimizer is coming next. Use &quot;Switch platform&quot; above to explore Pro.</p>
     </div>
   )
 }

@@ -6,7 +6,7 @@
   --text: #0f211e;
   --muted: #005a62;
   --accent: #e09743;
-  --accent-hover: #4a9bd5;
+  --accent-hover: #4991c4;
   --danger: #c0392b;
   --mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Menlo, monospace;
   color-scheme: light;
@@ -1151,4 +1151,186 @@ table.weights td {
   .landing-title {
     font-size: 44px;
   }
+}
+
+.risk-profile-bar {
+  margin: 20px 0;
+}
+
+.risk-profile-saved {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.risk-profile-badge {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.retake-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 10px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.retake-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.risk-q-btn {
+  width: auto;
+  padding: 10px 24px;
+}
+
+.risk-questionnaire {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.risk-questionnaire h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+}
+
+.risk-question {
+  margin-top: 28px;
+}
+
+.risk-q-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.risk-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.risk-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.risk-option.selected {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.risk-option input {
+  accent-color: var(--accent);
+}
+
+.risk-questionnaire .primary {
+  margin-top: 32px;
+}
+
+.risk-result {
+  max-width: 560px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.risk-result h2 {
+  font-size: 28px;
+  margin: 0 0 12px;
+}
+
+.risk-result p {
+  font-size: 16px;
+  color: var(--muted);
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+
+.risk-profile-label {
+  color: var(--accent);
+}
+
+.risk-profile-desc {
+  font-size: 16px;
+  color: var(--muted);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.bias-intro {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.bias-intro p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.bias-section {
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.bias-section h3 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.bias-section > .muted {
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.bias-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+
+.bias-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.bias-explanation {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 10px;
+}
+
+.bias-warning {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1.6;
 }
