@@ -1,6 +1,7 @@
 import numpy as np
 
 from app.optimizer import markowitz
+from app.optimizer.black_litterman import black_litterman, equilibrium_returns
 
 
 def make_problem() -> tuple[np.ndarray, np.ndarray]:
@@ -90,3 +91,30 @@ def test_min_cvar_is_fully_invested_and_long_only() -> None:
     assert status in markowitz._OPTIMAL
     assert abs(weights.sum() - 1.0) < 1e-6
     assert (weights >= -1e-9).all()
+
+
+def test_cost_aware_higher_cost_reduces_turnover() -> None:
+    mu, covariance = make_problem()
+    previous = np.array([1.0, 0.0, 0.0])
+    low, _ = markowitz.cost_aware(mu, covariance, previous, cost=0.0, risk_aversion=5.0)
+    high, _ = markowitz.cost_aware(mu, covariance, previous, cost=0.5, risk_aversion=5.0)
+    assert np.abs(high - previous).sum() <= np.abs(low - previous).sum() + 1e-6
+    assert abs(high.sum() - 1.0) < 1e-6
+
+
+def test_black_litterman_returns_equilibrium_without_views() -> None:
+    _, covariance = make_problem()
+    market_weights = np.ones(3) / 3
+    prior = equilibrium_returns(covariance, market_weights, 2.5)
+    posterior = black_litterman(covariance, market_weights, 2.5)
+    assert np.allclose(posterior, prior)
+
+
+def test_black_litterman_is_less_concentrated_than_sample_mvo() -> None:
+    mu, covariance = make_problem()
+    market_weights = np.ones(3) / 3
+    bl_mu = black_litterman(covariance, market_weights, 2.5)
+    sample_weights, _ = markowitz.max_sharpe(mu, covariance, 0.0, 1.0, 0.0)
+    bl_weights, _ = markowitz.max_sharpe(bl_mu, covariance, 0.0, 1.0, 0.0)
+    herfindahl = lambda w: float((w**2).sum())  # noqa: E731
+    assert herfindahl(bl_weights) <= herfindahl(sample_weights) + 1e-6

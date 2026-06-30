@@ -59,10 +59,11 @@ interface Props {
   current?: Plan
   pending: boolean
   onChoose: (plan: Plan) => void
+  onUpgradeToPro?: () => void
   onCancel?: () => void
 }
 
-export function PlanSelection({ current, pending, onChoose, onCancel }: Props) {
+export function PlanSelection({ current, pending, onChoose, onUpgradeToPro, onCancel }: Props) {
   const [savingId, setSavingId] = useState<Plan | null>(null)
   return (
     <div className="plan-selection">
@@ -94,6 +95,10 @@ export function PlanSelection({ current, pending, onChoose, onCancel }: Props) {
                 className="primary"
                 disabled={pending}
                 onClick={() => {
+                  if (plan.id === 'pro' && onUpgradeToPro) {
+                    onUpgradeToPro()
+                    return
+                  }
                   setSavingId(plan.id)
                   onChoose(plan.id)
                 }}

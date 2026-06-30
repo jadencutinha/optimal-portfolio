@@ -29,15 +29,24 @@ class FMPProvider(DataProvider):
     async def _fetch_one(self, ticker: str, start: date, end: date) -> pd.Series | None:
         url = f"{self._base_url}/historical-price-full/{ticker}"
         params = {"from": start.isoformat(), "to": end.isoformat(), "apikey": self._api_key}
-        response = await self._client.get(url, params=params)
-        response.raise_for_status()
-        payload = response.json()
-        historical = payload.get("historical", [])
-        records = {row["date"]: row["close"] for row in historical if row.get("close") is not None}
-        if not records:
-            return None
-        index = pd.to_datetime(list(records.keys()))
-        return pd.Series(list(records.values()), index=index, dtype=float).sort_index()
+        for attempt in range(3):
+            try:
+                response = await self._client.get(url, params=params)
+            except (httpx.TimeoutException, httpx.TransportError):
+                await asyncio.sleep(0.5 * (attempt + 1))
+                continue
+            if response.status_code == 429:
+                await asyncio.sleep(0.5 * (attempt + 1))
+                continue
+            response.raise_for_status()
+            payload = response.json()
+            historical = payload.get("historical", [])
+            records = {row["date"]: row["close"] for row in historical if row.get("close") is not None}
+            if not records:
+                return None
+            index = pd.to_datetime(list(records.keys()))
+            return pd.Series(list(records.values()), index=index, dtype=float).sort_index()
+        return None
 
     async def close(self) -> None:
         await self._client.aclose()

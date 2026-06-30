@@ -6,7 +6,9 @@ export type Objective =
   | 'risk_parity'
   | 'max_diversification'
   | 'cvar'
-export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma'
+  | 'cost_aware'
+export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma' | 'factor'
+export type ReturnModel = 'historical' | 'black_litterman'
 
 export interface UniverseAsset {
   ticker: string
@@ -34,7 +36,10 @@ export interface OptimizeRequest {
   tickers: string[]
   objective: Objective
   risk_model: RiskModel
+  return_model: ReturnModel
   cvar_alpha?: number
+  transaction_cost_bps?: number
+  risk_aversion?: number
   target_return?: number | null
   target_risk?: number | null
   lookback_days?: number | null
@@ -66,6 +71,8 @@ export interface OptimizeResponse {
   solver_status: string
   risk_free_rate: number
   covariance_shrinkage: number | null
+  turnover: number | null
+  transaction_cost: number | null
   weights: WeightAllocation[]
   metrics: PortfolioMetrics
   run_id: number | null
@@ -175,4 +182,99 @@ export interface BacktestResponse {
   risk_free_rate: number
   strategies: StrategyResult[]
   run_id: number | null
+}
+
+export interface PortfolioSummary {
+  id: number
+  name: string
+  objective: string
+  risk_model: string
+  metrics: Record<string, number>
+  created_at: string
+}
+
+export interface PortfolioDetail extends PortfolioSummary {
+  tickers: string[]
+  weights: Record<string, number>
+}
+
+export interface PortfolioCreate {
+  name: string
+  objective: string
+  risk_model: string
+  tickers: string[]
+  weights: Record<string, number>
+  metrics: Record<string, number>
+}
+
+export interface VerificationResult {
+  valid: boolean
+  course: string | null
+  issued_to: string | null
+  issued_at: string | null
+  credential_id: string | null
+}
+
+export interface CourseSummary {
+  id: string
+  title: string
+  summary: string
+  topic_count: number
+  enrolled: boolean
+  completed: boolean
+}
+
+export interface TopicQuiz {
+  prompt: string
+  options: string[]
+}
+
+export interface TopicBlock {
+  type: 'p' | 'h' | 'formula' | 'ul'
+  text?: string
+  items?: string[]
+}
+
+export interface CourseTopic {
+  id: string
+  title: string
+  body: TopicBlock[]
+  quiz: TopicQuiz
+}
+
+export interface ExamQuestion {
+  id: string
+  prompt: string
+  options: string[]
+}
+
+export interface CourseDetail {
+  id: string
+  title: string
+  summary: string
+  topics: CourseTopic[]
+  exam_question_count: number
+}
+
+export interface AnswerResult {
+  correct: boolean
+  answer: number
+}
+
+export interface ExamResult {
+  score: number
+  total: number
+  percent: number
+  passed: boolean
+  credential_id: string | null
+}
+
+export interface SweepCell {
+  objective: Objective
+  risk_model: RiskModel
+  status: 'ok' | 'error'
+  expected_return: number | null
+  volatility: number | null
+  sharpe_ratio: number | null
+  message?: string
 }

@@ -42,6 +42,15 @@ def test_ledoit_wolf_preserves_variances_and_shrinks_noise() -> None:
     assert np.allclose(np.diag(sample), np.diag(shrunk), rtol=1e-6)
 
 
+def test_factor_model_is_psd_and_preserves_variances() -> None:
+    returns = make_returns()
+    factor, _ = estimate_covariance(returns, 252, "factor")
+    sample, _ = estimate_covariance(returns, 252, "sample")
+    assert factor.shape == (5, 5)
+    assert _is_psd(factor)
+    assert np.allclose(np.diag(factor), np.diag(sample), rtol=1e-6)
+
+
 def test_ewma_emphasises_recent_observations() -> None:
     rng = np.random.default_rng(1)
     calm = rng.normal(0.0, 0.005, 200)

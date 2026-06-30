@@ -1,20 +1,34 @@
+import { OptimizerPage } from './OptimizerPage'
+
 const RISK_PROFILE_KEY = 'risk_profile'
 
 interface Props {
   onOpenRiskQ: () => void
+  onUpgrade: () => void
 }
 
-export function FreePage({ onOpenRiskQ }: Props) {
+export function FreePage({ onOpenRiskQ, onUpgrade }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
 
   return (
-    <div className="platform-landing">
-      <h1>Free platform</h1>
-      <p className="lead">Get started with the core of portfolio optimization, free.</p>
+    <div className="free-platform">
+      <div className="free-header">
+        <div>
+          <h1>Free platform</h1>
+          <p className="lead">
+            Core portfolio optimization, free. Upgrade to Pro for advanced models, backtesting, and live comparison.
+          </p>
+        </div>
+        <button type="button" className="primary upgrade-btn" onClick={onUpgrade}>
+          Upgrade to Pro
+        </button>
+      </div>
 
-      <div className="landing-grid">
+      <OptimizerPage />
+
+      <div className="landing-grid free-extras">
         <section>
-          <h3>Included</h3>
+          <h3>Your plan includes</h3>
           <ul>
             <li>Up to 8 tickers per portfolio</li>
             <li>Max-Sharpe and Min-Variance objectives</li>
@@ -23,11 +37,11 @@ export function FreePage({ onOpenRiskQ }: Props) {
           </ul>
         </section>
         <section>
-          <h3>Upgrade to Pro for</h3>
+          <h3>Locked — upgrade to Pro</h3>
           <ul>
-            <li>All risk models (shrinkage, EWMA) and objectives</li>
-            <li>Sector &amp; position constraints, efficient frontier</li>
-            <li>Live analysis and unlimited saves</li>
+            <li>Shrinkage, EWMA &amp; factor risk models, advanced objectives</li>
+            <li>Efficient frontier, sector &amp; position constraints</li>
+            <li>Backtesting, live strategy comparison, unlimited saves</li>
           </ul>
         </section>
       </div>
@@ -47,8 +61,6 @@ export function FreePage({ onOpenRiskQ }: Props) {
           </button>
         )}
       </div>
-
-      <p className="muted">The full free optimizer is coming next. Use &quot;Switch platform&quot; above to explore Pro.</p>
     </div>
   )
 }

@@ -4,14 +4,61 @@ import { apiClient } from './client'
 import type {
   BacktestRequest,
   BacktestResponse,
+  CourseDetail,
+  CourseSummary,
   FrontierParams,
   FrontierResponse,
   MeResponse,
   OptimizeRequest,
   OptimizeResponse,
   Plan,
+  PortfolioCreate,
+  PortfolioSummary,
   UniverseResponse,
 } from './types'
+
+export function useSavedPortfolios() {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['portfolios', session?.user?.id ?? 'anon'],
+    enabled: Boolean(session),
+    queryFn: async () => (await apiClient.get<PortfolioSummary[]>('/api/portfolios')).data,
+  })
+}
+
+export function useSavePortfolio() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (body: PortfolioCreate) =>
+      (await apiClient.post<PortfolioSummary>('/api/portfolios', body)).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['portfolios'] }),
+  })
+}
+
+export function useDeletePortfolio() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/api/portfolios/${id}`)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['portfolios'] }),
+  })
+}
+
+export function useCourses() {
+  return useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => (await apiClient.get<CourseSummary[]>('/api/courses')).data,
+  })
+}
+
+export function useCourseDetail(courseId: string | null) {
+  return useQuery({
+    queryKey: ['course', courseId],
+    enabled: Boolean(courseId),
+    queryFn: async () => (await apiClient.get<CourseDetail>(`/api/courses/${courseId}`)).data,
+  })
+}
 
 export function useMe() {
   const { session } = useAuth()

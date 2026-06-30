@@ -1,5 +1,6 @@
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { BacktestResponse, StrategyResult } from '../api/types'
+import { downloadCsv } from '../lib/csv'
 import { percent, ratio } from '../lib/format'
 
 const COLORS = ['#2e7d32', '#f59e0b', '#3b82f6', '#a855f7', '#ec4899']
@@ -56,6 +57,30 @@ export function BacktestResults({ result }: { result: BacktestResponse }) {
   const { strategies } = result
   const names = strategies.map((strategy) => strategy.name)
 
+  const exportCsv = () => {
+    const rows: (string | number)[][] = [
+      ['Strategy', 'CAGR', 'Volatility', 'Sharpe', 'Sortino', 'MaxDD', 'Calmar', 'Turnover', 'Alpha', 'Beta', 'IR'],
+    ]
+    strategies.forEach((strategy) => {
+      const stats = strategy.stats
+      const rel = strategy.relative
+      rows.push([
+        strategy.name,
+        stats.cagr,
+        stats.annual_volatility,
+        stats.sharpe_ratio,
+        stats.sortino_ratio,
+        stats.max_drawdown,
+        stats.calmar_ratio,
+        stats.avg_turnover,
+        rel ? rel.alpha : '',
+        rel ? rel.beta : '',
+        rel ? rel.information_ratio : '',
+      ])
+    })
+    downloadCsv('backtest-results.csv', rows)
+  }
+
   const equity = merge(strategies, (s) => s.curve.map((p) => ({ date: p.date, v: p.equity })))
   const drawdown = merge(strategies, (s) => s.curve.map((p) => ({ date: p.date, v: p.drawdown })))
   const rolling = merge(strategies, (s) => s.rolling_sharpe.map((p) => ({ date: p.date, v: p.sharpe })))
@@ -66,6 +91,11 @@ export function BacktestResults({ result }: { result: BacktestResponse }) {
         {result.provider} data · {result.as_of_start} → {result.as_of_end} · {result.rebalance} rebalancing ·{' '}
         {result.cost_bps} bps cost
       </p>
+      <div className="result-actions">
+        <button type="button" className="signin-trigger" onClick={exportCsv}>
+          Export CSV
+        </button>
+      </div>
 
       <h3>Growth of $1</h3>
       <SeriesChart data={equity} names={names} format={(v) => v.toFixed(2)} />

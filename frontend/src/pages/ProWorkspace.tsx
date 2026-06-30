@@ -1,20 +1,41 @@
 import { useState } from 'react'
+import { BehavioralCoach } from '../components/BehavioralCoach'
+import { SavedPortfolios } from '../components/SavedPortfolios'
 import { BacktestPage } from './BacktestPage'
 import { OptimizerPage } from './OptimizerPage'
+import { SweepPage } from './SweepPage'
+
+type Tab = 'optimizer' | 'backtest' | 'compare' | 'behavioral' | 'saved'
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'optimizer', label: 'Optimizer' },
+  { id: 'backtest', label: 'Backtest' },
+  { id: 'compare', label: 'Compare' },
+  { id: 'behavioral', label: 'Behavioral' },
+  { id: 'saved', label: 'My Portfolios' },
+]
 
 export function ProWorkspace() {
-  const [tab, setTab] = useState<'optimizer' | 'backtest'>('optimizer')
+  const [tab, setTab] = useState<Tab>('optimizer')
   return (
     <div className="pro-workspace">
       <div className="tabs">
-        <button type="button" className={tab === 'optimizer' ? 'tab active' : 'tab'} onClick={() => setTab('optimizer')}>
-          Optimizer
-        </button>
-        <button type="button" className={tab === 'backtest' ? 'tab active' : 'tab'} onClick={() => setTab('backtest')}>
-          Backtest
-        </button>
+        {TABS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            className={tab === option.id ? 'tab active' : 'tab'}
+            onClick={() => setTab(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
-      {tab === 'optimizer' ? <OptimizerPage /> : <BacktestPage />}
+      {tab === 'optimizer' && <OptimizerPage />}
+      {tab === 'backtest' && <BacktestPage />}
+      {tab === 'compare' && <SweepPage />}
+      {tab === 'behavioral' && <BehavioralCoach />}
+      {tab === 'saved' && <SavedPortfolios />}
     </div>
   )
 }

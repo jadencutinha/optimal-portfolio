@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import (
+    get_access,
+    get_cache,
     get_optimization_repository,
     get_price_repository,
     get_provider,
     get_sector_provider,
     get_settings,
 )
+from app.auth.gating import Access, check_optimize, enforce_quota
 from app.config import Settings
+from app.data.cache import Cache
 from app.data.provider import DataProvider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
@@ -25,9 +29,21 @@ async def optimize(
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     sector_provider: SectorProvider = Depends(get_sector_provider),
+    access: Access = Depends(get_access),
+    cache: Cache = Depends(get_cache),
     optimization_repository: OptimizationRepository = Depends(get_optimization_repository),
     price_repository: PriceRepository = Depends(get_price_repository),
 ) -> OptimizeResponse:
+    check_optimize(
+        tickers=request.tickers,
+        objective=request.objective,
+        risk_model=request.risk_model,
+        return_model=request.return_model,
+        lookback_days=request.lookback_days,
+        entitlements=access.entitlements,
+    )
+    await enforce_quota(access, cache)
+
     sectors = await sector_provider.resolve(request.tickers)
     try:
         response, frame = await run_optimization(request, provider, settings, sectors)

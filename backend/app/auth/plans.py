@@ -18,7 +18,7 @@ _ENTITLEMENTS: dict[str, dict] = {
     },
     "pro": {
         "max_tickers": 50,
-        "risk_models": ["sample", "ledoit_wolf", "ewma"],
+        "risk_models": ["sample", "ledoit_wolf", "ewma", "factor"],
         "objectives": ["min_variance", "max_sharpe", "target_return", "target_risk"],
         "max_lookback_days": 3650,
         "daily_optimizations": None,

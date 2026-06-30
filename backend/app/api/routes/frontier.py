@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.deps import get_provider, get_sector_provider, get_settings
+from app.api.deps import get_access, get_provider, get_sector_provider, get_settings
+from app.auth.gating import Access, check_optimize
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.sectors import SectorProvider
@@ -23,12 +24,22 @@ async def frontier(
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     sector_provider: SectorProvider = Depends(get_sector_provider),
+    access: Access = Depends(get_access),
 ) -> FrontierResponse:
     symbols = [symbol.strip().upper() for symbol in tickers.split(",") if symbol.strip()]
     if len(symbols) < 2:
         raise HTTPException(status_code=400, detail="Provide at least two tickers.")
     if risk_model not in RISK_MODELS:
         raise HTTPException(status_code=400, detail="Unknown risk model.")
+
+    check_optimize(
+        tickers=symbols,
+        objective="min_variance",
+        risk_model=risk_model,
+        return_model="historical",
+        lookback_days=lookback_days,
+        entitlements=access.entitlements,
+    )
 
     sectors = await sector_provider.resolve(symbols)
     try:
