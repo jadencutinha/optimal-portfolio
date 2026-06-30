@@ -1,30 +1,108 @@
+import { useState } from 'react'
+import { ModuleLayout } from '../components/ModuleLayout'
+import { TRACKS, type Track } from '../data/courseData'
+
 export function CoursePage() {
-  return (
-    <div className="platform-landing">
-      <h1>Course platform</h1>
-      <p className="lead">Learn portfolio construction by doing — from the basics of investing to convex optimization.</p>
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  const [moduleIndex, setModuleIndex] = useState<number | null>(null)
 
-      <div className="landing-grid">
-        <section>
-          <h3>What you'll learn</h3>
-          <ul>
-            <li>Investing fundamentals: risk, return, diversification</li>
-            <li>Expected return, volatility, and the Sharpe ratio</li>
-            <li>The Markowitz mean-variance model</li>
-            <li>Risk models and portfolio constraints</li>
-          </ul>
-        </section>
-        <section>
-          <h3>Coming soon</h3>
-          <ul>
-            <li>Interactive lessons wired to the live optimizer</li>
-            <li>Quizzes and progress tracking</li>
-            <li>A verifiable certificate on completion</li>
-          </ul>
-        </section>
+  if (selectedTrack && moduleIndex !== null) {
+    const mod = selectedTrack.modules[moduleIndex]
+    return (
+      <ModuleLayout
+        trackTitle={selectedTrack.title}
+        moduleNumber={moduleIndex + 1}
+        totalModules={selectedTrack.modules.length}
+        title={mod.title}
+        content={mod.content}
+        quiz={mod.quiz}
+        onBack={() => setModuleIndex(null)}
+        onPrev={moduleIndex > 0 ? () => setModuleIndex(moduleIndex - 1) : undefined}
+        onNext={
+          moduleIndex < selectedTrack.modules.length - 1
+            ? () => setModuleIndex(moduleIndex + 1)
+            : undefined
+        }
+      />
+    )
+  }
+
+  if (selectedTrack) {
+    return (
+      <div className="track-page">
+        <button
+          type="button"
+          className="breadcrumb-back"
+          onClick={() => setSelectedTrack(null)}
+        >
+          ← All tracks
+        </button>
+        <div className="track-page-header">
+          <span className="track-page-icon">{selectedTrack.icon}</span>
+          <div>
+            <h1 className="track-page-title">{selectedTrack.title}</h1>
+            <p className="track-page-meta">
+              {selectedTrack.modules.length} modules · {selectedTrack.estimatedTime}
+            </p>
+          </div>
+        </div>
+        <div className="module-list">
+          {selectedTrack.modules.map((mod, i) => (
+            <button
+              key={mod.id}
+              type="button"
+              className="module-card"
+              onClick={() => setModuleIndex(i)}
+            >
+              <span className="module-num">Module {i + 1}</span>
+              <span className="module-card-title">{mod.title}</span>
+              <span className="module-arrow">→</span>
+            </button>
+          ))}
+        </div>
       </div>
+    )
+  }
 
-      <p className="muted">Lessons are in development. Use “Switch platform” above to try Free or Pro in the meantime.</p>
+  return (
+    <div className="course-landing">
+      <h1 className="course-landing-title">PortfoliU Learn</h1>
+      <p className="course-landing-desc">
+        From saving basics to the math behind hedge funds — three tracks that build on each
+        other.
+      </p>
+      <div className="track-grid">
+        {TRACKS.map((track) => {
+          const available = track.modules.length > 0
+          return (
+            <div key={track.id} className={`track-card ${available ? '' : 'track-coming-soon'}`}>
+              <div className="track-card-icon">{track.icon}</div>
+              <div className="track-card-body">
+                <h3 className="track-card-title">
+                  Track {track.id} — {track.title}
+                </h3>
+                <p className="track-card-desc">{track.description}</p>
+                <p className="track-card-meta">
+                  {available
+                    ? `${track.modules.length} modules · ${track.estimatedTime}`
+                    : 'Coming soon'}
+                </p>
+              </div>
+              {available ? (
+                <button
+                  type="button"
+                  className="track-card-btn"
+                  onClick={() => setSelectedTrack(track)}
+                >
+                  Start
+                </button>
+              ) : (
+                <span className="track-card-locked">Soon</span>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
