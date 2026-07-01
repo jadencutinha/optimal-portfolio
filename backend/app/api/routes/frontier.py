@@ -6,8 +6,8 @@ from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.sectors import SectorProvider
 from app.optimizer.risk_models import RISK_MODELS, RiskModel
-from app.optimizer.service import OptimizationServiceError, run_frontier
-from app.schemas.optimize import FrontierResponse
+from app.optimizer.service import OptimizationServiceError, run_frontier, run_resampled_frontier
+from app.schemas.optimize import FrontierResponse, ResampledFrontierRequest, ResampledFrontierResponse
 
 router = APIRouter(tags=["frontier"])
 
@@ -51,6 +51,41 @@ async def frontier(
             risk_model=risk_model,
             n_points=points,
             risk_free_rate=risk_free_rate,
+            provider=provider,
+            settings=settings,
+            sectors=sectors,
+        )
+    except OptimizationServiceError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.post("/frontier/resampled", response_model=ResampledFrontierResponse)
+async def resampled_frontier(
+    request: ResampledFrontierRequest,
+    provider: DataProvider = Depends(get_provider),
+    settings: Settings = Depends(get_settings),
+    sector_provider: SectorProvider = Depends(get_sector_provider),
+    access: Access = Depends(get_access),
+) -> ResampledFrontierResponse:
+    check_optimize(
+        tickers=request.tickers,
+        objective="min_variance",
+        risk_model=request.risk_model,
+        return_model="historical",
+        lookback_days=request.lookback_days,
+        entitlements=access.entitlements,
+    )
+    sectors = await sector_provider.resolve(request.tickers)
+    try:
+        return await run_resampled_frontier(
+            tickers=request.tickers,
+            lookback_days=request.lookback_days,
+            min_weight=request.min_weight,
+            max_weight=request.max_weight,
+            risk_model=request.risk_model,
+            n_points=request.points,
+            n_resamples=request.resamples,
+            risk_free_rate=request.risk_free_rate,
             provider=provider,
             settings=settings,
             sectors=sectors,

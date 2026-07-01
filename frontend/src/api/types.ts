@@ -7,6 +7,7 @@ export type Objective =
   | 'max_diversification'
   | 'cvar'
   | 'cost_aware'
+  | 'hrp'
 export type RiskModel = 'sample' | 'ledoit_wolf' | 'ewma' | 'factor'
 export type ReturnModel = 'historical' | 'black_litterman'
 
@@ -374,4 +375,55 @@ export interface AssistantResponse {
   explanation: string
   config: AssistantConfig
   result: OptimizeResponse
+}
+
+export interface StressCurvePoint {
+  date: string
+  equity: number
+}
+
+export interface StressWindow {
+  key: string
+  label: string
+  description: string
+  start: string
+  end: string
+  available: boolean
+  total_return: number | null
+  max_drawdown: number | null
+  volatility: number | null
+  recovered: boolean | null
+  recovery_days: number | null
+  trough_date: string | null
+  assets_used: number
+  missing_tickers: string[]
+  curve: StressCurvePoint[]
+}
+
+export interface StressResponse {
+  objective: Objective
+  provider: string
+  weights: WeightAllocation[]
+  windows: StressWindow[]
+}
+
+export interface ResampledFrontierRequest {
+  tickers: string[]
+  lookback_days?: number | null
+  min_weight?: number
+  max_weight?: number
+  risk_model?: RiskModel
+  points?: number
+  resamples?: number
+}
+
+export interface ResampledFrontierResponse {
+  provider: string
+  risk_model: RiskModel
+  as_of_start: string
+  as_of_end: string
+  risk_free_rate: number
+  resamples: number
+  sample: FrontierPoint[]
+  resampled: FrontierPoint[]
 }

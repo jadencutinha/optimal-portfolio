@@ -12,6 +12,7 @@ Objective = Literal[
     "max_diversification",
     "cvar",
     "cost_aware",
+    "hrp",
 ]
 RiskModel = Literal["sample", "ledoit_wolf", "ewma", "factor"]
 ReturnModel = Literal["historical", "black_litterman"]
@@ -121,3 +122,43 @@ class FrontierResponse(BaseModel):
     points: list[FrontierPointSchema]
     min_variance_index: int
     tangency_index: int
+
+
+class ResampledFrontierRequest(BaseModel):
+    tickers: list[str] = Field(min_length=2, max_length=50)
+    lookback_days: int | None = Field(default=None, ge=30, le=3650)
+    min_weight: float = Field(default=0.0, ge=-1.0, le=1.0)
+    max_weight: float = Field(default=1.0, gt=0.0, le=1.0)
+    risk_model: RiskModel = "sample"
+    points: int = Field(default=12, ge=5, le=25)
+    resamples: int = Field(default=15, ge=5, le=40)
+    risk_free_rate: float | None = Field(default=None, ge=0.0, le=1.0)
+
+    @model_validator(mode="after")
+    def _validate(self) -> "ResampledFrontierRequest":
+        seen: set[str] = set()
+        cleaned: list[str] = []
+        for ticker in self.tickers:
+            symbol = ticker.strip().upper()
+            if symbol and symbol not in seen:
+                seen.add(symbol)
+                cleaned.append(symbol)
+        if len(cleaned) < 2:
+            raise ValueError("Provide at least two distinct tickers.")
+        self.tickers = cleaned
+        if self.min_weight >= self.max_weight:
+            raise ValueError("min_weight must be less than max_weight.")
+        if self.max_weight * len(cleaned) < 1.0:
+            raise ValueError("max_weight is too low to build a fully invested portfolio.")
+        return self
+
+
+class ResampledFrontierResponse(BaseModel):
+    provider: str
+    risk_model: RiskModel
+    as_of_start: date
+    as_of_end: date
+    risk_free_rate: float
+    resamples: int
+    sample: list[FrontierPointSchema]
+    resampled: list[FrontierPointSchema]

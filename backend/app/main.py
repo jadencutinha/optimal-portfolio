@@ -18,6 +18,7 @@ from app.api.routes import (
     planner,
     portfolios,
     prices,
+    stress,
     universe,
 )
 from app.auth.repository import ProfileRepository
@@ -109,6 +110,7 @@ def create_app() -> FastAPI:
     app.include_router(portfolios.router, prefix=settings.api_prefix)
     app.include_router(planner.router, prefix=settings.api_prefix)
     app.include_router(assistant.router, prefix=settings.api_prefix)
+    app.include_router(stress.router, prefix=settings.api_prefix)
     return app
 
 

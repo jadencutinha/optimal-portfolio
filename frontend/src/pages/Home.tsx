@@ -41,7 +41,15 @@ export function Home() {
   const { plan, plan_selected: planSelected } = me.data
 
   if (checkout) {
-    return <CheckoutPage onDone={() => setCheckout(false)} onCancel={() => setCheckout(false)} />
+    return (
+      <CheckoutPage
+        onDone={() => {
+          setCheckout(false)
+          setSwitching(false)
+        }}
+        onCancel={() => setCheckout(false)}
+      />
+    )
   }
 
   if (!planSelected || switching) {

@@ -6,7 +6,7 @@ import pandas as pd
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.data.returns import annualized_mean, build_price_frame, daily_returns
-from app.optimizer import markowitz
+from app.optimizer import hrp, markowitz
 from app.optimizer.black_litterman import black_litterman
 from app.optimizer.constraints import ConstraintError, build_bounds, uniform_bounds
 from app.optimizer.risk_models import RiskModel, estimate_covariance
@@ -17,6 +17,7 @@ from app.schemas.optimize import (
     OptimizeRequest,
     OptimizeResponse,
     PortfolioMetrics,
+    ResampledFrontierResponse,
     WeightAllocation,
 )
 
@@ -95,6 +96,8 @@ def _dispatch(
         return markowitz.max_diversification(covariance, bounds=bounds)
     if request.objective == "cvar":
         return markowitz.min_cvar(returns, request.cvar_alpha, bounds=bounds)
+    if request.objective == "hrp":
+        return hrp.hierarchical_risk_parity(covariance)
     return markowitz.cost_aware(
         mu,
         covariance,
@@ -321,6 +324,116 @@ async def run_explanation(
         top_risk_driver=top_driver,
         contributions=contributions,
         counterfactuals=counterfactuals,
+    )
+
+
+def _frontier_weights(
+    mu: np.ndarray, covariance: np.ndarray, bounds, n_points: int
+) -> list[np.ndarray]:
+    floor_weights, _ = markowitz.min_variance(mu, covariance, bounds=bounds)
+    ceiling_weights, _ = markowitz.max_return(mu, covariance, bounds=bounds)
+    r_lo = float(floor_weights @ mu)
+    r_hi = float(ceiling_weights @ mu)
+    if r_hi - r_lo <= 1e-9:
+        return [floor_weights for _ in range(n_points)]
+    targets = np.linspace(r_lo, r_hi, n_points)
+    weights_list: list[np.ndarray] = []
+    previous = floor_weights
+    for target in targets:
+        try:
+            weights, _ = markowitz.target_return(mu, covariance, target=float(target), bounds=bounds)
+            previous = weights
+        except markowitz.OptimizationError:
+            weights = previous
+        weights_list.append(weights)
+    return weights_list
+
+
+def _frontier_point(
+    weights: np.ndarray,
+    columns: list[str],
+    mu: np.ndarray,
+    covariance: np.ndarray,
+    rate: float,
+    sectors: dict[str, str] | None,
+) -> FrontierPointSchema:
+    expected, volatility, sharpe = markowitz.portfolio_metrics(weights, mu, covariance, rate)
+    return FrontierPointSchema(
+        expected_return=expected,
+        volatility=volatility,
+        sharpe_ratio=sharpe,
+        weights=_allocations(columns, weights, sectors),
+    )
+
+
+async def run_resampled_frontier(
+    *,
+    tickers: list[str],
+    lookback_days: int | None,
+    min_weight: float,
+    max_weight: float,
+    risk_model: RiskModel,
+    n_points: int,
+    n_resamples: int,
+    risk_free_rate: float | None,
+    provider: DataProvider,
+    settings: Settings,
+    sectors: dict[str, str] | None = None,
+) -> ResampledFrontierResponse:
+    start, end = _resolve_dates(None, None, lookback_days, settings)
+    frame = await _price_frame(tickers, start, end, provider, settings)
+    columns = list(frame.columns)
+    returns_frame = daily_returns(frame)
+    mu = annualized_mean(returns_frame, settings.trading_days).to_numpy()
+    covariance, _ = estimate_covariance(returns_frame, settings.trading_days, risk_model, 0.94)
+    rate = risk_free_rate if risk_free_rate is not None else settings.risk_free_rate
+    bounds = uniform_bounds(len(columns), min_weight, max_weight)
+
+    try:
+        base_weights = _frontier_weights(mu, covariance, bounds, n_points)
+    except markowitz.OptimizationError as error:
+        raise OptimizationServiceError(str(error), 422) from error
+
+    periods = len(returns_frame)
+    daily_mu = returns_frame.mean().to_numpy()
+    daily_cov = returns_frame.cov().to_numpy()
+    rng = np.random.default_rng(7)
+    accum = np.zeros((n_points, len(columns)))
+    valid = 0
+    for _ in range(n_resamples):
+        sample = rng.multivariate_normal(daily_mu, daily_cov, size=periods, check_valid="ignore")
+        mu_b = sample.mean(axis=0) * settings.trading_days
+        cov_b = np.cov(sample, rowvar=False) * settings.trading_days
+        try:
+            weights_list = _frontier_weights(mu_b, cov_b, bounds, n_points)
+        except markowitz.OptimizationError:
+            continue
+        for i in range(n_points):
+            accum[i] += weights_list[i]
+        valid += 1
+
+    if valid == 0:
+        raise OptimizationServiceError("Could not resample a stable frontier for these inputs.", 422)
+
+    resampled_weights = [accum[i] / valid for i in range(n_points)]
+    sample_points = sorted(
+        (_frontier_point(w, columns, mu, covariance, rate, sectors) for w in base_weights),
+        key=lambda point: point.volatility,
+    )
+    resampled_points = sorted(
+        (_frontier_point(w, columns, mu, covariance, rate, sectors) for w in resampled_weights),
+        key=lambda point: point.volatility,
+    )
+
+    return ResampledFrontierResponse(
+        provider=provider.name,
+        risk_model=risk_model,
+        as_of_start=frame.index.min().date(),
+        as_of_end=frame.index.max().date(),
+        risk_free_rate=rate,
+        resamples=valid,
+        sample=sample_points,
+        resampled=resampled_points,
     )
 
 

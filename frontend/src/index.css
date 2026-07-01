@@ -2791,3 +2791,117 @@ table.weights td {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---- Historical stress test (#4) ---- */
+.stress-intro {
+  margin-bottom: 18px;
+}
+
+.stress-intro h2 {
+  margin: 0 0 6px;
+}
+
+.stress-controls {
+  margin-bottom: 20px;
+}
+
+.stress-control-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.stress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.stress-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stress-card.unavailable {
+  opacity: 0.7;
+}
+
+.stress-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stress-card-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.stress-dates {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.stress-desc {
+  margin: 0;
+  font-size: 13px;
+}
+
+.stress-chart {
+  margin: 4px 0;
+}
+
+.stress-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.stress-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stress-metric-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.stress-metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.stress-metric-value.up {
+  color: #1b5e20;
+}
+
+.stress-metric-value.down {
+  color: var(--danger);
+}
+
+.stress-missing,
+.stress-nodata {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- Resampled frontier (#5) ---- */
+.resampled-frontier {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.resampled-note {
+  font-size: 13px;
+  margin: 10px 0;
+}

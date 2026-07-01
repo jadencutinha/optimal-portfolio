@@ -7,6 +7,7 @@ const ADVANCED_OBJECTIVES = new Set<Objective>([
   'cost_aware',
   'target_return',
   'target_risk',
+  'hrp',
 ])
 const ADVANCED_RISK = new Set<RiskModel>(['ledoit_wolf', 'ewma', 'factor'])
 
@@ -41,6 +42,7 @@ const OBJECTIVES: { value: Objective; label: string }[] = [
   { value: 'max_diversification', label: 'Max Diversification' },
   { value: 'cvar', label: 'Minimum CVaR' },
   { value: 'cost_aware', label: 'Net-of-cost' },
+  { value: 'hrp', label: 'Hierarchical Risk Parity' },
   { value: 'target_return', label: 'Target Return' },
   { value: 'target_risk', label: 'Target Risk' },
 ]

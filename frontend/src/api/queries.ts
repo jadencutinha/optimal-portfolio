@@ -19,6 +19,9 @@ import type {
   PlanResponse,
   PortfolioCreate,
   PortfolioSummary,
+  ResampledFrontierRequest,
+  ResampledFrontierResponse,
+  StressResponse,
   UniverseResponse,
 } from './types'
 
@@ -114,6 +117,20 @@ export function useAssistant() {
   return useMutation({
     mutationFn: async (request: AssistantRequest) =>
       (await apiClient.post<AssistantResponse>('/api/assistant', request)).data,
+  })
+}
+
+export function useStress() {
+  return useMutation({
+    mutationFn: async (request: OptimizeRequest) =>
+      (await apiClient.post<StressResponse>('/api/stress', request)).data,
+  })
+}
+
+export function useResampledFrontier() {
+  return useMutation({
+    mutationFn: async (request: ResampledFrontierRequest) =>
+      (await apiClient.post<ResampledFrontierResponse>('/api/frontier/resampled', request)).data,
   })
 }
 

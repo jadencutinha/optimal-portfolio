@@ -10,6 +10,7 @@ const OBJECTIVE_OPTIONS: { id: Objective; label: string }[] = [
   { id: 'max_sharpe', label: 'Max Sharpe' },
   { id: 'min_variance', label: 'Min Variance' },
   { id: 'risk_parity', label: 'Risk Parity' },
+  { id: 'hrp', label: 'Hierarchical RP' },
   { id: 'max_diversification', label: 'Max Diversification' },
   { id: 'cvar', label: 'Min CVaR' },
 ]

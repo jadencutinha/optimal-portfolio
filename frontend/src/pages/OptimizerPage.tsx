@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { useExplain, useFrontier, useMe, useOptimize, useSavePortfolio, useUniverse } from '../api/queries'
+import {
+  useExplain,
+  useFrontier,
+  useMe,
+  useOptimize,
+  useResampledFrontier,
+  useSavePortfolio,
+  useUniverse,
+} from '../api/queries'
 import { downloadCsv } from '../lib/csv'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
@@ -8,6 +16,7 @@ import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
+import { ResampledFrontierChart } from '../components/ResampledFrontierChart'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
@@ -19,6 +28,7 @@ export function OptimizerPage() {
   const optimize = useOptimize()
   const frontier = useFrontier()
   const explain = useExplain()
+  const resampled = useResampledFrontier()
   const me = useMe()
   const save = useSavePortfolio()
 
@@ -65,6 +75,7 @@ export function OptimizerPage() {
     setSelectedFrontierIndex(null)
     setLastRequest(request)
     explain.reset()
+    resampled.reset()
     optimize.mutate(request)
     frontier.mutate({
       tickers,
@@ -227,6 +238,40 @@ export function OptimizerPage() {
                     sharpe={result.metrics.sharpe_ratio}
                   />
                 )}
+
+                <div className="resampled-frontier">
+                  <button
+                    type="button"
+                    className="signin-trigger"
+                    disabled={resampled.isPending}
+                    onClick={() =>
+                      resampled.mutate({
+                        tickers,
+                        lookback_days: lookbackDays,
+                        min_weight: 0,
+                        max_weight: maxWeightPct / 100,
+                        risk_model: riskModel,
+                        points: 12,
+                        resamples: 15,
+                      })
+                    }
+                  >
+                    {resampled.isPending ? 'Resampling…' : 'Compare resampled frontier (Michaud)'}
+                  </button>
+                  {resampled.isError && (
+                    <p className="error">Couldn't resample the frontier. Try again.</p>
+                  )}
+                  {resampled.data && (
+                    <>
+                      <p className="muted resampled-note">
+                        Michaud resampling averages the frontier over many simulated markets, so the
+                        allocation is less sensitive to estimation error than the single-sample
+                        (classic) frontier.
+                      </p>
+                      <ResampledFrontierChart data={resampled.data} />
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>

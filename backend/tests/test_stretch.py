@@ -124,6 +124,65 @@ def test_build_optimize_request_target_return() -> None:
     assert request.target_return == 0.12
 
 
+def test_hrp_optimize_endpoint(client: TestClient) -> None:
+    payload = {"tickers": BASE_TICKERS, "objective": "hrp", "lookback_days": 500}
+    response = client.post("/api/optimize", json=payload)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    total = sum(allocation["weight"] for allocation in body["weights"])
+    assert abs(total - 1.0) < 1e-2
+    assert all(allocation["weight"] >= -1e-9 for allocation in body["weights"])
+    assert body["objective"] == "hrp"
+
+
+def test_hrp_allocator_diversifies() -> None:
+    import numpy as np
+
+    from app.optimizer.hrp import hierarchical_risk_parity
+
+    rng = np.random.default_rng(1)
+    data = rng.normal(size=(400, 5))
+    data[:, 1] += 0.9 * data[:, 0]
+    cov = np.cov(data, rowvar=False)
+    weights, status = hierarchical_risk_parity(cov)
+    assert status == "optimal"
+    assert abs(weights.sum() - 1.0) < 1e-9
+    assert (weights > 0).all()
+
+
+def test_stress_endpoint(client: TestClient) -> None:
+    payload = {"tickers": BASE_TICKERS, "objective": "max_sharpe", "lookback_days": 500}
+    response = client.post("/api/stress", json=payload)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    keys = {window["key"] for window in body["windows"]}
+    assert keys == {"gfc_2008", "covid_2020", "rate_shock_2022"}
+    for window in body["windows"]:
+        if window["available"]:
+            assert window["max_drawdown"] <= 0.0
+            assert window["total_return"] is not None
+            assert len(window["curve"]) >= 2
+
+
+def test_resampled_frontier_endpoint(client: TestClient) -> None:
+    payload = {
+        "tickers": BASE_TICKERS,
+        "risk_model": "sample",
+        "lookback_days": 500,
+        "points": 6,
+        "resamples": 5,
+    }
+    response = client.post("/api/frontier/resampled", json=payload)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert len(body["sample"]) == 6
+    assert len(body["resampled"]) == 6
+    assert body["resamples"] >= 1
+    for point in body["resampled"]:
+        total = sum(allocation["weight"] for allocation in point["weights"])
+        assert abs(total - 1.0) < 1e-2
+
+
 def test_extract_helpers() -> None:
     data = {
         "content": [
