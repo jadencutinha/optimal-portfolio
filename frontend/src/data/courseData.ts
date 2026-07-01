@@ -23,7 +23,6 @@ export interface Module {
 
 export interface Track {
   id: number
-  icon: string
   title: string
   description: string
   estimatedTime: string
@@ -32,7 +31,6 @@ export interface Track {
 
 const track1: Track = {
   id: 1,
-  icon: '📈',
   title: 'Money Fundamentals',
   description: 'Learn the basics — saving, investing, risk, and how to read your portfolio',
   estimatedTime: '25 min',
@@ -415,7 +413,6 @@ const track1: Track = {
 
 const track2: Track = {
   id: 2,
-  icon: '🧠',
   title: 'Behavioral Finance',
   description: 'Understand how your psychology affects your returns — and how to fix it',
   estimatedTime: '25 min',
@@ -424,7 +421,6 @@ const track2: Track = {
 
 const track3: Track = {
   id: 3,
-  icon: '🧮',
   title: 'Portfolio Optimization',
   description: 'Learn the math behind PortfoliU — the same methods hedge funds use',
   estimatedTime: '30 min',

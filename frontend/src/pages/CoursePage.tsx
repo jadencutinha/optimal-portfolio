@@ -38,7 +38,6 @@ export function CoursePage() {
           ← All tracks
         </button>
         <div className="track-page-header">
-          <span className="track-page-icon">{selectedTrack.icon}</span>
           <div>
             <h1 className="track-page-title">{selectedTrack.title}</h1>
             <p className="track-page-meta">
@@ -76,7 +75,6 @@ export function CoursePage() {
           const available = track.modules.length > 0
           return (
             <div key={track.id} className={`track-card ${available ? '' : 'track-coming-soon'}`}>
-              <div className="track-card-icon">{track.icon}</div>
               <div className="track-card-body">
                 <h3 className="track-card-title">
                   Track {track.id} — {track.title}

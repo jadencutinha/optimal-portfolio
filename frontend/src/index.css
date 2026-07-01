@@ -1967,13 +1967,6 @@ table.weights td {
   opacity: 0.55;
 }
 
-.track-card-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-  width: 48px;
-  text-align: center;
-}
-
 .track-card-body {
   flex: 1;
   min-width: 0;
@@ -2038,11 +2031,6 @@ table.weights td {
   align-items: center;
   gap: 18px;
   margin: 22px 0 28px;
-}
-
-.track-page-icon {
-  font-size: 40px;
-  flex-shrink: 0;
 }
 
 .track-page-title {
