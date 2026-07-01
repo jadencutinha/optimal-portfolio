@@ -4,12 +4,24 @@ import { Greeting } from '../components/Greeting'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
+import { FactorsPage } from './FactorsPage'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
 import { StressPage } from './StressPage'
 import { SweepPage } from './SweepPage'
+import { TrackerPage } from './TrackerPage'
 
-type Tab = 'optimizer' | 'assistant' | 'planner' | 'backtest' | 'compare' | 'stress' | 'behavioral' | 'saved'
+type Tab =
+  | 'optimizer'
+  | 'assistant'
+  | 'planner'
+  | 'backtest'
+  | 'compare'
+  | 'stress'
+  | 'factors'
+  | 'behavioral'
+  | 'tracker'
+  | 'saved'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'optimizer', label: 'Optimizer' },
@@ -18,7 +30,9 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'backtest', label: 'Backtest' },
   { id: 'compare', label: 'Compare' },
   { id: 'stress', label: 'Stress Test' },
+  { id: 'factors', label: 'Factors' },
   { id: 'behavioral', label: 'Behavioral' },
+  { id: 'tracker', label: 'Tracker' },
   { id: 'saved', label: 'My Portfolios' },
 ]
 
@@ -45,7 +59,9 @@ export function ProWorkspace() {
       {tab === 'backtest' && <BacktestPage />}
       {tab === 'compare' && <SweepPage />}
       {tab === 'stress' && <StressPage />}
+      {tab === 'factors' && <FactorsPage />}
       {tab === 'behavioral' && <BehavioralCoach />}
+      {tab === 'tracker' && <TrackerPage />}
       {tab === 'saved' && <SavedPortfolios />}
     </div>
   )

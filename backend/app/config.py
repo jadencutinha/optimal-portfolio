@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     anthropic_max_tokens: int = 1200
     anthropic_timeout_seconds: float = 60.0
 
+    sentry_dsn: str | None = None
+    sentry_traces_sample_rate: float = 0.0
+
     risk_free_rate: float = 0.02
     trading_days: int = 252
     default_lookback_days: int = 756

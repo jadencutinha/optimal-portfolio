@@ -1,4 +1,5 @@
 import { AuthBar } from './components/AuthBar'
+import { ThemeToggle } from './components/ThemeToggle'
 import { Home } from './pages/Home'
 import { VerifyPage } from './pages/VerifyPage'
 
@@ -32,6 +33,7 @@ export default function App() {
           </div>
         </div>
         <div className="header-actions">
+          <ThemeToggle />
           <AuthBar />
           <a className="whitepaper-link" href="/whitepaper.html" target="_blank" rel="noreferrer">
             Whitepaper

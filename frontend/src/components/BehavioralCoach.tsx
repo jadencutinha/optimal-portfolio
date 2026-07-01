@@ -118,13 +118,13 @@ export function BehavioralCoach() {
         <div className="behavioral-chart">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={data} margin={{ top: 10, right: 12, bottom: 4, left: 4 }}>
-              <CartesianGrid stroke="#a8d5aa" strokeOpacity={0.4} />
+              <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
               <XAxis dataKey="metric" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} unit="%" />
               <Tooltip formatter={(value: number) => `${value}%`} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="Math-optimal" fill="#2e7d32" />
-              <Bar dataKey="You" fill="#f59e0b" />
+              <Bar dataKey="Math-optimal" fill="var(--accent-hover)" />
+              <Bar dataKey="You" fill="var(--accent)" />
             </BarChart>
           </ResponsiveContainer>
         </div>

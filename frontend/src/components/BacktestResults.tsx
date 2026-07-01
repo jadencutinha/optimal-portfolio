@@ -34,7 +34,7 @@ function SeriesChart({
     <div className="bt-chart">
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={data} margin={{ top: 8, right: 16, bottom: 4, left: 4 }}>
-          <CartesianGrid stroke="#a8d5aa" strokeOpacity={0.4} />
+          <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
           <XAxis
             dataKey="date"
             tick={{ fontSize: 11 }}

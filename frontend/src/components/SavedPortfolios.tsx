@@ -1,16 +1,39 @@
 import { useDeletePortfolio, useSavedPortfolios } from '../api/queries'
+import { EmptyState } from './EmptyState'
+import { Skeleton } from './Skeleton'
 import { percent, ratio } from '../lib/format'
+import { useToast } from '../toast/useToast'
 
 export function SavedPortfolios() {
   const saved = useSavedPortfolios()
   const remove = useDeletePortfolio()
+  const toast = useToast()
 
   if (saved.isLoading) {
-    return <p className="muted">Loading your portfolios…</p>
+    return (
+      <div className="saved-list">
+        <Skeleton height="72px" radius="14px" />
+        <Skeleton height="72px" radius="14px" />
+        <Skeleton height="72px" radius="14px" />
+      </div>
+    )
   }
   const list = saved.data ?? []
   if (list.length === 0) {
-    return <p className="muted">No saved portfolios yet. Run the optimizer and click “Save portfolio”.</p>
+    return (
+      <EmptyState
+        icon="💾"
+        title="No saved portfolios yet"
+        description="Run the optimizer and click “Save portfolio” to keep it here."
+      />
+    )
+  }
+
+  const deletePortfolio = (id: number, name: string) => {
+    remove.mutate(id, {
+      onSuccess: () => toast(`Deleted "${name}"`, 'info'),
+      onError: () => toast('Could not delete that portfolio.', 'error'),
+    })
   }
 
   return (
@@ -35,7 +58,11 @@ export function SavedPortfolios() {
               <span>{percent(portfolio.metrics.volatility)} vol</span>
             )}
           </div>
-          <button type="button" className="signin-trigger" onClick={() => remove.mutate(portfolio.id)}>
+          <button
+            type="button"
+            className="signin-trigger"
+            onClick={() => deletePortfolio(portfolio.id, portfolio.name)}
+          >
             Delete
           </button>
         </div>

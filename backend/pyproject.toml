@@ -23,6 +23,8 @@ dependencies = [
     "greenlet>=3.0",
     "aiosqlite>=0.20",
     "asyncpg>=0.29",
+    "reportlab>=4.0",
+    "sentry-sdk[fastapi]>=2.0",
 ]
 
 [project.optional-dependencies]

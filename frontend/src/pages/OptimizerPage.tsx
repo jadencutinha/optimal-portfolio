@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  downloadReportPdf,
   useExplain,
   useFrontier,
   useMe,
@@ -12,14 +13,18 @@ import { downloadCsv } from '../lib/csv'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
+import { EmptyState } from '../components/EmptyState'
 import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
+import { PromptModal } from '../components/PromptModal'
 import { ResampledFrontierChart } from '../components/ResampledFrontierChart'
+import { SkeletonCards } from '../components/Skeleton'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
+import { useToast } from '../toast/useToast'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
 
@@ -31,6 +36,7 @@ export function OptimizerPage() {
   const resampled = useResampledFrontier()
   const me = useMe()
   const save = useSavePortfolio()
+  const toast = useToast()
 
   const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
   const pro = Boolean(entitlements.advanced_optimizers)
@@ -52,6 +58,8 @@ export function OptimizerPage() {
   const [assetBounds, setAssetBounds] = useState<AssetBound[]>([])
   const [selectedFrontierIndex, setSelectedFrontierIndex] = useState<number | null>(null)
   const [lastRequest, setLastRequest] = useState<OptimizeRequest | null>(null)
+  const [naming, setNaming] = useState(false)
+  const [uploadedWeights, setUploadedWeights] = useState<Record<string, number> | null>(null)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -71,6 +79,7 @@ export function OptimizerPage() {
       risk_aversion: riskAversion,
       asset_bounds: assetBounds,
       sector_caps: sectorCaps,
+      prev_weights: uploadedWeights ?? undefined,
     }
     setSelectedFrontierIndex(null)
     setLastRequest(request)
@@ -94,22 +103,27 @@ export function OptimizerPage() {
   const selectedPoint =
     frontierData && selectedFrontierIndex !== null ? frontierData.points[selectedFrontierIndex] : null
 
-  const savePortfolio = () => {
+  const confirmSave = (name: string) => {
     if (!result) return
-    const name = window.prompt('Name this portfolio', `${result.objective} · ${new Date().toLocaleDateString()}`)
-    if (!name) return
-    save.mutate({
-      name,
-      objective: result.objective,
-      risk_model: result.risk_model,
-      tickers: result.weights.map((allocation) => allocation.ticker),
-      weights: Object.fromEntries(result.weights.map((allocation) => [allocation.ticker, allocation.weight])),
-      metrics: {
-        sharpe_ratio: result.metrics.sharpe_ratio,
-        expected_return: result.metrics.expected_return,
-        volatility: result.metrics.volatility,
+    save.mutate(
+      {
+        name,
+        objective: result.objective,
+        risk_model: result.risk_model,
+        tickers: result.weights.map((allocation) => allocation.ticker),
+        weights: Object.fromEntries(result.weights.map((allocation) => [allocation.ticker, allocation.weight])),
+        metrics: {
+          sharpe_ratio: result.metrics.sharpe_ratio,
+          expected_return: result.metrics.expected_return,
+          volatility: result.metrics.volatility,
+        },
       },
-    })
+      {
+        onSuccess: () => toast(`Saved "${name}"`, 'success'),
+        onError: () => toast("Couldn't save — you may have hit your plan's saved-portfolio limit.", 'error'),
+      },
+    )
+    setNaming(false)
   }
 
   const exportCsv = () => {
@@ -119,6 +133,62 @@ export function OptimizerPage() {
       rows.push([allocation.ticker, allocation.weight, allocation.sector ?? '']),
     )
     downloadCsv('portfolio-weights.csv', rows)
+  }
+
+  const downloadPdf = async () => {
+    if (!lastRequest) return
+    try {
+      const blob = await downloadReportPdf(lastRequest)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'portfolio-report.pdf'
+      link.click()
+      URL.revokeObjectURL(url)
+      toast('Report downloaded', 'success')
+    } catch {
+      toast('Could not generate the report.', 'error')
+    }
+  }
+
+  const importCsv = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = String(reader.result ?? '')
+      const parsed: string[] = []
+      const weights: Record<string, number> = {}
+      let hasWeights = false
+      for (const line of text.split(/\r?\n/)) {
+        const [rawTicker, rawWeight] = line.split(/[,\t;]/)
+        const ticker = rawTicker?.trim().toUpperCase()
+        if (!ticker || ticker === 'TICKER' || !/^[A-Z][A-Z.-]*$/.test(ticker)) continue
+        if (!parsed.includes(ticker)) parsed.push(ticker)
+        if (rawWeight !== undefined && rawWeight.trim() !== '') {
+          const value = Number(rawWeight.replace('%', '').trim())
+          if (!Number.isNaN(value)) {
+            weights[ticker] = value
+            hasWeights = true
+          }
+        }
+      }
+      if (parsed.length < 2) {
+        toast('Need at least 2 valid tickers in the CSV.', 'error')
+        return
+      }
+      setTickers(parsed.slice(0, 50))
+      if (hasWeights) {
+        const total = Object.values(weights).reduce((sum, value) => sum + value, 0)
+        const normalized: Record<string, number> = {}
+        Object.entries(weights).forEach(([ticker, value]) => {
+          normalized[ticker] = total > 0 ? value / total : 0
+        })
+        setUploadedWeights(normalized)
+      } else {
+        setUploadedWeights(null)
+      }
+      toast(`Loaded ${parsed.length} tickers${hasWeights ? ' with weights' : ''}`, 'success')
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -132,6 +202,28 @@ export function OptimizerPage() {
           </div>
         )}
         <TickerInput tickers={tickers} suggestions={universe.data?.assets ?? []} onChange={setTickers} />
+        <div className="csv-upload">
+          <label className="csv-upload-btn">
+            Upload holdings CSV
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                if (file) importCsv(file)
+                event.target.value = ''
+              }}
+            />
+          </label>
+          {uploadedWeights && (
+            <span className="csv-loaded">
+              {Object.keys(uploadedWeights).length} holdings loaded
+              <button type="button" onClick={() => setUploadedWeights(null)}>
+                clear
+              </button>
+            </span>
+          )}
+        </div>
         <ObjectiveControls
           objective={objective}
           riskModel={riskModel}
@@ -172,9 +264,13 @@ export function OptimizerPage() {
       <section className="panel results">
         <h2>Results</h2>
         {!result && !optimize.isPending && (
-          <p className="muted">Configure a portfolio and run the optimizer to see the optimal allocation.</p>
+          <EmptyState
+            icon="◎"
+            title="No portfolio yet"
+            description="Configure your universe and objective, then run the optimizer to see the optimal allocation."
+          />
         )}
-        {optimize.isPending && <p className="muted">Solving the convex program…</p>}
+        {optimize.isPending && <SkeletonCards count={3} />}
         {result && (
           <div className="results-grid">
             <StatCards result={result} />
@@ -189,13 +285,13 @@ export function OptimizerPage() {
               {result.turnover !== null && ` · turnover ${(result.turnover * 100).toFixed(1)}%`}
             </p>
             <div className="result-actions">
-              <button type="button" className="signin-trigger" onClick={savePortfolio}>
+              <button type="button" className="signin-trigger" onClick={() => setNaming(true)}>
                 {save.isSuccess ? 'Saved ✓' : 'Save portfolio'}
               </button>
               <button type="button" className="signin-trigger" onClick={exportCsv}>
                 Export CSV
               </button>
-              <button type="button" className="signin-trigger" onClick={() => window.print()}>
+              <button type="button" className="signin-trigger" onClick={downloadPdf} disabled={!lastRequest}>
                 PDF report
               </button>
               <button
@@ -207,7 +303,6 @@ export function OptimizerPage() {
                 {explain.isPending ? 'Explaining…' : 'Why this portfolio?'}
               </button>
             </div>
-            {save.isError && <p className="error">Could not save — you may have hit your plan's saved-portfolio limit.</p>}
             {explain.isError && <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>}
             {explain.data && <Explanation data={explain.data} />}
 
@@ -277,6 +372,17 @@ export function OptimizerPage() {
           </div>
         )}
       </section>
+
+      {naming && result && (
+        <PromptModal
+          title="Save portfolio"
+          label="Portfolio name"
+          defaultValue={`${result.objective} · ${new Date().toLocaleDateString()}`}
+          submitLabel="Save"
+          onSubmit={confirmSave}
+          onCancel={() => setNaming(false)}
+        />
+      )}
     </div>
   )
 }

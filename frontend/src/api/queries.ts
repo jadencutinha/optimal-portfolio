@@ -9,6 +9,7 @@ import type {
   CourseDetail,
   CourseSummary,
   ExplainResponse,
+  FactorResponse,
   FrontierParams,
   FrontierResponse,
   MeResponse,
@@ -18,10 +19,12 @@ import type {
   PlanRequest,
   PlanResponse,
   PortfolioCreate,
+  PortfolioDetail,
   PortfolioSummary,
   ResampledFrontierRequest,
   ResampledFrontierResponse,
   StressResponse,
+  TrackResponse,
   UniverseResponse,
 } from './types'
 
@@ -125,6 +128,33 @@ export function useStress() {
     mutationFn: async (request: OptimizeRequest) =>
       (await apiClient.post<StressResponse>('/api/stress', request)).data,
   })
+}
+
+export function useFactors() {
+  return useMutation({
+    mutationFn: async (request: OptimizeRequest) =>
+      (await apiClient.post<FactorResponse>('/api/factors', request)).data,
+  })
+}
+
+export function useTrack() {
+  return useMutation({
+    mutationFn: async (weights: Record<string, number>) =>
+      (await apiClient.post<TrackResponse>('/api/track', { weights })).data,
+  })
+}
+
+export function usePortfolioDetail(id: number | null) {
+  return useQuery({
+    queryKey: ['portfolio', id],
+    enabled: id !== null,
+    queryFn: async () => (await apiClient.get<PortfolioDetail>(`/api/portfolios/${id}`)).data,
+  })
+}
+
+export async function downloadReportPdf(request: OptimizeRequest): Promise<Blob> {
+  const response = await apiClient.post('/api/report/pdf', request, { responseType: 'blob' })
+  return response.data as Blob
 }
 
 export function useResampledFrontier() {

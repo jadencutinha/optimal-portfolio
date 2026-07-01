@@ -41,7 +41,7 @@ export function FrontierChart({ frontier, portfolio, selectedIndex, onSelect }: 
     <div className="frontier-chart">
       <ResponsiveContainer width="100%" height={300}>
         <ScatterChart margin={{ top: 12, right: 16, bottom: 28, left: 4 }}>
-          <CartesianGrid stroke="#a8d5aa" strokeOpacity={0.4} />
+          <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
           <XAxis
             type="number"
             dataKey="x"

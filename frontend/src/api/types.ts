@@ -48,6 +48,7 @@ export interface OptimizeRequest {
   max_weight: number
   asset_bounds?: AssetBound[]
   sector_caps?: SectorCap[]
+  prev_weights?: Record<string, number> | null
 }
 
 export interface WeightAllocation {
@@ -426,4 +427,49 @@ export interface ResampledFrontierResponse {
   resamples: number
   sample: FrontierPoint[]
   resampled: FrontierPoint[]
+}
+
+export interface FactorExposure {
+  key: string
+  label: string
+  beta: number
+  t_stat: number
+  factor_return: number
+  contribution: number
+}
+
+export interface FactorResponse {
+  objective: Objective
+  weights: WeightAllocation[]
+  exposures: FactorExposure[]
+  alpha: number
+  r_squared: number
+  idiosyncratic_vol: number
+  observations: number
+  note: string
+}
+
+export interface TrackHolding {
+  ticker: string
+  target: number
+  current: number
+  drift: number
+}
+
+export interface TrackPoint {
+  date: string
+  drift: number
+}
+
+export interface TrackResponse {
+  as_of: string
+  total_return: number
+  max_drift: number
+  turnover_to_rebalance: number
+  rebalance_needed: boolean
+  band: number
+  top_drifter: string | null
+  holdings: TrackHolding[]
+  timeline: TrackPoint[]
+  missing_tickers: string[]
 }

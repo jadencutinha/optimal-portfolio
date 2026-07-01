@@ -10,15 +10,19 @@ from app.api.routes import (
     assistant,
     backtest,
     courses,
+    factors,
     frontier,
     health,
     jobs,
     me,
+    metrics as metrics_route,
     optimize,
     planner,
     portfolios,
     prices,
+    reports,
     stress,
+    tracking,
     universe,
 )
 from app.auth.repository import ProfileRepository
@@ -32,6 +36,8 @@ from app.data.sectors import SectorProvider
 from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
 from app.jobs.manager import JobManager
+from app.observability.metrics import MetricsCollector
+from app.observability.sentry import capture_exception, init_sentry
 from app.optimizer.repository import OptimizationRepository
 from app.portfolios.repository import PortfolioRepository
 
@@ -76,7 +82,9 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    init_sentry(settings.sentry_dsn, settings.environment, settings.sentry_traces_sample_rate)
     app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)
+    app.state.metrics = MetricsCollector()
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -90,12 +98,15 @@ def create_app() -> FastAPI:
         start = time.perf_counter()
         response = await call_next(request)
         elapsed = (time.perf_counter() - start) * 1000
+        app.state.metrics.record(request.method, request.url.path, response.status_code, elapsed)
         logger.info("%s %s -> %s (%.1fms)", request.method, request.url.path, response.status_code, elapsed)
         return response
 
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+        app.state.metrics.record(request.method, request.url.path, 500, 0.0)
+        capture_exception(exc)
         return JSONResponse(status_code=500, content={"detail": "An unexpected error occurred."})
 
     app.include_router(health.router, prefix=settings.api_prefix)
@@ -111,6 +122,10 @@ def create_app() -> FastAPI:
     app.include_router(planner.router, prefix=settings.api_prefix)
     app.include_router(assistant.router, prefix=settings.api_prefix)
     app.include_router(stress.router, prefix=settings.api_prefix)
+    app.include_router(factors.router, prefix=settings.api_prefix)
+    app.include_router(reports.router, prefix=settings.api_prefix)
+    app.include_router(tracking.router, prefix=settings.api_prefix)
+    app.include_router(metrics_route.router, prefix=settings.api_prefix)
     return app
 
 

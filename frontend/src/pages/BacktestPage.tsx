@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useBacktest, useUniverse } from '../api/queries'
 import type { BacktestObjective, BacktestRequest, BenchmarkName, RebalanceCadence, RiskModel } from '../api/types'
 import { BacktestResults } from '../components/BacktestResults'
+import { EmptyState } from '../components/EmptyState'
+import { Skeleton, SkeletonCards } from '../components/Skeleton'
 import { TickerInput } from '../components/TickerInput'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
@@ -178,9 +180,18 @@ export function BacktestPage() {
       <section className="panel">
         <h2>Results</h2>
         {!backtest.data && !backtest.isPending && (
-          <p className="muted">Configure a strategy and run a walk-forward backtest against the benchmarks.</p>
+          <EmptyState
+            icon="📈"
+            title="No backtest yet"
+            description="Configure a strategy and run a walk-forward backtest against the benchmarks."
+          />
         )}
-        {backtest.isPending && <p className="muted">Running walk-forward backtest…</p>}
+        {backtest.isPending && (
+          <div className="bt-skeleton">
+            <SkeletonCards count={4} />
+            <Skeleton height="240px" radius="14px" />
+          </div>
+        )}
         {backtest.data && <BacktestResults result={backtest.data} />}
       </section>
     </div>

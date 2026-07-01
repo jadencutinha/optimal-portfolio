@@ -1,0 +1,15 @@
+import { createContext } from 'react'
+
+export type ToastKind = 'success' | 'error' | 'info'
+
+export interface ToastMessage {
+  id: number
+  message: string
+  kind: ToastKind
+}
+
+export interface ToastContextValue {
+  toast: (message: string, kind?: ToastKind) => void
+}
+
+export const ToastContext = createContext<ToastContextValue | null>(null)

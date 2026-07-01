@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
+import { ErrorState } from '../components/ErrorState'
+import { Skeleton } from '../components/Skeleton'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
 import { CheckoutPage } from './CheckoutPage'
@@ -24,18 +26,20 @@ export function Home() {
   }
 
   if (me.isLoading) {
-    return <p className="muted">Loading your workspace…</p>
+    return (
+      <div className="workspace-skeleton">
+        <Skeleton width="240px" height="30px" />
+        <div className="skeleton-panels">
+          <Skeleton height="180px" radius="16px" />
+          <Skeleton height="180px" radius="16px" />
+        </div>
+        <Skeleton height="260px" radius="16px" />
+      </div>
+    )
   }
 
   if (me.isError || !me.data) {
-    return (
-      <div className="workspace-error">
-        <p className="error">We couldn't load your account.</p>
-        <button type="button" className="signin-trigger" onClick={() => me.refetch()}>
-          Retry
-        </button>
-      </div>
-    )
+    return <ErrorState message="We couldn't load your account." onRetry={() => me.refetch()} />
   }
 
   const { plan, plan_selected: planSelected } = me.data
