@@ -181,7 +181,6 @@ export function BacktestPage() {
         <h2>Results</h2>
         {!backtest.data && !backtest.isPending && (
           <EmptyState
-            icon="📈"
             title="No backtest yet"
             description="Configure a strategy and run a walk-forward backtest against the benchmarks."
           />
