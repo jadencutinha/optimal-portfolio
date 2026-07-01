@@ -19,23 +19,27 @@ export interface Module {
   title: string
   content: ContentBlock[]
   quiz: QuizQuestion[]
+  isCompleted: boolean
+  isLocked: boolean
 }
+
+export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced'
 
 export interface Track {
   id: number
-  icon: string
   title: string
   description: string
   estimatedTime: string
+  difficulty: Difficulty
   modules: Module[]
 }
 
 const track1: Track = {
   id: 1,
-  icon: '📈',
   title: 'Money Fundamentals',
   description: 'Learn the basics — saving, investing, risk, and how to read your portfolio',
   estimatedTime: '25 min',
+  difficulty: 'Beginner',
   modules: [
     {
       id: 1,
@@ -97,6 +101,8 @@ const track1: Track = {
           ],
         },
       ],
+      isCompleted: true,
+      isLocked: false,
     },
     {
       id: 2,
@@ -174,6 +180,8 @@ const track1: Track = {
           ],
         },
       ],
+      isCompleted: false,
+      isLocked: false,
     },
     {
       id: 3,
@@ -249,6 +257,8 @@ const track1: Track = {
           ],
         },
       ],
+      isCompleted: false,
+      isLocked: true,
     },
     {
       id: 4,
@@ -325,6 +335,8 @@ const track1: Track = {
           ],
         },
       ],
+      isCompleted: false,
+      isLocked: true,
     },
     {
       id: 5,
@@ -409,25 +421,27 @@ const track1: Track = {
           ],
         },
       ],
+      isCompleted: false,
+      isLocked: true,
     },
   ],
 }
 
 const track2: Track = {
   id: 2,
-  icon: '🧠',
   title: 'Behavioral Finance',
   description: 'Understand how your psychology affects your returns — and how to fix it',
   estimatedTime: '25 min',
+  difficulty: 'Intermediate',
   modules: [],
 }
 
 const track3: Track = {
   id: 3,
-  icon: '🧮',
   title: 'Portfolio Optimization',
   description: 'Learn the math behind PortfoliU — the same methods hedge funds use',
   estimatedTime: '30 min',
+  difficulty: 'Advanced',
   modules: [],
 }
 
