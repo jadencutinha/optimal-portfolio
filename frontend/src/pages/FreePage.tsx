@@ -1,3 +1,4 @@
+import { Greeting } from '../components/Greeting'
 import { OptimizerPage } from './OptimizerPage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
@@ -12,6 +13,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade }: Props) {
 
   return (
     <div className="free-platform">
+      <Greeting />
       <div className="free-header">
         <div>
           <h1>Free platform</h1>

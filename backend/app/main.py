@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routes import (
+    assistant,
     backtest,
     courses,
     frontier,
@@ -14,6 +15,7 @@ from app.api.routes import (
     jobs,
     me,
     optimize,
+    planner,
     portfolios,
     prices,
     universe,
@@ -105,6 +107,8 @@ def create_app() -> FastAPI:
     app.include_router(jobs.router, prefix=settings.api_prefix)
     app.include_router(courses.router, prefix=settings.api_prefix)
     app.include_router(portfolios.router, prefix=settings.api_prefix)
+    app.include_router(planner.router, prefix=settings.api_prefix)
+    app.include_router(assistant.router, prefix=settings.api_prefix)
     return app
 
 

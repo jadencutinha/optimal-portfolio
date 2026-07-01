@@ -26,6 +26,13 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str | None = None
     supabase_service_role_key: str | None = None
 
+    anthropic_api_key: str | None = None
+    anthropic_model: str = "claude-sonnet-4-6"
+    anthropic_base_url: str = "https://api.anthropic.com/v1"
+    anthropic_version: str = "2023-06-01"
+    anthropic_max_tokens: int = 1200
+    anthropic_timeout_seconds: float = 60.0
+
     risk_free_rate: float = 0.02
     trading_days: int = 252
     default_lookback_days: int = 756

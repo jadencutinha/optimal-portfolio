@@ -278,3 +278,100 @@ export interface SweepCell {
   sharpe_ratio: number | null
   message?: string
 }
+
+export interface RiskContribution {
+  ticker: string
+  weight: number
+  risk_contribution: number
+  return_contribution: number
+  at_max_bound: boolean
+  at_min_bound: boolean
+}
+
+export interface Counterfactual {
+  label: string
+  description: string
+  expected_return: number
+  volatility: number
+  sharpe_ratio: number
+  delta_sharpe: number
+}
+
+export interface ExplainResponse {
+  objective: Objective
+  as_of_start: string
+  as_of_end: string
+  expected_return: number
+  volatility: number
+  sharpe_ratio: number
+  effective_holdings: number
+  concentration_hhi: number
+  binding_max_weight: boolean
+  binding_tickers: string[]
+  top_risk_driver: string | null
+  contributions: RiskContribution[]
+  counterfactuals: Counterfactual[]
+}
+
+export interface PlanRequest {
+  expected_return: number
+  volatility: number
+  initial: number
+  monthly_contribution: number
+  years: number
+  target?: number | null
+  trials?: number
+  large_drawdown?: number
+  seed?: number | null
+}
+
+export interface PlanPoint {
+  month: number
+  p10: number
+  p25: number
+  p50: number
+  p75: number
+  p90: number
+}
+
+export interface PlanResponse {
+  years: number
+  months: number
+  trials: number
+  target: number | null
+  total_contributions: number
+  prob_success: number | null
+  prob_large_drawdown: number
+  large_drawdown: number
+  median_final: number
+  mean_final: number
+  p10_final: number
+  p90_final: number
+  timeline: PlanPoint[]
+}
+
+export interface AssistantRequest {
+  message: string
+  tickers?: string[] | null
+}
+
+export interface AssistantConfig {
+  tickers: string[]
+  objective: string
+  risk_model: string
+  return_model: string
+  max_weight: number
+  target_return: number | null
+  target_risk: number | null
+  cvar_alpha: number
+  risk_aversion: number
+  lookback_days: number | null
+}
+
+export interface AssistantResponse {
+  model: string
+  rationale: string
+  explanation: string
+  config: AssistantConfig
+  result: OptimizeResponse
+}

@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
+import { Greeting } from '../components/Greeting'
 import { SavedPortfolios } from '../components/SavedPortfolios'
+import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
 import { OptimizerPage } from './OptimizerPage'
+import { PlannerPage } from './PlannerPage'
 import { SweepPage } from './SweepPage'
 
-type Tab = 'optimizer' | 'backtest' | 'compare' | 'behavioral' | 'saved'
+type Tab = 'optimizer' | 'assistant' | 'planner' | 'backtest' | 'compare' | 'behavioral' | 'saved'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'optimizer', label: 'Optimizer' },
+  { id: 'assistant', label: 'Assistant' },
+  { id: 'planner', label: 'Planner' },
   { id: 'backtest', label: 'Backtest' },
   { id: 'compare', label: 'Compare' },
   { id: 'behavioral', label: 'Behavioral' },
@@ -19,6 +24,7 @@ export function ProWorkspace() {
   const [tab, setTab] = useState<Tab>('optimizer')
   return (
     <div className="pro-workspace">
+      <Greeting />
       <div className="tabs">
         {TABS.map((option) => (
           <button
@@ -32,6 +38,8 @@ export function ProWorkspace() {
         ))}
       </div>
       {tab === 'optimizer' && <OptimizerPage />}
+      {tab === 'assistant' && <AssistantPage />}
+      {tab === 'planner' && <PlannerPage />}
       {tab === 'backtest' && <BacktestPage />}
       {tab === 'compare' && <SweepPage />}
       {tab === 'behavioral' && <BehavioralCoach />}

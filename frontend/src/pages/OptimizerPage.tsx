@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { useFrontier, useMe, useOptimize, useSavePortfolio, useUniverse } from '../api/queries'
+import { useExplain, useFrontier, useMe, useOptimize, useSavePortfolio, useUniverse } from '../api/queries'
 import { downloadCsv } from '../lib/csv'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
+import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
@@ -17,6 +18,7 @@ export function OptimizerPage() {
   const universe = useUniverse()
   const optimize = useOptimize()
   const frontier = useFrontier()
+  const explain = useExplain()
   const me = useMe()
   const save = useSavePortfolio()
 
@@ -39,6 +41,7 @@ export function OptimizerPage() {
   const [sectorCaps, setSectorCaps] = useState<SectorCap[]>([])
   const [assetBounds, setAssetBounds] = useState<AssetBound[]>([])
   const [selectedFrontierIndex, setSelectedFrontierIndex] = useState<number | null>(null)
+  const [lastRequest, setLastRequest] = useState<OptimizeRequest | null>(null)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -60,6 +63,8 @@ export function OptimizerPage() {
       sector_caps: sectorCaps,
     }
     setSelectedFrontierIndex(null)
+    setLastRequest(request)
+    explain.reset()
     optimize.mutate(request)
     frontier.mutate({
       tickers,
@@ -182,8 +187,18 @@ export function OptimizerPage() {
               <button type="button" className="signin-trigger" onClick={() => window.print()}>
                 PDF report
               </button>
+              <button
+                type="button"
+                className="signin-trigger"
+                disabled={!lastRequest || explain.isPending}
+                onClick={() => lastRequest && explain.mutate(lastRequest)}
+              >
+                {explain.isPending ? 'Explaining…' : 'Why this portfolio?'}
+              </button>
             </div>
             {save.isError && <p className="error">Could not save — you may have hit your plan's saved-portfolio limit.</p>}
+            {explain.isError && <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>}
+            {explain.data && <Explanation data={explain.data} />}
 
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (

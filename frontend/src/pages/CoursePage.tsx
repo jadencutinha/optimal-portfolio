@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Greeting } from '../components/Greeting'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { TRACKS, type Track } from '../data/courseData'
 
@@ -66,6 +67,7 @@ export function CoursePage() {
 
   return (
     <div className="course-landing">
+      <Greeting />
       <h1 className="course-landing-title">PortfoliU Learn</h1>
       <p className="course-landing-desc">
         From saving basics to the math behind hedge funds — three tracks that build on each

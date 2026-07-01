@@ -2,16 +2,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/useAuth'
 import { apiClient } from './client'
 import type {
+  AssistantRequest,
+  AssistantResponse,
   BacktestRequest,
   BacktestResponse,
   CourseDetail,
   CourseSummary,
+  ExplainResponse,
   FrontierParams,
   FrontierResponse,
   MeResponse,
   OptimizeRequest,
   OptimizeResponse,
   Plan,
+  PlanRequest,
+  PlanResponse,
   PortfolioCreate,
   PortfolioSummary,
   UniverseResponse,
@@ -88,6 +93,27 @@ export function useOptimize() {
   return useMutation({
     mutationFn: async (request: OptimizeRequest) =>
       (await apiClient.post<OptimizeResponse>('/api/optimize', request)).data,
+  })
+}
+
+export function useExplain() {
+  return useMutation({
+    mutationFn: async (request: OptimizeRequest) =>
+      (await apiClient.post<ExplainResponse>('/api/optimize/explain', request)).data,
+  })
+}
+
+export function usePlan() {
+  return useMutation({
+    mutationFn: async (request: PlanRequest) =>
+      (await apiClient.post<PlanResponse>('/api/plan/montecarlo', request)).data,
+  })
+}
+
+export function useAssistant() {
+  return useMutation({
+    mutationFn: async (request: AssistantRequest) =>
+      (await apiClient.post<AssistantResponse>('/api/assistant', request)).data,
   })
 }
 

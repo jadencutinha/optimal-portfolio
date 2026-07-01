@@ -10,6 +10,7 @@ from app.optimizer import markowitz
 from app.optimizer.black_litterman import black_litterman
 from app.optimizer.constraints import ConstraintError, build_bounds, uniform_bounds
 from app.optimizer.risk_models import RiskModel, estimate_covariance
+from app.schemas.explain import Counterfactual, ExplainResponse, RiskContribution
 from app.schemas.optimize import (
     FrontierPointSchema,
     FrontierResponse,
@@ -185,6 +186,142 @@ async def run_optimization(
         ),
     )
     return response, frame
+
+
+def _contributions(
+    tickers: list[str],
+    weights: np.ndarray,
+    mu: np.ndarray,
+    covariance: np.ndarray,
+    bounds,
+) -> tuple[list[RiskContribution], str | None, list[str]]:
+    port_var = float(weights @ covariance @ weights)
+    marginal = covariance @ weights
+    port_ret = float(weights @ mu)
+    rows: list[RiskContribution] = []
+    binding: list[str] = []
+    top_driver: str | None = None
+    top_rc = -1.0
+    for i, ticker in enumerate(tickers):
+        rc = float(weights[i] * marginal[i] / port_var) if port_var > 1e-18 else 0.0
+        rec = float(weights[i] * mu[i] / port_ret) if abs(port_ret) > 1e-9 else 0.0
+        at_max = bool(weights[i] >= bounds.upper[i] - 1e-4)
+        at_min = bool(bounds.lower[i] > 0 and weights[i] <= bounds.lower[i] + 1e-4)
+        if at_max:
+            binding.append(ticker)
+        if weights[i] > 1e-6 and rc > top_rc:
+            top_rc = rc
+            top_driver = ticker
+        rows.append(
+            RiskContribution(
+                ticker=ticker,
+                weight=float(weights[i]),
+                risk_contribution=rc,
+                return_contribution=rec,
+                at_max_bound=at_max,
+                at_min_bound=at_min,
+            )
+        )
+    rows.sort(key=lambda row: row.weight, reverse=True)
+    return rows, top_driver, binding
+
+
+async def run_explanation(
+    request: OptimizeRequest,
+    provider: DataProvider,
+    settings: Settings,
+    sectors: dict[str, str] | None = None,
+) -> ExplainResponse:
+    start, end = _resolve_dates(request.start, request.end, request.lookback_days, settings)
+    frame = await _price_frame(request.tickers, start, end, provider, settings)
+    tickers = list(frame.columns)
+    returns_frame = daily_returns(frame)
+    mu = annualized_mean(returns_frame, settings.trading_days).to_numpy()
+    covariance, _ = estimate_covariance(
+        returns_frame, settings.trading_days, request.risk_model, request.ewma_lambda
+    )
+    returns_matrix = returns_frame.to_numpy()
+    risk_free_rate = request.risk_free_rate if request.risk_free_rate is not None else settings.risk_free_rate
+
+    if request.return_model == "black_litterman":
+        market_weights = np.ones(len(tickers)) / len(tickers)
+        mu = black_litterman(covariance, market_weights, request.bl_risk_aversion)
+
+    previous = _previous_vector(tickers, request.prev_weights)
+
+    try:
+        bounds = build_bounds(
+            tickers, request.min_weight, request.max_weight, request.asset_bounds, request.sector_caps, sectors
+        )
+    except ConstraintError as error:
+        raise OptimizationServiceError(str(error), 422) from error
+
+    try:
+        weights, _ = _dispatch(request, mu, covariance, returns_matrix, previous, risk_free_rate, bounds)
+    except markowitz.OptimizationError as error:
+        raise OptimizationServiceError(str(error), 422) from error
+
+    expected, volatility, sharpe = markowitz.portfolio_metrics(weights, mu, covariance, risk_free_rate)
+    contributions, top_driver, binding = _contributions(tickers, weights, mu, covariance, bounds)
+    hhi = float(np.sum(weights**2))
+    effective = float(1.0 / hhi) if hhi > 1e-12 else float(len(tickers))
+
+    counterfactuals: list[Counterfactual] = []
+    equal = np.ones(len(tickers)) / len(tickers)
+    eq_ret, eq_vol, eq_sharpe = markowitz.portfolio_metrics(equal, mu, covariance, risk_free_rate)
+    counterfactuals.append(
+        Counterfactual(
+            label="Equal weight",
+            description="Split evenly across every holding instead of optimizing.",
+            expected_return=eq_ret,
+            volatility=eq_vol,
+            sharpe_ratio=eq_sharpe,
+            delta_sharpe=eq_sharpe - sharpe,
+        )
+    )
+
+    if binding and request.max_weight < 1.0:
+        new_cap = min(1.0, round(request.max_weight + 0.15, 4))
+        relaxed = request.model_copy(update={"max_weight": new_cap})
+        try:
+            relaxed_bounds = build_bounds(
+                tickers, relaxed.min_weight, relaxed.max_weight, relaxed.asset_bounds, relaxed.sector_caps, sectors
+            )
+            relaxed_weights, _ = _dispatch(
+                relaxed, mu, covariance, returns_matrix, previous, risk_free_rate, relaxed_bounds
+            )
+            r_ret, r_vol, r_sharpe = markowitz.portfolio_metrics(relaxed_weights, mu, covariance, risk_free_rate)
+            counterfactuals.append(
+                Counterfactual(
+                    label=f"Relax cap to {int(new_cap * 100)}%",
+                    description=(
+                        f"Raise the per-holding cap from {int(request.max_weight * 100)}% "
+                        f"to {int(new_cap * 100)}%."
+                    ),
+                    expected_return=r_ret,
+                    volatility=r_vol,
+                    sharpe_ratio=r_sharpe,
+                    delta_sharpe=r_sharpe - sharpe,
+                )
+            )
+        except (ConstraintError, markowitz.OptimizationError):
+            pass
+
+    return ExplainResponse(
+        objective=request.objective,
+        as_of_start=frame.index.min().date(),
+        as_of_end=frame.index.max().date(),
+        expected_return=expected,
+        volatility=volatility,
+        sharpe_ratio=sharpe,
+        effective_holdings=effective,
+        concentration_hhi=hhi,
+        binding_max_weight=bool(binding),
+        binding_tickers=binding,
+        top_risk_driver=top_driver,
+        contributions=contributions,
+        counterfactuals=counterfactuals,
+    )
 
 
 async def run_frontier(

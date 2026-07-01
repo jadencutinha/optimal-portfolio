@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
-import { Greeting } from '../components/Greeting'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
 import { CheckoutPage } from './CheckoutPage'
@@ -55,9 +54,6 @@ export function Home() {
         onChoose={async (choice) => {
           await setPlan.mutateAsync(choice)
           setSwitching(false)
-          if (choice === 'free' && !localStorage.getItem(RISK_PROFILE_KEY)) {
-            setShowRiskQ(true)
-          }
         }}
       />
     )
@@ -77,7 +73,6 @@ export function Home() {
   return (
     <>
       <div className="platform-bar">
-        <Greeting />
         <button type="button" className="switch-plan" onClick={() => setSwitching(true)}>
           Switch platform
         </button>
