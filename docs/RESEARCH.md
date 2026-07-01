@@ -1,6 +1,6 @@
 # Background Research
 
-A short survey of the academic and practitioner literature that PortfolioU is built on.
+A short survey of the academic and practitioner literature that PortfoliU is built on.
 
 ## 1. Modern Portfolio Theory
 - **Markowitz (1952), "Portfolio Selection."** Introduced mean-variance optimization: choose weights to minimize variance `wᵀΣw` for a target return, tracing the **efficient frontier**. Won the 1990 Nobel. This is the core of our optimizer.

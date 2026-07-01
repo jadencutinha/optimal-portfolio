@@ -28,7 +28,7 @@ def build_report(response: OptimizeResponse, title: str = "Optimized Portfolio")
         bottomMargin=0.7 * inch,
         leftMargin=0.8 * inch,
         rightMargin=0.8 * inch,
-        title=f"PortfolioU — {title}",
+        title=f"PortfoliU — {title}",
     )
     styles = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=styles["Heading1"], textColor=_TEAL, fontSize=22, spaceAfter=2)
@@ -38,7 +38,7 @@ def build_report(response: OptimizeResponse, title: str = "Optimized Portfolio")
 
     metrics = response.metrics
     story = [
-        Paragraph("PortfolioU", h1),
+        Paragraph("PortfoliU", h1),
         Paragraph(f"{title} · generated {date.today().isoformat()}", sub),
     ]
 

@@ -12,7 +12,7 @@ export default function App() {
         <header className="app-header">
           <div className="brand">
             <a href="/" className="brand-link">
-              <h1>PortfolioU</h1>
+              <h1>PortfoliU</h1>
             </a>
           </div>
         </header>
@@ -28,7 +28,7 @@ export default function App() {
       <header className="app-header">
         <div className="brand">
           <div>
-            <h1>PortfolioU</h1>
+            <h1>PortfoliU</h1>
             <p>Convex portfolio optimization on real market data</p>
           </div>
         </div>

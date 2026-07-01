@@ -18,7 +18,7 @@ export function VerifyPage({ credentialId }: { credentialId: string }) {
 
   return (
     <div className="verify-page">
-      <h1 className="landing-title">PortfolioU</h1>
+      <h1 className="landing-title">PortfoliU</h1>
       {loading ? (
         <p className="muted">Verifying credential…</p>
       ) : result?.valid ? (
@@ -40,7 +40,7 @@ export function VerifyPage({ credentialId }: { credentialId: string }) {
         </div>
       )}
       <a className="back" href="/">
-        ← Back to PortfolioU
+        ← Back to PortfoliU
       </a>
     </div>
   )
