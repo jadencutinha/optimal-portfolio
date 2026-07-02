@@ -329,9 +329,9 @@ button.primary.modal-submit {
 .app-main {
   flex: 1;
   width: 100%;
-  max-width: 1180px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 28px 32px;
+  padding: 28px 40px;
 }
 
 .greeting {
@@ -380,7 +380,7 @@ button.primary.modal-submit {
 .platform-bar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 16px;
@@ -1079,13 +1079,31 @@ button.primary.modal-submit {
 
 .saved-card {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px 18px;
+}
+
+.saved-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.saved-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saved-detail {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
 }
 
 .saved-main {
@@ -3586,5 +3604,62 @@ body {
 }
 
 .drift-down {
+  color: var(--danger);
+}
+
+/* ---- Course search + module status ---- */
+.course-search {
+  position: relative;
+  max-width: 420px;
+  margin: 0 0 20px;
+}
+
+.course-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.course-search-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 10px 12px 10px 34px;
+  font-size: 14px;
+  outline: none;
+}
+
+.course-search-input:focus {
+  border-color: var(--accent);
+}
+
+.course-search-empty {
+  margin: 0 0 20px;
+}
+
+.sidebar-module-status {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+/* ---- Ticker validation ---- */
+.chip.invalid {
+  background: rgba(192, 57, 43, 0.12);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.ticker-warning {
+  margin: 8px 0 0;
+  font-size: 12px;
   color: var(--danger);
 }

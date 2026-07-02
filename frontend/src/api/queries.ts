@@ -24,6 +24,7 @@ import type {
   ResampledFrontierRequest,
   ResampledFrontierResponse,
   StressResponse,
+  TickerValidationResponse,
   TrackResponse,
   UniverseResponse,
 } from './types'
@@ -95,6 +96,13 @@ export function useUniverse() {
   })
 }
 
+export function useValidateTickers() {
+  return useMutation({
+    mutationFn: async (tickers: string[]) =>
+      (await apiClient.post<TickerValidationResponse>('/api/tickers/validate', { tickers })).data,
+  })
+}
+
 export function useOptimize() {
   return useMutation({
     mutationFn: async (request: OptimizeRequest) =>
@@ -154,6 +162,11 @@ export function usePortfolioDetail(id: number | null) {
 
 export async function downloadReportPdf(request: OptimizeRequest): Promise<Blob> {
   const response = await apiClient.post('/api/report/pdf', request, { responseType: 'blob' })
+  return response.data as Blob
+}
+
+export async function downloadPortfolioPdf(id: number): Promise<Blob> {
+  const response = await apiClient.get(`/api/portfolios/${id}/report.pdf`, { responseType: 'blob' })
   return response.data as Blob
 }
 

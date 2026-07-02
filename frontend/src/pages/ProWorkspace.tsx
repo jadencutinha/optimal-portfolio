@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
-import { Greeting } from '../components/Greeting'
+import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
@@ -36,11 +36,11 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'saved', label: 'My Portfolios' },
 ]
 
-export function ProWorkspace() {
+export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   const [tab, setTab] = useState<Tab>('optimizer')
   return (
     <div className="pro-workspace">
-      <Greeting />
+      <PlatformHeader onSwitch={onSwitch} />
       <div className="tabs">
         {TABS.map((option) => (
           <button

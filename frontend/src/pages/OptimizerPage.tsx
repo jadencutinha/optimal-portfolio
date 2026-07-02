@@ -26,7 +26,7 @@ import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
 import { useToast } from '../toast/useToast'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 export function OptimizerPage() {
   const universe = useUniverse()
@@ -284,6 +284,12 @@ export function OptimizerPage() {
               {result.covariance_shrinkage !== null && ` · shrinkage ${result.covariance_shrinkage.toFixed(2)}`}
               {result.turnover !== null && ` · turnover ${(result.turnover * 100).toFixed(1)}%`}
             </p>
+            {result.dropped_tickers.length > 0 && (
+              <p className="ticker-warning">
+                {result.dropped_tickers.join(', ')} had no price data and{' '}
+                {result.dropped_tickers.length === 1 ? 'was' : 'were'} excluded from this portfolio.
+              </p>
+            )}
             <div className="result-actions">
               <button type="button" className="signin-trigger" onClick={() => setNaming(true)}>
                 {save.isSuccess ? 'Saved ✓' : 'Save portfolio'}

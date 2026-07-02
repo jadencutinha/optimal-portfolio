@@ -82,16 +82,19 @@ export function Home() {
     )
   }
 
+  const onSwitch = () => setSwitching(true)
+
   return (
     <>
-      <div className="platform-bar">
-        <button type="button" className="switch-plan" onClick={() => setSwitching(true)}>
-          Switch platform
-        </button>
-      </div>
-      {plan === 'course' && <CoursePage />}
-      {plan === 'free' && <FreePage onOpenRiskQ={() => setShowRiskQ(true)} onUpgrade={() => setCheckout(true)} />}
-      {plan === 'pro' && <ProWorkspace />}
+      {plan === 'course' && <CoursePage onSwitch={onSwitch} />}
+      {plan === 'free' && (
+        <FreePage
+          onOpenRiskQ={() => setShowRiskQ(true)}
+          onUpgrade={() => setCheckout(true)}
+          onSwitch={onSwitch}
+        />
+      )}
+      {plan === 'pro' && <ProWorkspace onSwitch={onSwitch} />}
     </>
   )
 }

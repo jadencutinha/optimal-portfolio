@@ -2,9 +2,15 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../auth/useAuth'
 
-export function AuthModal({ onClose }: { onClose: () => void }) {
+export function AuthModal({
+  onClose,
+  initialMode = 'login',
+}: {
+  onClose: () => void
+  initialMode?: 'login' | 'signup'
+}) {
   const { signIn, signUp, signInWithGoogle } = useAuth()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

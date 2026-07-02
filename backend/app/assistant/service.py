@@ -7,7 +7,7 @@ from app.optimizer.service import OptimizationServiceError, run_optimization
 from app.schemas.assistant import AssistantConfig, AssistantRequest, AssistantResponse
 from app.schemas.optimize import OptimizeRequest, OptimizeResponse
 
-DEFAULT_UNIVERSE = ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "JNJ", "XOM", "PG"]
+DEFAULT_UNIVERSE = ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "JNJ", "XOM", "KO"]
 
 _OBJECTIVES = {
     "min_variance",

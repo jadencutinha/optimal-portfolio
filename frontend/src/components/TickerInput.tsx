@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useValidateTickers } from '../api/queries'
 import type { UniverseAsset } from '../api/types'
 
 interface Props {
@@ -9,6 +10,22 @@ interface Props {
 
 export function TickerInput({ tickers, suggestions, onChange }: Props) {
   const [draft, setDraft] = useState('')
+  const [invalid, setInvalid] = useState<Set<string>>(new Set())
+  const validate = useValidateTickers()
+  const validateMutate = validate.mutate
+
+  useEffect(() => {
+    if (tickers.length === 0) {
+      setInvalid(new Set())
+      return
+    }
+    const handle = window.setTimeout(() => {
+      validateMutate(tickers, {
+        onSuccess: (data) => setInvalid(new Set(data.invalid)),
+      })
+    }, 400)
+    return () => window.clearTimeout(handle)
+  }, [tickers, validateMutate])
 
   const add = (raw: string) => {
     const symbol = raw.trim().toUpperCase()
@@ -27,7 +44,11 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
       <label>Tickers</label>
       <div className="chips">
         {tickers.map((ticker) => (
-          <span key={ticker} className="chip">
+          <span
+            key={ticker}
+            className={`chip ${invalid.has(ticker) ? 'invalid' : ''}`.trim()}
+            title={invalid.has(ticker) ? 'No price data found for this ticker' : undefined}
+          >
             {ticker}
             <button type="button" onClick={() => remove(ticker)} aria-label={`Remove ${ticker}`}>
               ×
@@ -65,6 +86,11 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
             </button>
           ))}
         </div>
+      )}
+      {invalid.size > 0 && (
+        <p className="ticker-warning">
+          No price data for {Array.from(invalid).join(', ')} — they'll be ignored when you optimize.
+        </p>
       )}
     </div>
   )

@@ -115,3 +115,100 @@ def _holdings_table(rows: list[list[str]]) -> Table:
         )
     )
     return table
+
+
+def _weights_table(rows: list[list[str]]) -> Table:
+    table = Table(rows, colWidths=[2.9 * inch, 2.9 * inch])
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), _TEAL),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, _LIGHT]),
+                ("LINEBELOW", (0, 0), (-1, 0), 1, _ACCENT),
+            ]
+        )
+    )
+    return table
+
+
+def _fmt_pct(value: object) -> str:
+    return _pct(float(value)) if isinstance(value, (int, float)) else "—"
+
+
+def _fmt_ratio(value: object) -> str:
+    return f"{float(value):.2f}" if isinstance(value, (int, float)) else "—"
+
+
+def build_saved_report(
+    *,
+    name: str,
+    created_at: str,
+    objective: str,
+    risk_model: str,
+    weights: dict[str, float],
+    metrics: dict,
+) -> bytes:
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=LETTER,
+        topMargin=0.7 * inch,
+        bottomMargin=0.7 * inch,
+        leftMargin=0.8 * inch,
+        rightMargin=0.8 * inch,
+        title=f"PortfoliU — {name}",
+    )
+    styles = getSampleStyleSheet()
+    h1 = ParagraphStyle("h1", parent=styles["Heading1"], textColor=_TEAL, fontSize=22, spaceAfter=2)
+    sub = ParagraphStyle("sub", parent=styles["Normal"], textColor=colors.grey, fontSize=10, spaceAfter=16)
+    h2 = ParagraphStyle("h2", parent=styles["Heading2"], textColor=_TEXT, fontSize=13, spaceBefore=14, spaceAfter=6)
+    note = ParagraphStyle("note", parent=styles["Normal"], textColor=colors.grey, fontSize=8, spaceBefore=18)
+
+    items = sorted(weights.items(), key=lambda item: item[1], reverse=True)
+    hhi = sum(weight * weight for weight in weights.values())
+    effective = 1.0 / hhi if hhi > 0 else float(len(weights))
+    largest = items[0] if items else ("—", 0.0)
+
+    story = [
+        Paragraph("PortfoliU", h1),
+        Paragraph(f"{name} · saved {created_at}", sub),
+        Paragraph("Configuration", h2),
+        _kv_table(
+            [
+                ["Objective", objective.replace("_", " ").title()],
+                ["Risk model", risk_model.replace("_", " ").title()],
+                ["Holdings", str(len(weights))],
+                ["Saved", created_at],
+            ]
+        ),
+        Paragraph("Performance", h2),
+        _kv_table(
+            [
+                ["Expected annual return", _fmt_pct(metrics.get("expected_return"))],
+                ["Annual volatility", _fmt_pct(metrics.get("volatility"))],
+                ["Sharpe ratio", _fmt_ratio(metrics.get("sharpe_ratio"))],
+            ]
+        ),
+        Paragraph("Diversification", h2),
+        _kv_table(
+            [
+                ["Effective holdings", f"{effective:.1f}"],
+                ["Concentration (HHI)", f"{hhi:.3f}"],
+                ["Largest position", f"{largest[0]} ({_pct(float(largest[1]), 1)})"],
+            ]
+        ),
+        Paragraph("Holdings", h2),
+        _weights_table([["Ticker", "Weight"]] + [[ticker, _pct(float(weight), 2)] for ticker, weight in items]),
+        Paragraph(
+            "This report is generated for educational purposes and is not investment advice. "
+            "Figures reflect the portfolio as saved, based on historical model estimates.",
+            note,
+        ),
+    ]
+
+    doc.build(story)
+    return buffer.getvalue()

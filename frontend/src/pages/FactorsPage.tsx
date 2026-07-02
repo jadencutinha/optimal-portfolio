@@ -7,7 +7,7 @@ import { SkeletonCards } from '../components/Skeleton'
 import { TickerInput } from '../components/TickerInput'
 import { percent, ratio } from '../lib/format'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 const OBJECTIVES: { id: Objective; label: string }[] = [
   { id: 'max_sharpe', label: 'Max Sharpe' },

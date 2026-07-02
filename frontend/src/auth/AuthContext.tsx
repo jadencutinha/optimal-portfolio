@@ -45,6 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut: async () => {
         await supabase.auth.signOut()
       },
+      updateProfile: async (updates) => {
+        const { error } = await supabase.auth.updateUser({ data: updates })
+        return { error: error?.message }
+      },
     }),
     [session, loading],
   )

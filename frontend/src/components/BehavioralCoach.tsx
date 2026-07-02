@@ -5,7 +5,7 @@ import type { Objective, OptimizeRequest, OptimizeResponse } from '../api/types'
 import { BIAS_INFO, BIAS_QUESTIONS, biasAdjustment, detectBiases, type Bias } from '../lib/biases'
 import { percent, ratio } from '../lib/format'
 
-const TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 type Phase = 'quiz' | 'analyzing' | 'result' | 'error'
 

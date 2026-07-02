@@ -14,7 +14,7 @@ import { useOptimize, usePlan } from '../api/queries'
 import type { OptimizeRequest, PlanResponse } from '../api/types'
 import { percent } from '../lib/format'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 const optimizeRequest: OptimizeRequest = {
   tickers: DEFAULT_TICKERS,

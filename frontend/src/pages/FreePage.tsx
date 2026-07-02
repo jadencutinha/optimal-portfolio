@@ -1,4 +1,4 @@
-import { Greeting } from '../components/Greeting'
+import { PlatformHeader } from '../components/PlatformHeader'
 import { OptimizerPage } from './OptimizerPage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
@@ -6,14 +6,15 @@ const RISK_PROFILE_KEY = 'risk_profile'
 interface Props {
   onOpenRiskQ: () => void
   onUpgrade: () => void
+  onSwitch: () => void
 }
 
-export function FreePage({ onOpenRiskQ, onUpgrade }: Props) {
+export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
 
   return (
     <div className="free-platform">
-      <Greeting />
+      <PlatformHeader onSwitch={onSwitch} />
       <div className="free-header">
         <div>
           <h1>Free platform</h1>

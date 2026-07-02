@@ -22,6 +22,7 @@ from app.api.routes import (
     prices,
     reports,
     stress,
+    tickers,
     tracking,
     universe,
 )
@@ -125,6 +126,7 @@ def create_app() -> FastAPI:
     app.include_router(factors.router, prefix=settings.api_prefix)
     app.include_router(reports.router, prefix=settings.api_prefix)
     app.include_router(tracking.router, prefix=settings.api_prefix)
+    app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)
     return app
 

@@ -7,6 +7,8 @@ interface Props {
   moduleIndex: number
   onSelectModule: (index: number) => void
   onBackToTracks: () => void
+  isModuleComplete: (moduleId: number) => boolean
+  onModuleComplete: (moduleId: number) => void
 }
 
 function renderText(text: string) {
@@ -24,7 +26,14 @@ function estimateReadingMinutes(content: ContentBlock[]) {
   return Math.max(1, Math.round(wordCount / 200))
 }
 
-export function ModuleLayout({ track, moduleIndex, onSelectModule, onBackToTracks }: Props) {
+export function ModuleLayout({
+  track,
+  moduleIndex,
+  onSelectModule,
+  onBackToTracks,
+  isModuleComplete,
+  onModuleComplete,
+}: Props) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const mod = track.modules[moduleIndex]
 
@@ -42,8 +51,13 @@ export function ModuleLayout({ track, moduleIndex, onSelectModule, onBackToTrack
     const chosen = answers[i]
     return chosen !== undefined && q.options[chosen]?.correct
   }).length
+  const allCorrect = mod.quiz.length > 0 && allAnswered && correctCount === mod.quiz.length
 
-  const completedCount = track.modules.filter((m) => m.isCompleted).length
+  useEffect(() => {
+    if (allCorrect) onModuleComplete(mod.id)
+  }, [allCorrect, mod.id, onModuleComplete])
+
+  const completedCount = track.modules.filter((m) => isModuleComplete(m.id)).length
   const progressPct = Math.round((completedCount / track.modules.length) * 100)
   const readingMinutes = estimateReadingMinutes(mod.content)
 
@@ -62,7 +76,8 @@ export function ModuleLayout({ track, moduleIndex, onSelectModule, onBackToTrack
         <nav className="sidebar-module-list">
           {track.modules.map((m, i) => {
             const isCurrent = i === moduleIndex
-            const statusClass = m.isLocked ? 'locked' : m.isCompleted ? 'completed' : 'available'
+            const done = isModuleComplete(m.id)
+            const statusClass = m.isLocked ? 'locked' : done ? 'completed' : 'available'
             return (
               <button
                 key={m.id}
@@ -74,7 +89,7 @@ export function ModuleLayout({ track, moduleIndex, onSelectModule, onBackToTrack
                 <span className="sidebar-module-icon">
                   {m.isLocked ? (
                     <LockIcon />
-                  ) : m.isCompleted ? (
+                  ) : done ? (
                     <CheckIcon />
                   ) : (
                     <span className="sidebar-module-dot" />
@@ -83,6 +98,7 @@ export function ModuleLayout({ track, moduleIndex, onSelectModule, onBackToTrack
                 <span className="sidebar-module-text">
                   <span className="sidebar-module-num">Module {i + 1}</span>
                   <span className="sidebar-module-title">{m.title}</span>
+                  {!m.isLocked && !done && <span className="sidebar-module-status">In progress</span>}
                 </span>
               </button>
             )

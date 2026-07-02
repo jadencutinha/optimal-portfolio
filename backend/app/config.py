@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     data_provider: Literal["auto", "fmp", "sample"] = "auto"
     fmp_api_key: str | None = None
-    fmp_base_url: str = "https://financialmodelingprep.com/api/v3"
+    fmp_base_url: str = "https://financialmodelingprep.com/stable"
     request_timeout_seconds: float = 15.0
 
     redis_url: str | None = None

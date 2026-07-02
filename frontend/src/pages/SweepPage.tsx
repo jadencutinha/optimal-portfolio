@@ -4,7 +4,7 @@ import { useUniverse } from '../api/queries'
 import type { Objective, RiskModel, SweepCell } from '../api/types'
 import { TickerInput } from '../components/TickerInput'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 const OBJECTIVE_OPTIONS: { id: Objective; label: string }[] = [
   { id: 'max_sharpe', label: 'Max Sharpe' },

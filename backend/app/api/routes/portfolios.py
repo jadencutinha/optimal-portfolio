@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.api.deps import get_current_user, get_portfolio_repository
@@ -5,6 +7,7 @@ from app.auth.plans import entitlements_for
 from app.auth.repository import ProfileData
 from app.db.models import SavedPortfolio
 from app.portfolios.repository import PortfolioRepository
+from app.reports.pdf import build_saved_report
 from app.schemas.portfolio import PortfolioCreate, PortfolioDetail, PortfolioSummary
 
 router = APIRouter(tags=["portfolios"])
@@ -72,6 +75,33 @@ async def get_portfolio(
         created_at=portfolio.created_at,
         tickers=portfolio.tickers,
         weights=portfolio.weights,
+    )
+
+
+@router.get("/portfolios/{portfolio_id}/report.pdf")
+async def portfolio_report(
+    portfolio_id: int,
+    user: ProfileData = Depends(get_current_user),
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> Response:
+    portfolio = await repository.get(user.id, portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found.")
+    created = portfolio.created_at
+    created_str = created.date().isoformat() if hasattr(created, "date") else str(created)[:10]
+    pdf_bytes = build_saved_report(
+        name=portfolio.name,
+        created_at=created_str,
+        objective=portfolio.objective,
+        risk_model=portfolio.risk_model,
+        weights=portfolio.weights,
+        metrics=portfolio.metrics,
+    )
+    slug = re.sub(r"[^a-z0-9]+", "-", portfolio.name.lower()).strip("-") or "portfolio"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{slug}.pdf"'},
     )
 
 
