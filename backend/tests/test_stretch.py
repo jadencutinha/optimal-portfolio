@@ -89,6 +89,20 @@ def test_assistant_unconfigured(client: TestClient) -> None:
     assert response.status_code == 503, response.text
 
 
+def test_resolve_provider() -> None:
+    from app.assistant.client import resolve_provider
+    from app.config import Settings
+
+    both = Settings(assistant_provider="auto", openai_api_key="x", anthropic_api_key="y")
+    assert resolve_provider(both) == "openai"
+    anthropic_only = Settings(assistant_provider="auto", openai_api_key=None, anthropic_api_key="y")
+    assert resolve_provider(anthropic_only) == "anthropic"
+    neither = Settings(assistant_provider="auto", openai_api_key=None, anthropic_api_key=None)
+    assert resolve_provider(neither) is None
+    forced_anthropic = Settings(assistant_provider="anthropic", openai_api_key="x", anthropic_api_key=None)
+    assert resolve_provider(forced_anthropic) is None
+
+
 def test_resolve_universe_defaults() -> None:
     assert resolve_universe(None) == DEFAULT_UNIVERSE
     assert resolve_universe(["aapl"]) == DEFAULT_UNIVERSE

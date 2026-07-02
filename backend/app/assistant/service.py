@@ -1,6 +1,6 @@
 from pydantic import ValidationError
 
-from app.assistant.client import AssistantError, call_messages, extract_text, extract_tool_use
+from app.assistant.client import AssistantError, call_text, call_tool, resolved_model
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.optimizer.service import OptimizationServiceError, run_optimization
@@ -203,16 +203,7 @@ async def run_assistant(
         f"Available tickers: {', '.join(universe)}.\n"
         "Choose one configuration using only these tickers by calling the tool."
     )
-    config_data = await call_messages(
-        settings,
-        system=CONFIG_SYSTEM,
-        messages=[{"role": "user", "content": user_prompt}],
-        tools=[CONFIGURE_TOOL],
-        tool_choice={"type": "tool", "name": "configure_portfolio"},
-    )
-    tool_input = extract_tool_use(config_data, "configure_portfolio")
-    if tool_input is None:
-        raise AssistantError("The assistant could not interpret that goal. Try rephrasing.", 502)
+    tool_input = await call_tool(settings, system=CONFIG_SYSTEM, user=user_prompt, tool=CONFIGURE_TOOL)
 
     opt_request = build_optimize_request(tool_input, universe)
     try:
@@ -220,12 +211,10 @@ async def run_assistant(
     except OptimizationServiceError as error:
         raise AssistantError(error.message, error.status_code) from error
 
-    explain_data = await call_messages(
-        settings,
-        system=EXPLAIN_SYSTEM,
-        messages=[{"role": "user", "content": _result_summary(request.message, opt_request, result)}],
+    explanation = (
+        await call_text(settings, system=EXPLAIN_SYSTEM, user=_result_summary(request.message, opt_request, result))
+        or "Here is the portfolio built for your goal."
     )
-    explanation = extract_text(explain_data) or "Here is the portfolio built for your goal."
 
     config = AssistantConfig(
         tickers=opt_request.tickers,
@@ -240,7 +229,7 @@ async def run_assistant(
         lookback_days=opt_request.lookback_days,
     )
     return AssistantResponse(
-        model=settings.anthropic_model,
+        model=resolved_model(settings),
         rationale=str(tool_input.get("rationale", "")).strip(),
         explanation=explanation,
         config=config,

@@ -12,6 +12,9 @@ def client() -> Iterator[TestClient]:
     os.environ["DATA_PROVIDER"] = "sample"
     os.environ["FMP_API_KEY"] = ""
     os.environ["REDIS_URL"] = ""
+    os.environ["ANTHROPIC_API_KEY"] = ""
+    os.environ["OPENAI_API_KEY"] = ""
+    os.environ["ASSISTANT_PROVIDER"] = "auto"
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{workdir}/test.db"
 
     from app.config import get_settings
