@@ -8,7 +8,7 @@
   --accent: #e09743;
   --accent-hover: #4991c4;
   --danger: #c0392b;
-  --mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Menlo, monospace;
+  --mono: 'Times New Roman', Times, serif;
   color-scheme: light;
 }
 
@@ -21,6 +21,13 @@ body {
   font-family: 'Times New Roman', Times, serif;
   background: var(--bg);
   color: var(--text);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 .app {
@@ -799,23 +806,6 @@ button.primary.modal-submit {
 .course-catalog h1 {
   margin: 0 0 16px;
   font-size: 30px;
-}
-
-.course-search {
-  width: 100%;
-  max-width: 360px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  padding: 10px 14px;
-  font-size: 14px;
-  outline: none;
-  margin-bottom: 22px;
-}
-
-.course-search:focus {
-  border-color: var(--accent);
 }
 
 .course-grid {
@@ -3609,19 +3599,8 @@ body {
 
 /* ---- Course search + module status ---- */
 .course-search {
-  position: relative;
   max-width: 420px;
   margin: 0 0 20px;
-}
-
-.course-search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  opacity: 0.7;
-  pointer-events: none;
 }
 
 .course-search-input {
@@ -3630,7 +3609,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
-  padding: 10px 12px 10px 34px;
+  padding: 10px 12px;
   font-size: 14px;
   outline: none;
 }
@@ -3662,4 +3641,116 @@ body {
   margin: 8px 0 0;
   font-size: 12px;
   color: var(--danger);
+}
+
+/* ---- Interactive product tour ---- */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+}
+
+.tour-backdrop.solid {
+  background: rgba(6, 20, 24, 0.72);
+}
+
+.tour-spotlight {
+  position: fixed;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 9999px rgba(6, 20, 24, 0.72);
+  pointer-events: none;
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+
+.tour-tip {
+  position: fixed;
+  z-index: 2;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
+}
+
+.tour-tip-step {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.tour-tip h4 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.tour-tip p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.tour-tip-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tour-skip {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.tour-skip:hover {
+  color: var(--text);
+}
+
+.tour-next {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 18px;
+  white-space: nowrap;
+}
+
+.tour-launch {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tour-launch:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.workspace-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.free-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
