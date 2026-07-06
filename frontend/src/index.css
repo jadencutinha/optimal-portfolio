@@ -2281,18 +2281,13 @@ table.weights td {
   width: 100%;
 }
 
-.sidebar-module-item:hover:not(:disabled) {
+.sidebar-module-item:hover {
   background: var(--bg-elevated);
 }
 
 .sidebar-module-item.current {
   background: var(--bg-elevated);
   border-color: var(--accent);
-}
-
-.sidebar-module-item:disabled {
-  cursor: default;
-  opacity: 0.45;
 }
 
 .sidebar-module-icon {
@@ -2599,6 +2594,10 @@ table.weights td {
 }
 
 .quiz-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -2613,6 +2612,23 @@ table.weights td {
   background: rgba(46, 125, 50, 0.08);
   color: #2e7d32;
   font-weight: 600;
+}
+
+.quiz-retake-btn {
+  flex-shrink: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.quiz-retake-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
 }
 
 /* ─── Module navigation ───────────────────────────────────────── */

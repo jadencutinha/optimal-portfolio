@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
-import { CheckIcon, LockIcon } from './icons'
+import { CheckIcon } from './icons'
 
 interface Props {
   track: Track
@@ -64,7 +64,6 @@ export function ModuleLayout({
   const prevModule = moduleIndex > 0 ? track.modules[moduleIndex - 1] : undefined
   const nextModule =
     moduleIndex < track.modules.length - 1 ? track.modules[moduleIndex + 1] : undefined
-  const nextLocked = !!nextModule?.isLocked
 
   return (
     <div className="module-shell">
@@ -76,24 +75,16 @@ export function ModuleLayout({
         <nav className="sidebar-module-list">
           {track.modules.map((m, i) => {
             const isCurrent = i === moduleIndex
-            const done = isModuleComplete(m.id)
-            const statusClass = m.isLocked ? 'locked' : done ? 'completed' : 'available'
+            const statusClass = m.isCompleted ? 'completed' : 'available'
             return (
               <button
                 key={m.id}
                 type="button"
                 className={`sidebar-module-item ${statusClass} ${isCurrent ? 'current' : ''}`}
                 onClick={() => onSelectModule(i)}
-                disabled={m.isLocked}
               >
                 <span className="sidebar-module-icon">
-                  {m.isLocked ? (
-                    <LockIcon />
-                  ) : done ? (
-                    <CheckIcon />
-                  ) : (
-                    <span className="sidebar-module-dot" />
-                  )}
+                  {m.isCompleted ? <CheckIcon /> : <span className="sidebar-module-dot" />}
                 </span>
                 <span className="sidebar-module-text">
                   <span className="sidebar-module-num">Module {i + 1}</span>
@@ -217,6 +208,9 @@ export function ModuleLayout({
               {correctCount === mod.quiz.length
                 ? `Perfect — ${correctCount}/${mod.quiz.length} correct!`
                 : `${correctCount}/${mod.quiz.length} correct — review the highlighted answers above.`}
+              <button type="button" className="quiz-retake-btn" onClick={() => setAnswers({})}>
+                Retake quiz
+              </button>
             </div>
           )}
         </div>
@@ -233,10 +227,10 @@ export function ModuleLayout({
           <button
             type="button"
             className="module-nav-btn primary-nav"
-            onClick={() => nextModule && !nextLocked && onSelectModule(moduleIndex + 1)}
-            disabled={!nextModule || nextLocked}
+            onClick={() => nextModule && onSelectModule(moduleIndex + 1)}
+            disabled={!nextModule}
           >
-            {!nextModule ? 'Track complete' : nextLocked ? 'Next module (locked)' : 'Next module →'}
+            {nextModule ? 'Next module →' : 'Track complete'}
           </button>
         </div>
       </div>
