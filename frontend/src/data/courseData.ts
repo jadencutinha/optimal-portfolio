@@ -20,7 +20,6 @@ export interface Module {
   content: ContentBlock[]
   quiz: QuizQuestion[]
   isCompleted: boolean
-  isLocked: boolean
 }
 
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced'
@@ -37,25 +36,25 @@ export interface Track {
 const track1: Track = {
   id: 1,
   title: 'Money Fundamentals',
-  description: 'Learn the basics — saving, investing, risk, and how to read your portfolio',
+  description: 'Learn the basics! Saving, investing, risk, and how to read your portfolio',
   estimatedTime: '25 min',
   difficulty: 'Beginner',
   modules: [
     {
       id: 1,
-      title: 'Saving vs Investing — What\'s the Difference and Why It Matters',
+      title: 'Saving vs Investing: What\'s the Difference and Why It Matters',
       content: [
         {
           type: 'paragraph',
-          text: 'Most people use **saving** and **investing** interchangeably — but they\'re actually very different things, and understanding the difference is the foundation of everything else.',
+          text: 'Most people use **saving** and **investing** interchangeably, but they\'re actually very different things, and understanding the difference is the foundation of everything else.',
         },
         {
           type: 'paragraph',
-          text: '**Saving** means putting money somewhere safe and accessible — a checking account, savings account, or under your mattress. The money doesn\'t grow much but it\'s always there when you need it. You save for short-term goals: an emergency fund, a vacation, a new laptop.',
+          text: '**Saving** means putting money somewhere safe and accessible: a checking account, savings account, or under your mattress. The money doesn\'t grow much but it\'s always there when you need it. You save for short-term goals: an emergency fund, a vacation, a new laptop.',
         },
         {
           type: 'paragraph',
-          text: '**Investing** means putting money to work so it can grow over time. You buy assets — stocks, bonds, real estate — that increase in value or pay you income. The tradeoff is that investing involves **risk**. Your money can go up, but it can also go down. You invest for long-term goals: retirement, building wealth, financial independence.',
+          text: '**Investing** means putting money to work so it can grow over time. You buy assets, stocks, bonds, real estate, that increase in value or pay you income. The tradeoff is that investing involves **risk**. Your money can go up, but it can also go down. You invest for long-term goals: retirement, building wealth, financial independence.',
         },
         {
           type: 'subheading',
@@ -102,7 +101,6 @@ const track1: Track = {
         },
       ],
       isCompleted: true,
-      isLocked: false,
     },
     {
       id: 2,
@@ -110,7 +108,7 @@ const track1: Track = {
       content: [
         {
           type: 'paragraph',
-          text: '**Compound interest** is the most powerful concept in personal finance. Einstein allegedly called it the eighth wonder of the world — and he wasn\'t wrong.',
+          text: '**Compound interest** is the most powerful concept in personal finance. Einstein allegedly called it the eighth wonder of the world, and he wasn\'t wrong.',
         },
         {
           type: 'paragraph',
@@ -132,7 +130,7 @@ const track1: Track = {
         },
         {
           type: 'callout',
-          text: 'The same $1,000 turned into $17,449 — not $4,000. That\'s the power of compounding.',
+          text: 'The same $1,000 turned into $17,449, not $4,000. That\'s the power of compounding.',
         },
         {
           type: 'subheading',
@@ -141,8 +139,8 @@ const track1: Track = {
         {
           type: 'list',
           items: [
-            '**Time** — the longer you stay invested, the more dramatic the compounding effect',
-            '**Rate of return** — even small differences in return rate have huge long-term effects',
+            '**Time**: longer you stay invested, the more dramatic the compounding effect',
+            '**Rate of return**: even small differences in return rate have huge long-term effects',
           ],
         },
         {
@@ -181,11 +179,10 @@ const track1: Track = {
         },
       ],
       isCompleted: false,
-      isLocked: false,
     },
     {
       id: 3,
-      title: 'Risk vs Return — Why Higher Return Always Means Higher Risk',
+      title: 'Risk vs Return: Why Higher Return Always Means Higher Risk',
       content: [
         {
           type: 'callout',
@@ -197,7 +194,7 @@ const track1: Track = {
         },
         {
           type: 'paragraph',
-          text: '**Risk** is the possibility that your investment loses value. It\'s measured by **volatility** — how much the price moves up and down over time.',
+          text: '**Risk** is the possibility that your investment loses value. It\'s measured by **volatility**, how much the price moves up and down over time.',
         },
         {
           type: 'subheading',
@@ -258,11 +255,10 @@ const track1: Track = {
         },
       ],
       isCompleted: false,
-      isLocked: true,
     },
     {
       id: 4,
-      title: "Diversification — Don't Put All Your Eggs in One Basket",
+      title: "Diversification: Don't Put All Your Eggs in One Basket",
       content: [
         {
           type: 'callout',
@@ -295,9 +291,9 @@ const track1: Track = {
         {
           type: 'list',
           items: [
-            '**Correlation of 1.0** — they always move exactly together (no diversification benefit)',
-            '**Correlation of 0** — they move completely independently (good diversification)',
-            '**Correlation of −1.0** — they always move in opposite directions (perfect hedge)',
+            '**Correlation of 1.0**: they always move exactly together (no diversification benefit)',
+            '**Correlation of 0**: they move completely independently (good diversification)',
+            '**Correlation of −1.0**: they always move in opposite directions (perfect hedge)',
           ],
         },
         {
@@ -306,7 +302,7 @@ const track1: Track = {
         },
         {
           type: 'paragraph',
-          text: 'The optimizer doesn\'t just look at each stock individually. It looks at the **covariance matrix** — how every stock in your portfolio moves relative to every other stock. It then finds the combination of weights that gives you the most return for the least risk, taking all those relationships into account.',
+          text: 'The optimizer doesn\'t just look at each stock individually. It looks at the **covariance matrix**: how every stock in your portfolio moves relative to every other stock. It then finds the combination of weights that gives you the most return for the least risk, taking all those relationships into account.',
         },
       ],
       quiz: [
@@ -336,11 +332,10 @@ const track1: Track = {
         },
       ],
       isCompleted: false,
-      isLocked: true,
     },
     {
       id: 5,
-      title: 'How to Read Your Portfolio — What the Numbers Mean',
+      title: 'How to Read Your Portfolio: What the Numbers Mean',
       content: [
         {
           type: 'paragraph',
@@ -422,7 +417,6 @@ const track1: Track = {
         },
       ],
       isCompleted: false,
-      isLocked: true,
     },
   ],
 }
@@ -430,7 +424,7 @@ const track1: Track = {
 const track2: Track = {
   id: 2,
   title: 'Behavioral Finance',
-  description: 'Understand how your psychology affects your returns — and how to fix it',
+  description: 'Understand how your psychology affects your returns and how to fix it',
   estimatedTime: '25 min',
   difficulty: 'Intermediate',
   modules: [],
@@ -439,7 +433,7 @@ const track2: Track = {
 const track3: Track = {
   id: 3,
   title: 'Portfolio Optimization',
-  description: 'Learn the math behind PortfoliU — the same methods hedge funds use',
+  description: 'Learn the math behind PortfoliU: the same methods hedge funds use',
   estimatedTime: '30 min',
   difficulty: 'Advanced',
   modules: [],
