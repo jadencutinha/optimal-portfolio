@@ -130,6 +130,7 @@ async def run_optimization(
     start, end = _resolve_dates(request.start, request.end, request.lookback_days, settings)
     frame = await _price_frame(request.tickers, start, end, provider, settings)
     tickers = list(frame.columns)
+    dropped_tickers = [ticker for ticker in request.tickers if ticker not in tickers]
     returns_frame = daily_returns(frame)
     mu = annualized_mean(returns_frame, settings.trading_days).to_numpy()
     covariance, shrinkage = estimate_covariance(
@@ -187,6 +188,7 @@ async def run_optimization(
             volatility=volatility,
             sharpe_ratio=sharpe,
         ),
+        dropped_tickers=dropped_tickers,
     )
     return response, frame
 

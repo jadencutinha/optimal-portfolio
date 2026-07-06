@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
-import { Greeting } from '../components/Greeting'
+import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
+import { Tour } from '../components/Tour'
+import { PRO_TOUR } from '../lib/tours'
 import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
 import { FactorsPage } from './FactorsPage'
@@ -10,6 +12,8 @@ import { PlannerPage } from './PlannerPage'
 import { StressPage } from './StressPage'
 import { SweepPage } from './SweepPage'
 import { TrackerPage } from './TrackerPage'
+
+const TOUR_KEY = 'tour_pro_seen'
 
 type Tab =
   | 'optimizer'
@@ -36,16 +40,36 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'saved', label: 'My Portfolios' },
 ]
 
-export function ProWorkspace() {
+export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   const [tab, setTab] = useState<Tab>('optimizer')
+  const [tour, setTour] = useState(false)
+
+  useEffect(() => {
+    if (!localStorage.getItem(TOUR_KEY)) {
+      const timer = window.setTimeout(() => setTour(true), 600)
+      return () => window.clearTimeout(timer)
+    }
+  }, [])
+
+  const closeTour = () => {
+    setTour(false)
+    localStorage.setItem(TOUR_KEY, '1')
+  }
+
   return (
     <div className="pro-workspace">
-      <Greeting />
+      <PlatformHeader onSwitch={onSwitch} />
+      <div className="workspace-tools">
+        <button type="button" className="tour-launch" onClick={() => setTour(true)}>
+          Take a tour
+        </button>
+      </div>
       <div className="tabs">
         {TABS.map((option) => (
           <button
             key={option.id}
             type="button"
+            data-tour={option.id}
             className={tab === option.id ? 'tab active' : 'tab'}
             onClick={() => setTab(option.id)}
           >
@@ -63,6 +87,7 @@ export function ProWorkspace() {
       {tab === 'behavioral' && <BehavioralCoach />}
       {tab === 'tracker' && <TrackerPage />}
       {tab === 'saved' && <SavedPortfolios />}
+      {tour && <Tour steps={PRO_TOUR} onClose={closeTour} />}
     </div>
   )
 }

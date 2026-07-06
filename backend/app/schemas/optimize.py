@@ -103,6 +103,7 @@ class OptimizeResponse(BaseModel):
     transaction_cost: float | None = None
     weights: list[WeightAllocation]
     metrics: PortfolioMetrics
+    dropped_tickers: list[str] = Field(default_factory=list)
     run_id: int | None = None
 
 

@@ -13,7 +13,7 @@ import type { Objective, StressWindow } from '../api/types'
 import { TickerInput } from '../components/TickerInput'
 import { percent } from '../lib/format'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 const OBJECTIVES: { id: Objective; label: string }[] = [
   { id: 'max_sharpe', label: 'Max Sharpe' },

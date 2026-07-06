@@ -6,7 +6,7 @@ import { EmptyState } from '../components/EmptyState'
 import { Skeleton, SkeletonCards } from '../components/Skeleton'
 import { TickerInput } from '../components/TickerInput'
 
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'PG']
+const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
 const BENCHMARKS: { id: BenchmarkName; label: string }[] = [
   { id: 'index', label: 'Index (SPY)' },
@@ -181,7 +181,6 @@ export function BacktestPage() {
         <h2>Results</h2>
         {!backtest.data && !backtest.isPending && (
           <EmptyState
-            icon="📈"
             title="No backtest yet"
             description="Configure a strategy and run a walk-forward backtest against the benchmarks."
           />

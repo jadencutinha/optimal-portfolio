@@ -12,6 +12,11 @@ export interface AuthState {
   ) => Promise<{ error?: string; needsConfirmation?: boolean }>
   signInWithGoogle: () => Promise<{ error?: string }>
   signOut: () => Promise<void>
+  updateProfile: (updates: {
+    full_name?: string
+    username?: string
+    birthdate?: string
+  }) => Promise<{ error?: string }>
 }
 
 export const AuthContext = createContext<AuthState | undefined>(undefined)

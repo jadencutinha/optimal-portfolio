@@ -77,7 +77,19 @@ export interface OptimizeResponse {
   transaction_cost: number | null
   weights: WeightAllocation[]
   metrics: PortfolioMetrics
+  dropped_tickers: string[]
   run_id: number | null
+}
+
+export interface TickerValidation {
+  ticker: string
+  valid: boolean
+}
+
+export interface TickerValidationResponse {
+  results: TickerValidation[]
+  valid: string[]
+  invalid: string[]
 }
 
 export interface FrontierPoint {

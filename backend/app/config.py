@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     data_provider: Literal["auto", "fmp", "sample"] = "auto"
     fmp_api_key: str | None = None
-    fmp_base_url: str = "https://financialmodelingprep.com/api/v3"
+    fmp_base_url: str = "https://financialmodelingprep.com/stable"
     request_timeout_seconds: float = 15.0
 
     redis_url: str | None = None
@@ -26,12 +26,19 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str | None = None
     supabase_service_role_key: str | None = None
 
+    assistant_provider: Literal["auto", "anthropic", "openai"] = "auto"
+
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-sonnet-4-6"
     anthropic_base_url: str = "https://api.anthropic.com/v1"
     anthropic_version: str = "2023-06-01"
     anthropic_max_tokens: int = 1200
     anthropic_timeout_seconds: float = 60.0
+
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-4.1-mini"
+    openai_base_url: str = "https://api.openai.com/v1"
+    openai_timeout_seconds: float = 60.0
 
     sentry_dsn: str | None = None
     sentry_traces_sample_rate: float = 0.0

@@ -89,6 +89,20 @@ def test_assistant_unconfigured(client: TestClient) -> None:
     assert response.status_code == 503, response.text
 
 
+def test_resolve_provider() -> None:
+    from app.assistant.client import resolve_provider
+    from app.config import Settings
+
+    both = Settings(assistant_provider="auto", openai_api_key="x", anthropic_api_key="y")
+    assert resolve_provider(both) == "openai"
+    anthropic_only = Settings(assistant_provider="auto", openai_api_key=None, anthropic_api_key="y")
+    assert resolve_provider(anthropic_only) == "anthropic"
+    neither = Settings(assistant_provider="auto", openai_api_key=None, anthropic_api_key=None)
+    assert resolve_provider(neither) is None
+    forced_anthropic = Settings(assistant_provider="anthropic", openai_api_key="x", anthropic_api_key=None)
+    assert resolve_provider(forced_anthropic) is None
+
+
 def test_resolve_universe_defaults() -> None:
     assert resolve_universe(None) == DEFAULT_UNIVERSE
     assert resolve_universe(["aapl"]) == DEFAULT_UNIVERSE
@@ -220,6 +234,51 @@ def test_metrics_endpoint(client: TestClient) -> None:
     body = response.json()
     assert body["total_requests"] >= 1
     assert isinstance(body["endpoints"], list)
+
+
+def test_fmp_base_normalization() -> None:
+    from app.data.fmp import _stable_base
+
+    assert _stable_base("https://financialmodelingprep.com/api/v3") == "https://financialmodelingprep.com/stable"
+    assert _stable_base("https://financialmodelingprep.com/api/v3/") == "https://financialmodelingprep.com/stable"
+    assert _stable_base("https://financialmodelingprep.com/stable") == "https://financialmodelingprep.com/stable"
+
+
+def test_validate_tickers_endpoint(client: TestClient) -> None:
+    response = client.post("/api/tickers/validate", json={"tickers": ["AAPL", "msft", "AAPL"]})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    tickers = [result["ticker"] for result in body["results"]]
+    assert tickers == ["AAPL", "MSFT"]
+    assert set(body["valid"]) | set(body["invalid"]) == {"AAPL", "MSFT"}
+    assert all(isinstance(result["valid"], bool) for result in body["results"])
+
+
+def test_optimize_reports_dropped_tickers(client: TestClient) -> None:
+    payload = {"tickers": BASE_TICKERS, "objective": "min_variance", "lookback_days": 500}
+    response = client.post("/api/optimize", json=payload)
+    assert response.status_code == 200, response.text
+    assert "dropped_tickers" in response.json()
+
+
+def test_build_saved_report_pdf() -> None:
+    from app.reports.pdf import build_saved_report
+
+    pdf = build_saved_report(
+        name="My Portfolio",
+        created_at="2026-07-01",
+        objective="max_sharpe",
+        risk_model="sample",
+        weights={"AAPL": 0.5, "MSFT": 0.3, "JPM": 0.2},
+        metrics={"sharpe_ratio": 0.42, "expected_return": 0.12, "volatility": 0.18},
+    )
+    assert pdf[:4] == b"%PDF"
+    assert len(pdf) > 500
+
+
+def test_portfolio_report_requires_auth(client: TestClient) -> None:
+    response = client.get("/api/portfolios/1/report.pdf")
+    assert response.status_code == 401
 
 
 def test_extract_helpers() -> None:
