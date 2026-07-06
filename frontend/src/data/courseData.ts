@@ -19,7 +19,6 @@ export interface Module {
   title: string
   content: ContentBlock[]
   quiz: QuizQuestion[]
-  isCompleted: boolean
 }
 
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced'
@@ -100,7 +99,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: true,
     },
     {
       id: 2,
@@ -178,7 +176,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 3,
@@ -254,7 +251,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 4,
@@ -331,7 +327,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 5,
@@ -416,7 +411,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
   ],
 }
