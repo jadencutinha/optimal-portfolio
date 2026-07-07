@@ -25,6 +25,7 @@ import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
 import { useToast } from '../toast/useToast'
+import { Tooltip } from '../components/ToolTip'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
@@ -315,7 +316,9 @@ export function OptimizerPage() {
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (
               <div className="frontier-section">
-                <h3>Efficient Frontier</h3>
+                <Tooltip text="Shows the best investment combinations for different levels of risk. Portfolios below the curve are inefficient.">
+                  <h3>Efficient Frontier</h3>
+                </Tooltip>
                 <FrontierChart
                   frontier={frontierData}
                   portfolio={result.metrics}

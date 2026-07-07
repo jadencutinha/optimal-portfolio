@@ -3770,3 +3770,45 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* ---- Tooltips ---- */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  align-self: flex-start;
+  cursor: help; 
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+}
+
+.tooltip-box {
+  position: absolute;
+  visibility: hidden;
+  background-color: #111827;
+  color: #e5e7eb;
+  text-align: left;
+  padding: 10px 14px;
+
+  width: max-content;
+  max-width: 240px; 
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+
+  opacity: 0;
+  z-index: 1;
+  
+  /* Position tooltip above text */
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+
+  transition: opacity 0.2s;
+}
+
+.tooltip-container:hover .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+}
+
