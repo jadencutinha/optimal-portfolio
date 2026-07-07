@@ -75,7 +75,8 @@ export function ModuleLayout({
         <nav className="sidebar-module-list">
           {track.modules.map((m, i) => {
             const isCurrent = i === moduleIndex
-            const statusClass = m.isCompleted ? 'completed' : 'available'
+            const done = isModuleComplete(m.id)
+            const statusClass = done ? 'completed' : 'available'
             return (
               <button
                 key={m.id}
@@ -84,12 +85,12 @@ export function ModuleLayout({
                 onClick={() => onSelectModule(i)}
               >
                 <span className="sidebar-module-icon">
-                  {m.isCompleted ? <CheckIcon /> : <span className="sidebar-module-dot" />}
+                  {done ? <CheckIcon /> : <span className="sidebar-module-dot" />}
                 </span>
                 <span className="sidebar-module-text">
                   <span className="sidebar-module-num">Module {i + 1}</span>
                   <span className="sidebar-module-title">{m.title}</span>
-                  {!m.isLocked && !done && <span className="sidebar-module-status">In progress</span>}
+                  {!done && <span className="sidebar-module-status">In progress</span>}
                 </span>
               </button>
             )

@@ -19,7 +19,6 @@ export interface Module {
   title: string
   content: ContentBlock[]
   quiz: QuizQuestion[]
-  isCompleted: boolean
 }
 
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced'
@@ -100,7 +99,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: true,
     },
     {
       id: 2,
@@ -178,7 +176,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 3,
@@ -254,7 +251,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 4,
@@ -331,7 +327,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
     {
       id: 5,
@@ -416,7 +411,6 @@ const track1: Track = {
           ],
         },
       ],
-      isCompleted: false,
     },
   ],
 }
@@ -427,7 +421,376 @@ const track2: Track = {
   description: 'Understand how your psychology affects your returns and how to fix it',
   estimatedTime: '25 min',
   difficulty: 'Intermediate',
-  modules: [],
+  modules: [
+    {
+      id: 1,
+      title: 'Loss Aversion and the Disposition Effect',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'In the 1970s, psychologists Daniel Kahneman and Amos Tversky found something strange: people feel the pain of a loss about **twice as strongly** as the pleasure of an equivalent gain. Losing $100 hurts roughly twice as much as winning $100 feels good. This is **loss aversion**, and it quietly distorts almost every investing decision you make.',
+        },
+        {
+          type: 'subheading',
+          text: 'The disposition effect',
+        },
+        {
+          type: 'paragraph',
+          text: 'Loss aversion shows up most clearly in what researchers call the **disposition effect**: investors tend to sell their winning stocks too early (to lock in the good feeling) and hold onto their losing stocks too long (hoping they will "come back" so the loss never has to be realized). Studies of real brokerage accounts consistently find investors are much more likely to sell a stock that is up than one that is down, even when the losing stock has worse future prospects.',
+        },
+        {
+          type: 'callout',
+          text: 'A loss only becomes "real" to most people when they sell. So they avoid selling, even when holding on is the objectively worse decision. The stock does not know what you paid for it, and neither does the market.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this is expensive',
+        },
+        {
+          type: 'list',
+          items: [
+            'Winners get sold too early, cutting off further gains',
+            'Losers get held too long, sometimes turning a small loss into a large one',
+            'Taxes get worse too: realizing gains too early triggers tax bills sooner, while unrealized losses that could offset them just sit there',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'paragraph',
+          text: 'PortfoliU\'s optimizer has no memory of what you paid for anything. It looks only at expected return, risk, and correlation going forward, so it cannot fall into the disposition effect the way a person can. When PortfoliU tells you to trim a position, it is because of where that asset sits in your portfolio today, not whether it happens to be a winner or a loser right now.',
+        },
+        {
+          type: 'callout',
+          text: 'PortfoliU\'s Risk Assessment questionnaire, which you can take from the home screen, specifically checks whether your reaction to a hypothetical drop or your comfort with volatility shows signs of loss aversion, and flags it in your results if it does.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'According to loss aversion, how does losing $100 feel compared to winning $100?',
+          options: [
+            { text: 'About the same', correct: false },
+            { text: 'Roughly twice as bad as winning $100 feels good', correct: true },
+            { text: 'Losses barely register compared to gains', correct: false },
+          ],
+        },
+        {
+          question: 'What is the disposition effect?',
+          options: [
+            { text: 'Selling winners too early and holding losers too long', correct: true },
+            { text: 'Selling everything at once regardless of performance', correct: false },
+            { text: 'Only investing in assets you feel positive about', correct: false },
+          ],
+        },
+        {
+          question: 'Why does an optimizer like PortfoliU avoid the disposition effect?',
+          options: [
+            { text: 'It only considers forward-looking risk and return, not your purchase price', correct: true },
+            { text: 'It refuses to ever sell a losing position', correct: false },
+            { text: 'It automatically sells anything that is currently up', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Overconfidence, Overtrading, and Home Bias',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Ask a room full of drivers if they are above average, and most will say yes. The same overconfidence shows up in investing: people tend to overestimate how much they know and how much control they have over outcomes that are largely driven by chance.',
+        },
+        {
+          type: 'subheading',
+          text: 'Overtrading hurts returns',
+        },
+        {
+          type: 'paragraph',
+          text: 'A well-known study of individual brokerage accounts by researchers Brad Barber and Terrance Odean found that the investors who traded the most earned significantly lower returns than those who traded the least, even before accounting for the extra fees and taxes from all that activity. Confidence in your own stock picks or market timing does not usually make you right more often. It mostly makes you trade more, and every trade has a cost.',
+        },
+        {
+          type: 'subheading',
+          text: 'Home bias',
+        },
+        {
+          type: 'paragraph',
+          text: 'Overconfidence also shows up as **home bias**: a tendency to overweight what feels familiar, like your own country\'s stocks, your employer\'s stock, or industries you personally work in. Familiarity feels like knowledge, but it is not the same thing as diversification, and it often leaves you concentrated exactly where your paycheck already depends on the outcome.',
+        },
+        {
+          type: 'list',
+          items: [
+            'More trades means more transaction costs and often more taxes',
+            'Confidence in a prediction is a feeling, not evidence that the prediction is accurate',
+            'Overweighting familiar or local assets reduces diversification, even though it feels safer',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'The investors who trade the most tend to earn the least. Activity feels like progress, but in investing, unnecessary activity is usually a cost, not an edge.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'paragraph',
+          text: 'This is exactly why PortfoliU offers a **net-of-cost** optimization objective: it targets a strong Sharpe ratio while explicitly penalizing turnover and trading costs, so the optimizer will not suggest constant small trades unless the benefit actually outweighs the cost. It also reports sector counts and concentration (HHI), so home bias toward one stock or sector is visible instead of hidden.',
+        },
+        {
+          type: 'callout',
+          text: 'PortfoliU\'s Risk Assessment questionnaire also checks for overconfidence directly: describing yourself as an experienced investor while also picking the highest-risk answer on every question flags overconfidence as a bias to watch for in your results.',
+        },
+      ],
+      quiz: [
+        {
+          question: "What did Barber and Odean's research find about frequent traders?",
+          options: [
+            { text: 'They earned higher returns than infrequent traders', correct: false },
+            { text: 'They earned lower returns, even before fees and taxes', correct: true },
+            { text: 'Trading frequency had no effect on returns', correct: false },
+          ],
+        },
+        {
+          question: 'What is home bias?',
+          options: [
+            { text: 'Avoiding all foreign investments for legal reasons', correct: false },
+            { text: 'Overweighting familiar assets like local or employer stock', correct: true },
+            { text: 'Only investing in real estate', correct: false },
+          ],
+        },
+        {
+          question: "How does PortfoliU's net-of-cost objective address overtrading?",
+          options: [
+            { text: 'It bans all trading after the initial allocation', correct: false },
+            { text: 'It targets a strong Sharpe ratio while penalizing turnover and trading costs', correct: true },
+            { text: 'It ignores transaction costs entirely to maximize returns', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      title: 'Herding and Recency Bias: Chasing the Hot Hand',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'When something has gone up a lot recently, it feels safe. When something has gone down a lot recently, it feels dangerous. This is **recency bias**: giving too much weight to what happened lately and assuming it will keep happening, even though markets do not actually work that way.',
+        },
+        {
+          type: 'subheading',
+          text: 'Chasing past performance',
+        },
+        {
+          type: 'paragraph',
+          text: 'Fund flow data shows this clearly: money pours into mutual funds and sectors right after they have posted strong recent returns, and flows out right after weak returns. But research on mutual fund performance consistently finds that funds with the best returns over the past few years do not reliably keep outperforming going forward. Investors end up systematically buying high and selling low, chasing performance that has already happened.',
+        },
+        {
+          type: 'subheading',
+          text: 'Herding',
+        },
+        {
+          type: 'paragraph',
+          text: '**Herding** is the related tendency to do what everyone else seems to be doing, on the assumption that a crowd cannot all be wrong. But bubbles form exactly because of herding: each person feels reassured by everyone else piling in, right up until the moment everyone tries to leave at once.',
+        },
+        {
+          type: 'list',
+          items: [
+            'Recent performance is one of the weakest predictors of future performance',
+            'A hot streak often means an asset has already gotten expensive relative to its fundamentals',
+            'Buying because "everyone else is buying" outsources your judgment to a crowd that may be making the same mistake you are',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'Past performance getting excited headlines is not the same as future performance. By the time an investment is popular enough to feel obviously safe, much of its opportunity may already be priced in.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'paragraph',
+          text: 'PortfoliU builds your portfolio from a covariance matrix and optimization objective, not from whatever asset happens to be trending. Because the optimizer weighs every asset\'s expected return against its risk and its correlation with everything else you hold, a single hot performer will not automatically dominate your portfolio unless it genuinely improves your overall risk-adjusted return.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is recency bias?',
+          options: [
+            { text: 'Giving too much weight to recent performance when predicting the future', correct: true },
+            { text: 'Only trusting the oldest data available', correct: false },
+            { text: 'Ignoring all historical data', correct: false },
+          ],
+        },
+        {
+          question: 'What does research on mutual fund performance generally find?',
+          options: [
+            { text: 'Recent top performers reliably keep outperforming', correct: false },
+            { text: 'Recent strong returns are a weak predictor of future returns', correct: true },
+            { text: 'Fund performance is entirely random with no patterns at all', correct: false },
+          ],
+        },
+        {
+          question: 'Why is herding risky?',
+          options: [
+            { text: 'It guarantees losses for everyone involved', correct: false },
+            { text: 'It outsources judgment to a crowd that may be making the same mistake', correct: true },
+            { text: 'It only affects professional investors, not individuals', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      title: 'Anchoring and Mental Accounting',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Two more biases distort how investors see the same dollar depending on where it came from or what number they first saw attached to it.',
+        },
+        {
+          type: 'subheading',
+          text: 'Anchoring',
+        },
+        {
+          type: 'paragraph',
+          text: '**Anchoring** is the tendency to fixate on an initial reference point, even when that point is arbitrary or no longer relevant. The most common investing example is the purchase price: "I will sell once it gets back to what I paid." But the price you paid has no bearing on what the asset is worth today or where it is headed next. The market does not remember your cost basis, only you do.',
+        },
+        {
+          type: 'subheading',
+          text: 'Mental accounting',
+        },
+        {
+          type: 'paragraph',
+          text: '**Mental accounting** is the habit of treating money differently depending on which mental "bucket" it sits in, even though money is completely interchangeable. A classic version is the "house money" effect: investors take bigger risks with gains than they would with their original principal, as if profit were somehow less real or less theirs than the money they started with. Someone might also keep a large cash pile "for emergencies" while carrying high-interest debt, treating the two buckets as unrelated when, financially, they are the same balance sheet.',
+        },
+        {
+          type: 'list',
+          items: [
+            'Anchoring on your purchase price can keep you holding a losing position long past the point it makes sense',
+            'Anchoring can also make you sell a winner too early because it "already made enough"',
+            'Mental accounting causes people to take excessive risk with gains, or hold too much idle cash, purely based on which bucket the money is in',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'A dollar is a dollar, regardless of whether it came from your paycheck, an inheritance, or a lucky trade. The moment you start treating dollars differently based on their origin, you are making decisions based on a story in your head rather than on the actual numbers.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'paragraph',
+          text: "PortfoliU's drift tracker watches your portfolio against your target weights and flags when any position has drifted outside your chosen tolerance band, regardless of whether that drift came from a gain or a loss. It treats every dollar in your portfolio the same way: as a claim on today's optimal allocation, not as money that is somehow different because of where it came from or what you originally paid for it.",
+        },
+        {
+          type: 'callout',
+          text: "PortfoliU's Risk Assessment questionnaire checks for anchoring too: a long time horizon paired with answers focused on capital preservation flags anchoring to overly conservative expectations as a bias worth watching.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is anchoring, in an investing context?',
+          options: [
+            { text: 'Fixating on a reference point like your purchase price, even when it is no longer relevant', correct: true },
+            { text: 'Only investing in physically anchored assets like real estate', correct: false },
+            { text: 'Diversifying across many different anchors of risk', correct: false },
+          ],
+        },
+        {
+          question: 'What is the "house money" effect an example of?',
+          options: [
+            { text: 'Loss aversion', correct: false },
+            { text: 'Mental accounting', correct: true },
+            { text: 'Herding', correct: false },
+          ],
+        },
+        {
+          question: "How does PortfoliU's drift tracker avoid mental accounting?",
+          options: [
+            { text: 'It ignores gains and only tracks losses', correct: false },
+            { text: 'It flags drift from target weights regardless of whether it came from a gain or a loss', correct: true },
+            { text: 'It keeps gains and principal in separate portfolios', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      title: 'The Behavior Gap: Why Rules Beat Willpower',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Every year, research firms compare the returns of investment funds to the actual returns earned by the average investor in those same funds. The gap is consistent and large: the average investor earns meaningfully less than the funds they invest in, because of poorly timed buying and selling. This is often called the **behavior gap**, and every bias covered in this track feeds into it.',
+        },
+        {
+          type: 'subheading',
+          text: 'Willpower is not a strategy',
+        },
+        {
+          type: 'paragraph',
+          text: 'Knowing about loss aversion, recency bias, and mental accounting does not automatically protect you from them. These biases operate quickly and emotionally, especially during a market crash or a euphoric rally, which is exactly when good judgment matters most and is hardest to access. Trying to simply "be more rational" in the moment is a weak defense against a brain that evolved for immediate survival, not long-term compounding.',
+        },
+        {
+          type: 'subheading',
+          text: 'Rules beat willpower',
+        },
+        {
+          type: 'paragraph',
+          text: 'The reliable fix is not more willpower, it is a pre-committed system that makes the decision before emotions are running high. Setting a target allocation and a rebalancing rule in advance means that when the market drops 20%, you already know what to do: rebalance back to target, which mechanically means buying more of what just got cheaper. You do not have to trust your in-the-moment judgment, because you already made the decision when you were calm.',
+        },
+        {
+          type: 'list',
+          items: [
+            'Decide your target allocation and objective in advance, while you are calm and thinking clearly',
+            'Use a rebalancing band so small drift is ignored and only meaningful drift triggers action',
+            'Automate what you can, so a bad day in the market does not turn into a bad decision',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'The investors who do best are usually not the ones who predict the market correctly. They are the ones who pre-commit to a sensible process and then let the process do the deciding when emotions would otherwise take over.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'paragraph',
+          text: "This is the entire philosophy behind PortfoliU. You set your risk tolerance and optimization objective once, in advance. The optimizer computes the target allocation from data, not headlines. The drift tracker tells you exactly when a rebalance is actually warranted, using a band you set ahead of time. Every bias in this track (loss aversion, overconfidence, herding, anchoring) loses most of its power once the decision has already been made by a rules-based system instead of by you in the heat of the moment.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is the "behavior gap"?',
+          options: [
+            { text: 'The difference between a fund\'s returns and the actual returns earned by average investors in it', correct: true },
+            { text: 'The gap between a fund\'s stated fees and its actual fees', correct: false },
+            { text: 'The difference between stock and bond returns', correct: false },
+          ],
+        },
+        {
+          question: 'Why is willpower alone considered a weak defense against investing biases?',
+          options: [
+            { text: 'Biases only affect inexperienced investors', correct: false },
+            { text: 'Biases operate quickly and emotionally, especially during market extremes when judgment is hardest to access', correct: true },
+            { text: 'Willpower works fine as long as you read enough about biases', correct: false },
+          ],
+        },
+        {
+          question: 'What is the recommended fix for behavioral biases in investing?',
+          options: [
+            { text: 'Check your portfolio more frequently to stay informed', correct: false },
+            { text: 'Pre-commit to a target allocation and rebalancing rule while calm, then let the rule decide', correct: true },
+            { text: 'Avoid setting any fixed targets so you can adapt to every market move', correct: false },
+          ],
+        },
+      ],
+    },
+  ],
 }
 
 const track3: Track = {
