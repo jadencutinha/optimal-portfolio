@@ -35,9 +35,6 @@ export default function App() {
         <div className="header-actions">
           <ThemeToggle />
           <AuthBar />
-          <a className="whitepaper-link" href="/whitepaper.html" target="_blank" rel="noreferrer">
-            Whitepaper
-          </a>
         </div>
       </header>
       <main className="app-main">
