@@ -8,7 +8,7 @@
   --accent: #e09743;
   --accent-hover: #4991c4;
   --danger: #c0392b;
-  --mono: 'Times New Roman', Times, serif;
+  --mono: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
   color-scheme: light;
 }
 
@@ -18,7 +18,7 @@
 
 body {
   margin: 0;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: var(--mono);
   background: var(--bg);
   color: var(--text);
 }
