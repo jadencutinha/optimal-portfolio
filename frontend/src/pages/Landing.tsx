@@ -357,8 +357,8 @@ export function Landing() {
 
       <footer className="landing-footer">
         <p>
-          Built with equal contribution by <strong>Jaden</strong> (Princeton University) and{' '}
-          <strong>Nadia</strong> (Washington University, St.&nbsp;Louis).
+          Built with equal contribution by <strong>Jaden</strong> (Princeton University), {' '}
+          <strong>Nadia</strong> (Washington University, St.&nbsp;Louis) and {' '} <strong>Bernardo</strong> (Rutgers University).
         </p>
         <a href="https://github.com/jadencutinha/optimal-portfolio" target="_blank" rel="noreferrer">
           View source on GitHub
