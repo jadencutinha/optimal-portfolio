@@ -1,5 +1,6 @@
 import type { Objective, ReturnModel, RiskModel } from '../api/types'
-import { Tooltip } from './ToolTip'
+import { Tooltip } from './Tooltip'
+import { FINANCIAL_TERMS } from '../data/definitions'
 
 const ADVANCED_OBJECTIVES = new Set<Objective>([
   'risk_parity',
@@ -198,7 +199,7 @@ export function ObjectiveControls(props: Props) {
       </div>
 
       <div className="field">
-        <Tooltip text="placeholder">
+        <Tooltip text={FINANCIAL_TERMS["Lookback Window"]?.definition}>
           <label>Lookback window</label>
         </Tooltip>
         <select value={props.lookbackDays} onChange={(event) => props.onLookbackDays(Number(event.target.value))}>
