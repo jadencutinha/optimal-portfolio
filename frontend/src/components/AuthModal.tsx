@@ -30,23 +30,30 @@ export function AuthModal({
   const canSubmit = isSignup ? Boolean(username && email && password) : Boolean(email && password)
 
   const submit = async () => {
-    if (!canSubmit) return
+    if (!canSubmit || busy) return
     setBusy(true)
     setError(null)
     setNotice(null)
-    const result = isSignup ? await signUp(email, password, username) : await signIn(email, password)
-    setBusy(false)
-    if (result.error) {
-      setError(result.error)
-      return
+    try {
+      const result = isSignup
+        ? await signUp(email, password, username)
+        : await signIn(email, password)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+      if (isSignup && 'needsConfirmation' in result && result.needsConfirmation) {
+        setNotice('Account created — check your email to confirm, then log in.')
+        setMode('login')
+        setPassword('')
+        return
+      }
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    } finally {
+      setBusy(false)
     }
-    if (isSignup && 'needsConfirmation' in result && result.needsConfirmation) {
-      setNotice('Account created — check your email to confirm, then log in.')
-      setMode('login')
-      setPassword('')
-      return
-    }
-    onClose()
   }
 
   return createPortal(

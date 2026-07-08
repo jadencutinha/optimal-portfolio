@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_supabase_admin
 from app.auth.repository import ProfileData
 
 PAYLOAD = {
@@ -70,3 +70,32 @@ def test_portfolios_are_scoped_to_user(client: TestClient) -> None:
 
 def test_portfolio_requires_auth(client: TestClient) -> None:
     assert client.get("/api/portfolios").status_code == 401
+
+
+class _FakeAdmin:
+    def __init__(self) -> None:
+        self.deleted: list[str] = []
+
+    async def delete_user(self, user_id: str) -> None:
+        self.deleted.append(user_id)
+
+
+def test_delete_account_removes_data_and_auth_user(client: TestClient) -> None:
+    admin = _FakeAdmin()
+    as_user(client, "goodbye", "pro")
+    client.app.dependency_overrides[get_supabase_admin] = lambda: admin
+    try:
+        assert client.post("/api/portfolios", json=PAYLOAD).status_code == 200
+        assert len(client.get("/api/portfolios").json()) == 1
+
+        response = client.delete("/api/me")
+        assert response.status_code == 204, response.text
+        assert admin.deleted == ["goodbye"]
+        assert client.get("/api/portfolios").json() == []
+    finally:
+        client.app.dependency_overrides.pop(get_supabase_admin, None)
+        clear(client)
+
+
+def test_delete_account_requires_auth(client: TestClient) -> None:
+    assert client.delete("/api/me").status_code == 401

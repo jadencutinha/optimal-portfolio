@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../auth/useAuth'
 import { useToast } from '../toast/useToast'
+import { ConfirmDialog } from './ConfirmDialog'
 
 export function ProfileModal({ onClose }: { onClose: () => void }) {
-  const { session, updateProfile } = useAuth()
+  const { session, updateProfile, deleteAccount } = useAuth()
   const toast = useToast()
 
   const meta = (session?.user.user_metadata ?? {}) as Record<string, unknown>
@@ -15,14 +16,29 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
   const [birthdate, setBirthdate] = useState(str('birthdate'))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape' && !confirmingDelete && !deleting) onClose()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [onClose, confirmingDelete, deleting])
+
+  const confirmDelete = async () => {
+    setDeleting(true)
+    const result = await deleteAccount()
+    if (result.error) {
+      setDeleting(false)
+      setConfirmingDelete(false)
+      toast(result.error, 'error')
+      return
+    }
+    toast('Your account has been deleted', 'success')
+    onClose()
+  }
 
   const save = async () => {
     setBusy(true)
@@ -84,7 +100,30 @@ export function ProfileModal({ onClose }: { onClose: () => void }) {
         <button type="button" className="modal-toggle" onClick={onClose}>
           Cancel
         </button>
+
+        <div className="danger-zone">
+          <span className="danger-zone-label">Danger zone</span>
+          <button
+            type="button"
+            className="danger-link"
+            onClick={() => setConfirmingDelete(true)}
+          >
+            Delete account permanently
+          </button>
+        </div>
       </div>
+
+      {confirmingDelete && (
+        <ConfirmDialog
+          title="Delete account?"
+          message="This permanently deletes your account and all saved portfolios, course progress, and certificates. This cannot be undone."
+          confirmLabel="Delete permanently"
+          cancelLabel="Keep account"
+          busy={deleting}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmingDelete(false)}
+        />
+      )}
     </div>,
     document.body,
   )
