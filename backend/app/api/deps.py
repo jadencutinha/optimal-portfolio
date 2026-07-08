@@ -3,7 +3,7 @@ from fastapi import Depends, Header, HTTPException, Request
 from app.auth.gating import Access
 from app.auth.plans import entitlements_for
 from app.auth.repository import ProfileData, ProfileRepository
-from app.auth.supabase import AuthError, SupabaseVerifier
+from app.auth.supabase import AuthError, SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
 from app.config import Settings
 from app.data.cache import Cache
@@ -51,6 +51,10 @@ def get_portfolio_repository(request: Request) -> PortfolioRepository:
 
 def get_verifier(request: Request) -> SupabaseVerifier:
     return request.app.state.verifier
+
+
+def get_supabase_admin(request: Request) -> SupabaseAdmin:
+    return request.app.state.supabase_admin
 
 
 def get_profile_repository(request: Request) -> ProfileRepository:

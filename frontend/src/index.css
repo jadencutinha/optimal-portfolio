@@ -321,6 +321,99 @@ button.primary.modal-submit {
   font-size: 12px;
 }
 
+/* ---- Delete account: danger zone + confirm dialog ---- */
+.danger-zone {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.danger-zone-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+.danger-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.danger-link:hover {
+  opacity: 0.8;
+}
+
+.confirm-overlay {
+  z-index: 110;
+  background: rgba(120, 20, 15, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.confirm-card {
+  border: 1px solid var(--danger);
+  box-shadow: 0 24px 60px rgba(120, 20, 15, 0.45), 0 0 0 1px var(--danger);
+}
+
+.confirm-message {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.ghost-btn,
+.danger-btn {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghost-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.ghost-btn:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+}
+
+.danger-btn {
+  background: var(--danger);
+  border: 1px solid var(--danger);
+  color: white;
+}
+
+.danger-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.ghost-btn:disabled,
+.danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .app-header h1 {
   margin: 0;
   font-size: 22px;
