@@ -1,8 +1,16 @@
 from dataclasses import dataclass
 
+from sqlalchemy import delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.db.models import Profile
+from app.db.models import (
+    Certificate,
+    Enrollment,
+    ExamResult,
+    Profile,
+    SavedPortfolio,
+    TopicProgress,
+)
 
 
 @dataclass
@@ -28,6 +36,20 @@ class ProfileRepository:
                 profile.email = email
                 await session.commit()
             return ProfileData(profile.id, profile.email, profile.plan, profile.plan_selected)
+
+    async def delete_account(self, user_id: str) -> None:
+        """Remove every row this app stores for the given user."""
+        async with self._session_factory() as session:
+            for model in (
+                SavedPortfolio,
+                Enrollment,
+                TopicProgress,
+                ExamResult,
+                Certificate,
+            ):
+                await session.execute(sql_delete(model).where(model.user_id == user_id))
+            await session.execute(sql_delete(Profile).where(Profile.id == user_id))
+            await session.commit()
 
     async def set_plan(self, user_id: str, plan: str) -> ProfileData | None:
         async with self._session_factory() as session:

@@ -12,6 +12,7 @@ export interface AuthState {
   ) => Promise<{ error?: string; needsConfirmation?: boolean }>
   signInWithGoogle: () => Promise<{ error?: string }>
   signOut: () => Promise<void>
+  deleteAccount: () => Promise<{ error?: string }>
   updateProfile: (updates: {
     full_name?: string
     username?: string

@@ -27,7 +27,7 @@ from app.api.routes import (
     universe,
 )
 from app.auth.repository import ProfileRepository
-from app.auth.supabase import SupabaseVerifier
+from app.auth.supabase import SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
 from app.config import get_settings
 from app.data.cache import build_cache
@@ -65,6 +65,7 @@ async def lifespan(app: FastAPI):
     app.state.provider = provider
     app.state.sector_provider = SectorProvider(cache, settings)
     app.state.verifier = SupabaseVerifier(settings)
+    app.state.supabase_admin = SupabaseAdmin(settings)
     app.state.profile_repository = ProfileRepository(session_factory)
     app.state.optimization_repository = OptimizationRepository(session_factory)
     app.state.price_repository = PriceRepository(session_factory)

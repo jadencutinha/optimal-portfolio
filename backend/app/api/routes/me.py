@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from app.api.deps import get_current_user, get_profile_repository
+from app.api.deps import get_current_user, get_profile_repository, get_supabase_admin
 from app.auth.plans import entitlements_for
 from app.auth.repository import ProfileData, ProfileRepository
+from app.auth.supabase import AdminError, SupabaseAdmin
 from app.schemas.auth import MeResponse, PlanUpdate
 
 router = APIRouter(tags=["auth"])
@@ -33,3 +34,17 @@ async def set_plan(
     if updated is None:
         raise HTTPException(status_code=404, detail="Profile not found.")
     return _to_response(updated)
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    user: ProfileData = Depends(get_current_user),
+    profiles: ProfileRepository = Depends(get_profile_repository),
+    admin: SupabaseAdmin = Depends(get_supabase_admin),
+) -> Response:
+    try:
+        await admin.delete_user(user.id)
+    except AdminError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    await profiles.delete_account(user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
