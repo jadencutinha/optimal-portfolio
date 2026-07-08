@@ -1260,6 +1260,7 @@ button.primary.modal-submit {
   .platform-bar,
   .tabs,
   .cert-actions,
+  .cert-back-btn,
   .result-actions,
   .controls,
   .modal-toggle {
@@ -1958,6 +1959,12 @@ table.weights td {
   padding: 12px 0 40px;
 }
 
+.certificate-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
 .course-landing-title {
   margin: 0 0 8px;
   font-size: 32px;
@@ -2187,9 +2194,29 @@ table.weights td {
   color: var(--muted);
 }
 
+.certificate-lock.earned {
+  color: #2e7d32;
+}
+
 .certificate-lock svg {
   width: 20px;
   height: 20px;
+}
+
+.certificate-download-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent-hover);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.certificate-download-btn:hover {
+  background: var(--accent);
+  color: #fff;
 }
 
 .certificate-track-name {

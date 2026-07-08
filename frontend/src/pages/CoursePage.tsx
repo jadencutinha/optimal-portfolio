@@ -1,15 +1,29 @@
 import { useState } from 'react'
-import { LockIcon } from '../components/icons'
+import { Certificate } from '../components/Certificate'
+import { CheckIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { TRACKS, type Track } from '../data/courseData'
-import { loadProgress, moduleKey, saveProgress, type CourseProgress } from '../lib/courseProgress'
+import {
+  ensureTrackCompletion,
+  loadProgress,
+  moduleKey,
+  saveProgress,
+  type CourseProgress,
+} from '../lib/courseProgress'
 
-export function CoursePage({ onSwitch }: { onSwitch: () => void }) {
+export function CoursePage({
+  onSwitch,
+  learnerName,
+}: {
+  onSwitch: () => void
+  learnerName?: string | null
+}) {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [moduleIndex, setModuleIndex] = useState(0)
   const [search, setSearch] = useState('')
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
+  const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
 
   const isComplete = (trackId: number, moduleId: number) => Boolean(progress[moduleKey(trackId, moduleId)])
 
@@ -43,6 +57,17 @@ export function CoursePage({ onSwitch }: { onSwitch: () => void }) {
         onBackToTracks={() => setSelectedTrack(null)}
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
         onModuleComplete={(moduleId) => markComplete(selectedTrack.id, moduleId)}
+      />
+    )
+  }
+
+  if (certificateTrack) {
+    return (
+      <Certificate
+        track={certificateTrack}
+        completion={ensureTrackCompletion(certificateTrack.id)}
+        learner={learnerName?.trim() || 'PortfoliU Learner'}
+        onClose={() => setCertificateTrack(null)}
       />
     )
   }
@@ -154,15 +179,28 @@ export function CoursePage({ onSwitch }: { onSwitch: () => void }) {
       <div className="certificates-section">
         <h2 className="certificates-title">Your Certificates</h2>
         <div className="certificates-grid">
-          {TRACKS.map((track) => (
-            <div key={track.id} className="certificate-card">
-              <span className="certificate-lock">
-                <LockIcon />
-              </span>
-              <p className="certificate-track-name">{track.title}</p>
-              <p className="certificate-hint">Complete the track to unlock</p>
-            </div>
-          ))}
+          {TRACKS.map((track) => {
+            const earned = track.modules.length > 0 && trackPct(track) === 100
+            return (
+              <div key={track.id} className="certificate-card">
+                <span className={`certificate-lock ${earned ? 'earned' : ''}`}>
+                  {earned ? <CheckIcon /> : <LockIcon />}
+                </span>
+                <p className="certificate-track-name">{track.title}</p>
+                {earned ? (
+                  <button
+                    type="button"
+                    className="certificate-download-btn"
+                    onClick={() => setCertificateTrack(track)}
+                  >
+                    View Certificate
+                  </button>
+                ) : (
+                  <p className="certificate-hint">Complete the track to unlock</p>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 

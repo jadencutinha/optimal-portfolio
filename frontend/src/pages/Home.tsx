@@ -86,7 +86,7 @@ export function Home() {
 
   return (
     <>
-      {plan === 'course' && <CoursePage onSwitch={onSwitch} />}
+      {plan === 'course' && <CoursePage onSwitch={onSwitch} learnerName={me.data.email} />}
       {plan === 'free' && (
         <FreePage
           onOpenRiskQ={() => setShowRiskQ(true)}
