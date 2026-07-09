@@ -85,7 +85,7 @@ export function FinalExam({ courseId, courseTitle, learner, onClose }: Props) {
 
   return (
     <div className="final-exam">
-      <h2>{courseTitle} — Final Exam</h2>
+      <h2>{courseTitle} Final Exam</h2>
       <p className="muted">{questions.length} questions · 90% to pass</p>
       {questions.map((question, questionIndex) => (
         <div key={question.id} className="exam-q">

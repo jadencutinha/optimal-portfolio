@@ -38,9 +38,9 @@ export const BIAS_QUESTIONS: BiasQuestion[] = [
     id: 'concentration',
     text: 'Would you put 40% of your money into one stock you strongly believe in?',
     options: [
-      { label: 'Absolutely — conviction pays', weights: { overconfidence: 2 } },
+      { label: 'Absolutely, conviction pays', weights: { overconfidence: 2 } },
       { label: 'Maybe, for the right company', weights: { overconfidence: 1 } },
-      { label: 'No — that feels too concentrated' },
+      { label: 'No, that feels too concentrated' },
     ],
   },
   {
@@ -49,7 +49,7 @@ export const BIAS_QUESTIONS: BiasQuestion[] = [
     options: [
       { label: 'Very confident', weights: { overconfidence: 2 } },
       { label: 'Somewhat confident', weights: { overconfidence: 1 } },
-      { label: 'Not confident — markets are hard' },
+      { label: 'Not confident, markets are hard' },
     ],
   },
   {

@@ -45,7 +45,7 @@ export function FactorsPage() {
       <div className="factors-intro">
         <h2>Factor exposures</h2>
         <p className="muted">
-          Decompose your portfolio's returns into style-factor tilts — how much of its behavior comes
+          Decompose your portfolio's returns into style-factor tilts to see how much of its behavior comes
           from the market, momentum, and other factors versus stock-specific bets.
         </p>
       </div>

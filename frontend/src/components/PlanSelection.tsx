@@ -41,7 +41,7 @@ const PLANS: PlanCard[] = [
     id: 'pro',
     name: 'Pro',
     price: '$29/mo',
-    tagline: 'The full optimizer — everything unlocked.',
+    tagline: 'The full optimizer with everything unlocked.',
     features: [
       'Up to 50 tickers',
       'All objectives & risk models',
@@ -51,7 +51,7 @@ const PLANS: PlanCard[] = [
       'Unlimited saved portfolios',
     ],
     featured: true,
-    note: 'Demo — no payment required yet',
+    note: 'Demo. No payment required yet',
   },
 ]
 
@@ -69,7 +69,7 @@ export function PlanSelection({ current, pending, onChoose, onUpgradeToPro, onCa
     <div className="plan-selection">
       <header className="plan-head">
         <h2>{current ? 'Switch your platform' : 'Choose your platform'}</h2>
-        <p>{current ? 'Move to a different experience anytime.' : 'Pick how you want to start — you can switch later.'}</p>
+        <p>{current ? 'Move to a different experience anytime.' : 'Pick how you want to start. You can switch later.'}</p>
       </header>
 
       <div className="plan-grid">

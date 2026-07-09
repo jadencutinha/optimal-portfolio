@@ -29,7 +29,7 @@ export function Explanation({ data }: Props) {
           '.'
         )}{' '}
         {data.binding_max_weight
-          ? `The per-holding cap is binding on ${data.binding_tickers.join(', ')} — it wanted to hold more.`
+          ? `The per-holding cap is binding on ${data.binding_tickers.join(', ')}. It wanted to hold more.`
           : 'No position cap is binding, so weights are set purely by the risk/return trade-off.'}
       </p>
 

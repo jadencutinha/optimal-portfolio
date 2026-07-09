@@ -49,7 +49,7 @@ export function StressPage() {
         <h2>Historical stress test</h2>
         <p className="muted">
           Build a portfolio, then replay it through history's worst shocks to see the drawdown it
-          would have taken — and how long it took to recover.
+          would have taken, and how long it took to recover.
         </p>
       </div>
 
@@ -170,7 +170,7 @@ function StressCard({ window }: { window: StressWindow }) {
 
       {window.missing_tickers.length > 0 && (
         <p className="stress-missing">
-          No history for {window.missing_tickers.join(', ')} in this window — weights renormalized over the
+          No history for {window.missing_tickers.join(', ')} in this window, weights renormalized over the
           rest.
         </p>
       )}

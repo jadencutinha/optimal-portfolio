@@ -16,8 +16,8 @@ const QUESTIONS = [
     text: 'How long do you plan to keep your money invested?',
     options: [
       { label: 'Less than 1 year', score: 1 },
-      { label: '1–3 years', score: 2 },
-      { label: '3–7 years', score: 3 },
+      { label: '1 to 3 years', score: 2 },
+      { label: '3 to 7 years', score: 3 },
       { label: '7+ years', score: 4 },
     ],
   },
@@ -36,9 +36,9 @@ const QUESTIONS = [
     text: 'How would you describe your investing experience?',
     options: [
       { label: 'No experience', score: 1 },
-      { label: 'Some — I understand basic concepts', score: 2 },
-      { label: 'Moderate — I follow markets regularly', score: 3 },
-      { label: 'Experienced — I actively manage investments', score: 4 },
+      { label: 'Some, I understand basic concepts', score: 2 },
+      { label: 'Moderate, I follow markets regularly', score: 3 },
+      { label: 'Experienced, I actively manage investments', score: 4 },
     ],
   },
   {
@@ -77,7 +77,7 @@ const BIAS_INFO: Record<string, Bias> = {
   anchoring: {
     name: 'Anchoring',
     explanation:
-      'Anchoring is the tendency to rely too heavily on the first piece of information you encounter — like a stock\'s purchase price or a market peak, when making decisions. Investors often hold losing positions too long because they are "anchored" to what they paid, or they avoid buying after a rally because prices feel "too high" relative to a past level.',
+      'Anchoring is the tendency to rely too heavily on the first piece of information you encounter, like a stock\'s purchase price or a market peak, when making decisions. Investors often hold losing positions too long because they are "anchored" to what they paid, or they avoid buying after a rally because prices feel "too high" relative to a past level.',
     warning:
       'Your answers suggest you may be anchoring to conservative expectations even though your time horizon gives you room to take on more growth. Try to evaluate investments on their future potential, not where they\'ve been.',
   },
@@ -132,7 +132,7 @@ export function RiskQuestionnaire({ onComplete }: Props) {
 
         <div className="bias-intro">
           <p>
-            Our psychological instincts evolved for survival — not investing. The same impulses that once kept us safe can lead us to panic-sell during downturns, overtrade, or anchor to the wrong numbers. Understanding your behavioral tendencies is just as important as understanding risk and return.
+            Our psychological instincts evolved for survival, not investing. The same impulses that once kept us safe can lead us to panic-sell during downturns, overtrade, or anchor to the wrong numbers. Understanding your behavioral tendencies is just as important as understanding risk and return.
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export function RiskQuestionnaire({ onComplete }: Props) {
         {detectedBiases.length === 0 && (
           <div className="bias-section">
             <h3>Your behavioral profile looks balanced</h3>
-            <p className="muted">Your answers don't show strong signs of common biases — but stay aware. Loss aversion, overconfidence, and anchoring are universal human tendencies that can surface under pressure.</p>
+            <p className="muted">Your answers don't show strong signs of common biases, but stay aware. Loss aversion, overconfidence, and anchoring are universal human tendencies that can surface under pressure.</p>
           </div>
         )}
 

@@ -79,7 +79,7 @@ export function ObjectiveControls(props: Props) {
             return (
               <option key={option.value} value={option.value} disabled={locked}>
                 {option.label}
-                {locked ? ' — Pro' : ''}
+                {locked ? ' (Pro)' : ''}
               </option>
             )
           })}
@@ -94,7 +94,7 @@ export function ObjectiveControls(props: Props) {
             return (
               <option key={option.value} value={option.value} disabled={locked}>
                 {option.label}
-                {locked ? ' — Pro' : ''}
+                {locked ? ' (Pro)' : ''}
               </option>
             )
           })}
@@ -109,7 +109,7 @@ export function ObjectiveControls(props: Props) {
             return (
               <option key={option.value} value={option.value} disabled={locked}>
                 {option.label}
-                {locked ? ' — Pro' : ''}
+                {locked ? ' (Pro)' : ''}
               </option>
             )
           })}
