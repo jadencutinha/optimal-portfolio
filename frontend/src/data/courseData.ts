@@ -154,8 +154,8 @@ const track1: Track = {
         {
           question: 'You invest $1,000 at 10% simple interest for 10 years. How much do you have?',
           options: [
+            { text: '$2,000', correct: true},
             { text: '$1,500', correct: false },
-            { text: '$2,000', correct: true },
             { text: '$2,594', correct: false },
           ],
         },
@@ -230,23 +230,23 @@ const track1: Track = {
           question: 'An investment promises 20% returns with zero risk. What should you think?',
           options: [
             { text: "It's a great opportunity", correct: false },
-            { text: "It's probably a scam", correct: true },
             { text: 'It depends on the company', correct: false },
+            { text: "It's probably a scam", correct: true },
           ],
         },
         {
           question: 'Which asset class historically has the highest long-term return?',
           options: [
             { text: 'Government bonds', correct: false },
-            { text: 'Large-cap stocks', correct: true },
             { text: 'Savings accounts', correct: false },
+            { text: 'Large-cap stocks', correct: true },
           ],
         },
         {
           question: "Why does the stock market's 10% average return require patience?",
           options: [
-            { text: 'Because returns are guaranteed', correct: false },
             { text: 'Because individual years can be very positive or very negative', correct: true },
+            { text: 'Because returns are guaranteed', correct: false },
             { text: 'Because you need to pick the right stocks', correct: false },
           ],
         },
@@ -321,8 +321,8 @@ const track1: Track = {
         {
           question: 'What is the "free lunch" of investing?',
           options: [
-            { text: 'Compound interest', correct: false },
             { text: 'Diversification', correct: true },
+            { text: 'Compound interest', correct: false },
             { text: 'Index funds', correct: false },
           ],
         },
@@ -398,16 +398,16 @@ const track1: Track = {
           question: 'What does a high HHI concentration score mean?',
           options: [
             { text: 'Your portfolio is well diversified', correct: false },
-            { text: 'Most of your money is in a few stocks', correct: true },
             { text: 'Your returns will be higher', correct: false },
+            { text: 'Most of your money is in a few stocks', correct: true },
           ],
         },
         {
           question: 'Expected return is:',
           options: [
             { text: 'A guaranteed annual return', correct: false },
-            { text: 'A historical estimate of average annual return', correct: true },
             { text: "The minimum you'll earn", correct: false },
+            { text: 'A historical estimate of average annual return', correct: true },
           ],
         },
       ],
@@ -472,8 +472,8 @@ const track2: Track = {
           question: 'According to loss aversion, how does losing $100 feel compared to winning $100?',
           options: [
             { text: 'About the same', correct: false },
-            { text: 'Roughly twice as bad as winning $100 feels good', correct: true },
             { text: 'Losses barely register compared to gains', correct: false },
+            { text: 'Roughly twice as bad as winning $100 feels good', correct: true },
           ],
         },
         {
@@ -548,15 +548,15 @@ const track2: Track = {
           question: "What did Barber and Odean's research find about frequent traders?",
           options: [
             { text: 'They earned higher returns than infrequent traders', correct: false },
-            { text: 'They earned lower returns, even before fees and taxes', correct: true },
             { text: 'Trading frequency had no effect on returns', correct: false },
+            { text: 'They earned lower returns, even before fees and taxes', correct: true },
           ],
         },
         {
           question: 'What is home bias?',
           options: [
-            { text: 'Avoiding all foreign investments for legal reasons', correct: false },
             { text: 'Overweighting familiar assets like local or employer stock', correct: true },
+            { text: 'Avoiding all foreign investments for legal reasons', correct: false },
             { text: 'Only investing in real estate', correct: false },
           ],
         },
@@ -627,8 +627,8 @@ const track2: Track = {
         {
           question: 'What does research on mutual fund performance generally find?',
           options: [
-            { text: 'Recent top performers reliably keep outperforming', correct: false },
             { text: 'Recent strong returns are a weak predictor of future returns', correct: true },
+            { text: 'Recent top performers reliably keep outperforming', correct: false },
             { text: 'Fund performance is entirely random with no patterns at all', correct: false },
           ],
         },
@@ -636,8 +636,8 @@ const track2: Track = {
           question: 'Why is herding risky?',
           options: [
             { text: 'It guarantees losses for everyone involved', correct: false },
-            { text: 'It outsources judgment to a crowd that may be making the same mistake', correct: true },
             { text: 'It only affects professional investors, not individuals', correct: false },
+            { text: 'It outsources judgment to a crowd that may be making the same mistake', correct: true },
           ],
         },
       ],
@@ -776,8 +776,8 @@ const track2: Track = {
           question: 'Why is willpower alone considered a weak defense against investing biases?',
           options: [
             { text: 'Biases only affect inexperienced investors', correct: false },
-            { text: 'Biases operate quickly and emotionally, especially during market extremes when judgment is hardest to access', correct: true },
             { text: 'Willpower works fine as long as you read enough about biases', correct: false },
+            { text: 'Biases operate quickly and emotionally, especially during market extremes when judgment is hardest to access', correct: true },
           ],
         },
         {
@@ -857,8 +857,8 @@ const track3: Track = {
           question: "You blend a 12%-return stock with a 6%-return bond 50/50. What's the portfolio's expected return?",
           options: [
             { text: '6%', correct: false },
-            { text: '9%', correct: true },
             { text: '12%', correct: false },
+            { text: '9%', correct: true },
           ],
         },
         {
@@ -873,8 +873,8 @@ const track3: Track = {
           question: 'If two assets had a correlation of exactly 1 (moved in perfect lockstep), what would portfolio volatility equal?',
           options: [
             { text: 'Less than the weighted average', correct: false },
-            { text: 'Exactly the weighted average of the individual volatilities', correct: true },
             { text: 'Zero', correct: false },
+            { text: 'Exactly the weighted average of the individual volatilities', correct: true },
           ],
         },
       ],
@@ -950,8 +950,8 @@ const track3: Track = {
         {
           question: 'What is the efficient frontier?',
           options: [
-            { text: 'Any portfolio with positive returns', correct: false },
             { text: 'The set of portfolios offering the best possible return for each level of risk', correct: true },
+            { text: 'Any portfolio with positive returns', correct: false },
             { text: 'A portfolio with zero risk', correct: false },
           ],
         },
@@ -1016,8 +1016,8 @@ const track3: Track = {
         {
           question: 'Why can 20 similar tech stocks diversify worse than 5 stocks across different sectors?',
           options: [
-            { text: 'Because more stocks is always better', correct: false },
             { text: 'Because the tech stocks are highly correlated and move together', correct: true },
+            { text: 'Because more stocks is always better', correct: false },
             { text: "Because sector doesn't matter", correct: false },
           ],
         },
@@ -1094,8 +1094,8 @@ const track3: Track = {
           question: 'What does shrinkage do?',
           options: [
             { text: 'Deletes low-return assets', correct: false },
-            { text: 'Blends the noisy sample matrix toward a more stable target', correct: true },
             { text: 'Increases the number of assets considered', correct: false },
+            { text: 'Blends the noisy sample matrix toward a more stable target', correct: true },
           ],
         },
         {
@@ -1170,15 +1170,15 @@ const track3: Track = {
           question: 'What does Black-Litterman start from instead of raw historical average returns?',
           options: [
             { text: 'A random guess', correct: false },
-            { text: 'Equilibrium returns implied by market-cap weights', correct: true },
             { text: 'Zero expected return for every asset', correct: false },
+            { text: 'Equilibrium returns implied by market-cap weights', correct: true },
           ],
         },
         {
           question: 'How does Black-Litterman incorporate your own opinions?',
           options: [
-            { text: 'It ignores the market completely and uses only your view', correct: false },
             { text: 'It blends your view with market equilibrium, weighted by your confidence', correct: true },
+            { text: 'It ignores the market completely and uses only your view', correct: false },
             { text: 'It requires 100% confidence or no view at all', correct: false },
           ],
         },
@@ -1242,15 +1242,15 @@ const track3: Track = {
           question: 'What does CVaR specifically target?',
           options: [
             { text: 'Overall day-to-day volatility', correct: false },
-            { text: 'The average loss in the worst-case scenarios', correct: true },
             { text: 'Only the best-case scenarios', correct: false },
+            { text: 'The average loss in the worst-case scenarios', correct: true },
           ],
         },
         {
           question: 'What does risk parity try to equalize?',
           options: [
-            { text: 'Expected return across assets', correct: false },
             { text: "Each asset's contribution to total portfolio risk", correct: true },
+            { text: 'Expected return across assets', correct: false },
             { text: 'The number of shares of each asset', correct: false },
           ],
         },
