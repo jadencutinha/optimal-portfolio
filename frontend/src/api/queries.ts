@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../auth/useAuth'
+import { extractApiError } from '../lib/errors'
 import { apiClient } from './client'
 import type {
   AssistantRequest,
@@ -121,6 +122,36 @@ export function usePlan() {
   return useMutation({
     mutationFn: async (request: PlanRequest) =>
       (await apiClient.post<PlanResponse>('/api/plan/montecarlo', request)).data,
+  })
+}
+
+export interface ComparisonSlot {
+  id: string
+  label: string
+  request: OptimizeRequest
+}
+
+export type ComparisonOutcome = ComparisonSlot &
+  ({ status: 'ok'; response: OptimizeResponse } | { status: 'error'; message: string })
+
+export function useComparePortfolios() {
+  return useMutation({
+    mutationFn: async (slots: ComparisonSlot[]): Promise<ComparisonOutcome[]> => {
+      const settled = await Promise.allSettled(
+        slots.map((slot) => apiClient.post<OptimizeResponse>('/api/optimize', slot.request)),
+      )
+      return settled.map((outcome, index) => {
+        const slot = slots[index]
+        if (outcome.status === 'fulfilled') {
+          return { ...slot, status: 'ok', response: outcome.value.data }
+        }
+        return {
+          ...slot,
+          status: 'error',
+          message: extractApiError(outcome.reason, 'This portfolio could not be optimized.'),
+        }
+      })
+    },
   })
 }
 

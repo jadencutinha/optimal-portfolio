@@ -9,6 +9,7 @@ import { BacktestPage } from './BacktestPage'
 import { FactorsPage } from './FactorsPage'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
+import { SideBySidePage } from './SideBySidePage'
 import { StressPage } from './StressPage'
 import { SweepPage } from './SweepPage'
 import { TrackerPage } from './TrackerPage'
@@ -19,6 +20,7 @@ type Tab =
   | 'optimizer'
   | 'assistant'
   | 'planner'
+  | 'sidebyside'
   | 'backtest'
   | 'compare'
   | 'stress'
@@ -31,8 +33,9 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'optimizer', label: 'Optimizer' },
   { id: 'assistant', label: 'Assistant' },
   { id: 'planner', label: 'Planner' },
+  { id: 'sidebyside', label: 'Side by Side' },
   { id: 'backtest', label: 'Backtest' },
-  { id: 'compare', label: 'Compare' },
+  { id: 'compare', label: 'Sweep' },
   { id: 'stress', label: 'Stress Test' },
   { id: 'factors', label: 'Factors' },
   { id: 'behavioral', label: 'Behavioral' },
@@ -80,6 +83,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
       {tab === 'optimizer' && <OptimizerPage />}
       {tab === 'assistant' && <AssistantPage />}
       {tab === 'planner' && <PlannerPage />}
+      {tab === 'sidebyside' && <SideBySidePage />}
       {tab === 'backtest' && <BacktestPage />}
       {tab === 'compare' && <SweepPage />}
       {tab === 'stress' && <StressPage />}

@@ -17,6 +17,11 @@ export const PRO_TOUR: TourStep[] = [
     body: 'Run thousands of Monte Carlo simulations to see your odds of reaching a target and the risk of a deep drawdown.',
   },
   {
+    selector: '[data-tour="sidebyside"]',
+    title: 'Side by Side',
+    body: 'Optimize up to four portfolios at once, each with its own tickers and objective, and compare their risk, return, and holdings on one screen.',
+  },
+  {
     selector: '[data-tour="backtest"]',
     title: 'Backtest',
     body: 'Replay your strategy through history with no look-ahead, benchmarked against the index, equal-weight, and 60/40.',
@@ -53,6 +58,11 @@ export const FREE_TOUR: TourStep[] = [
     selector: '[data-tour="planner"]',
     title: 'Goal Planner',
     body: 'Project your wealth with Monte Carlo simulations and see your odds of hitting a savings goal.',
+  },
+  {
+    selector: '[data-tour="sidebyside"]',
+    title: 'Side by Side',
+    body: 'Compare two or more portfolios at once, each with its own tickers and objective. Every portfolio uses one of your daily optimizer runs.',
   },
   {
     selector: '[data-tour="saved"]',

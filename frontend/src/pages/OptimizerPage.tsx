@@ -10,6 +10,7 @@ import {
   useUniverse,
 } from '../api/queries'
 import { downloadCsv } from '../lib/csv'
+import { extractApiError } from '../lib/errors'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
@@ -112,7 +113,9 @@ export function OptimizerPage() {
 
   const result = optimize.data
   const frontierData = frontier.data
-  const errorMessage = optimize.isError ? extractError(optimize.error) : null
+  const errorMessage = optimize.isError
+    ? extractApiError(optimize.error, 'Optimization failed. Adjust your inputs and try again.')
+    : null
 
   const selectedPoint =
     frontierData && selectedFrontierIndex !== null ? frontierData.points[selectedFrontierIndex] : null
@@ -410,21 +413,4 @@ export function OptimizerPage() {
       )}
     </div>
   )
-}
-
-function extractError(error: unknown): string {
-  if (typeof error === 'object' && error !== null && 'response' in error) {
-    const response = (error as { response?: { data?: { detail?: unknown } } }).response
-    const detail = response?.data?.detail
-    if (typeof detail === 'string') {
-      return detail
-    }
-    if (Array.isArray(detail)) {
-      return detail
-        .map((item: { msg?: string }) => item?.msg)
-        .filter(Boolean)
-        .join('; ')
-    }
-  }
-  return 'Optimization failed. Adjust your inputs and try again.'
 }
