@@ -16,6 +16,7 @@ import { ConstraintBuilder } from '../components/ConstraintBuilder'
 import { EmptyState } from '../components/EmptyState'
 import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
+import { GrowthProjection } from '../components/GrowthProjection'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
 import { PromptModal } from '../components/PromptModal'
@@ -24,6 +25,7 @@ import { SkeletonCards } from '../components/Skeleton'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
+import { useLastOptimization } from '../optimizer/useLastOptimization'
 import { useToast } from '../toast/useToast'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
@@ -37,6 +39,7 @@ export function OptimizerPage() {
   const me = useMe()
   const save = useSavePortfolio()
   const toast = useToast()
+  const { setLastRun } = useLastOptimization()
 
   const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
   const pro = Boolean(entitlements.advanced_optimizers)
@@ -85,7 +88,18 @@ export function OptimizerPage() {
     setLastRequest(request)
     explain.reset()
     resampled.reset()
-    optimize.mutate(request)
+    optimize.mutate(request, {
+      onSuccess: (response) => {
+        setLastRun({
+          expectedReturn: response.metrics.expected_return,
+          volatility: response.metrics.volatility,
+          sharpeRatio: response.metrics.sharpe_ratio,
+          objective: response.objective,
+          riskModel: response.risk_model,
+          tickers: response.weights.map((allocation) => allocation.ticker),
+        })
+      },
+    })
     frontier.mutate({
       tickers,
       lookback_days: lookbackDays,
@@ -278,6 +292,11 @@ export function OptimizerPage() {
               <AllocationChart weights={result.weights} />
               <WeightsTable weights={result.weights} />
             </div>
+            <GrowthProjection
+              key={`${result.metrics.expected_return}-${result.metrics.volatility}`}
+              expectedReturn={result.metrics.expected_return}
+              volatility={result.metrics.volatility}
+            />
             <p className="provenance">
               {result.n_assets} assets · {result.provider} data · {result.risk_model} ·{' '}
               {result.as_of_start} → {result.as_of_end} · solver {result.solver_status}

@@ -4024,6 +4024,63 @@ table.weights td {
   margin-bottom: 4px;
 }
 
+.planner-source {
+  font-size: 12px;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+/* ---- Dollar growth projection on the optimizer ---- */
+.growth-projection {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.growth-projection h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.growth-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.growth-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.growth-inputs .planner-field {
+  margin-bottom: 0;
+}
+
+.growth-run {
+  height: 42px;
+  white-space: nowrap;
+}
+
+.growth-output {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.growth-output .planner-stat-value {
+  font-size: 19px;
+}
+
 /* ---- Natural-language assistant (#55) ---- */
 .assistant-composer {
   background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elevated) 100%);
