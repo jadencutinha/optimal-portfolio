@@ -4,7 +4,7 @@ export const PRO_TOUR: TourStep[] = [
   {
     selector: '[data-tour="optimizer"]',
     title: 'Optimizer',
-    body: 'Build a mathematically optimal portfolio from your tickers — choose objectives, risk models, constraints, and trace the efficient frontier.',
+    body: 'Build a mathematically optimal portfolio from your tickers. Choose objectives, risk models, and constraints, then trace the efficient frontier.',
   },
   {
     selector: '[data-tour="assistant"]',
@@ -14,7 +14,7 @@ export const PRO_TOUR: TourStep[] = [
   {
     selector: '[data-tour="planner"]',
     title: 'Goal Planner',
-    body: 'Run thousands of Monte Carlo simulations to see your odds of reaching a target — and the risk of a deep drawdown.',
+    body: 'Run thousands of Monte Carlo simulations to see your odds of reaching a target and the risk of a deep drawdown.',
   },
   {
     selector: '[data-tour="backtest"]',
@@ -24,7 +24,7 @@ export const PRO_TOUR: TourStep[] = [
   {
     selector: '[data-tour="stress"]',
     title: 'Stress Test',
-    body: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock — drawdown and recovery time.',
+    body: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock, including drawdown and recovery time.',
   },
   {
     selector: '[data-tour="factors"]',

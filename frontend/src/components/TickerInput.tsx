@@ -89,7 +89,7 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
       )}
       {invalid.size > 0 && (
         <p className="ticker-warning">
-          No price data for {Array.from(invalid).join(', ')} — they'll be ignored when you optimize.
+          No price data for {Array.from(invalid).join(', ')}. They'll be ignored when you optimize.
         </p>
       )}
     </div>

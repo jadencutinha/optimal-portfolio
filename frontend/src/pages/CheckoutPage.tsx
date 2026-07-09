@@ -43,14 +43,14 @@ export function CheckoutPage({ onDone, onCancel }: { onDone: () => void; onCance
 
         {DEMO_BYPASS && (
           <button type="button" className="bypass-btn" disabled={setPlan.isPending} onClick={upgrade}>
-            Skip payment (demo) — unlock Pro now
+            Skip payment and unlock Pro now
           </button>
         )}
 
         <button type="button" className="modal-toggle" onClick={onCancel}>
           Cancel
         </button>
-        <p className="muted checkout-note">Demo checkout — no card is charged.</p>
+        <p className="muted checkout-note">Demo checkout. No card is charged.</p>
       </div>
     </div>
   )

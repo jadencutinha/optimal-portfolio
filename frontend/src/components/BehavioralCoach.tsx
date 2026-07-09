@@ -100,7 +100,7 @@ export function BehavioralCoach() {
 
         {biases.length === 0 ? (
           <p className="muted">
-            Your answers don't show strong signs of common biases — your instincts line up well with the math-optimal
+            Your answers don't show strong signs of common biases. Your instincts line up well with the math-optimal
             portfolio.
           </p>
         ) : (
@@ -148,20 +148,20 @@ export function BehavioralCoach() {
           {adjustment.tilt === 'conservative' && adjustment.driver && (
             <p>
               Your <strong>{BIAS_INFO[adjustment.driver].name.toLowerCase()}</strong> would steer you toward a
-              lower-risk portfolio — cutting your expected return by{' '}
+              lower-risk portfolio, cutting your expected return by{' '}
               <strong>{percent(Math.max(returnGap, 0))}</strong> per year versus the math-optimal allocation.
             </p>
           )}
           {adjustment.tilt === 'concentrated' && (
             <p>
-              Your <strong>overconfidence</strong> would steer you to concentrate — raising your volatility by{' '}
+              Your <strong>overconfidence</strong> would steer you to concentrate, raising your volatility by{' '}
               <strong>{percent(Math.max(volGap, 0))}</strong> and lowering your Sharpe from{' '}
               <strong>{ratio(optimal.metrics.sharpe_ratio)}</strong> to{' '}
               <strong>{ratio(adjusted.metrics.sharpe_ratio)}</strong>.
             </p>
           )}
           {adjustment.tilt === 'none' && (
-            <p>No bias adjustment was needed — stick with the disciplined, math-optimal portfolio.</p>
+            <p>No bias adjustment was needed. Stick with the disciplined, math-optimal portfolio.</p>
           )}
         </div>
 
