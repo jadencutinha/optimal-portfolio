@@ -364,6 +364,77 @@ export interface PlanResponse {
   timeline: PlanPoint[]
 }
 
+export type BiasName = 'lossAversion' | 'overconfidence' | 'anchoring'
+
+export interface BehaviorGapRequest {
+  tickers: string[]
+  objective: 'max_sharpe' | 'min_variance'
+  risk_model: RiskModel
+  history_days?: number
+  estimation_window?: number
+  rebalance?: 'monthly' | 'quarterly' | 'annual'
+  cost_bps?: number
+  max_weight: number
+  initial: number
+  loss_aversion: boolean
+  overconfidence: boolean
+  anchoring: boolean
+  panic_drawdown: number
+}
+
+export interface BehaviorCurvePoint {
+  date: string
+  value: number
+  drawdown: number
+}
+
+export interface PolicyStats {
+  final_value: number
+  total_return: number
+  cagr: number
+  volatility: number
+  sharpe_ratio: number
+  max_drawdown: number
+  total_cost: number
+  total_turnover: number
+  rebalances: number
+  panic_sales: number
+  days_derisked: number
+}
+
+export interface PolicyResult {
+  name: string
+  stats: PolicyStats
+  curve: BehaviorCurvePoint[]
+  panic_dates: string[]
+}
+
+export interface BiasDriver {
+  bias: BiasName
+  behavior: string
+}
+
+export interface ToleranceCheck {
+  stated_tolerance: number
+  worst_drawdown: number
+  breaches: number
+  first_breach: string | null
+}
+
+export interface BehaviorGapResponse {
+  start: string
+  end: string
+  initial: number
+  tickers: string[]
+  disciplined: PolicyResult
+  behavioral: PolicyResult
+  gap_value: number
+  gap_pct: number
+  cagr_gap: number
+  drivers: BiasDriver[]
+  tolerance: ToleranceCheck | null
+}
+
 export interface AssistantRequest {
   message: string
   tickers?: string[] | null

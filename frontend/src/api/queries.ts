@@ -7,6 +7,8 @@ import type {
   AssistantResponse,
   BacktestRequest,
   BacktestResponse,
+  BehaviorGapRequest,
+  BehaviorGapResponse,
   CourseDetail,
   CourseSummary,
   ExplainResponse,
@@ -122,6 +124,13 @@ export function usePlan() {
   return useMutation({
     mutationFn: async (request: PlanRequest) =>
       (await apiClient.post<PlanResponse>('/api/plan/montecarlo', request)).data,
+  })
+}
+
+export function useBehaviorGap() {
+  return useMutation({
+    mutationFn: async (request: BehaviorGapRequest) =>
+      (await apiClient.post<BehaviorGapResponse>('/api/behavior/gap', request)).data,
   })
 }
 

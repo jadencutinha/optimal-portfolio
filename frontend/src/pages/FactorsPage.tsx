@@ -72,7 +72,6 @@ export function FactorsPage() {
         <h2>Exposures</h2>
         {!result && !factors.isPending && (
           <EmptyState
-            icon="🧭"
             title="No analysis yet"
             description="Build a portfolio and analyze its factor tilts."
           />

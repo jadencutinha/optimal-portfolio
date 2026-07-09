@@ -98,6 +98,7 @@ export function OptimizerPage() {
           objective: response.objective,
           riskModel: response.risk_model,
           tickers: response.weights.map((allocation) => allocation.ticker),
+          request,
         })
       },
     })

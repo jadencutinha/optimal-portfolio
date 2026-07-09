@@ -1,10 +1,9 @@
-import type { Objective } from '../api/types'
-
 export type Bias = 'lossAversion' | 'overconfidence' | 'anchoring'
 
 export interface BiasOption {
   label: string
   weights?: Partial<Record<Bias, number>>
+  tolerance?: number
 }
 
 export interface BiasQuestion {
@@ -61,7 +60,35 @@ export const BIAS_QUESTIONS: BiasQuestion[] = [
       { label: 'Sell if the thesis has changed' },
     ],
   },
+  {
+    id: 'winner',
+    text: 'A stock you bought at $100 is now $140. What do you do?',
+    options: [
+      { label: 'Take the profit before it slips away', weights: { anchoring: 1 } },
+      { label: 'Trim it back to its target weight' },
+      { label: 'Leave it alone unless the thesis changed' },
+    ],
+  },
+  {
+    id: 'tolerance',
+    text: 'How far below its peak could your portfolio fall before you would actually sell?',
+    options: [
+      { label: 'About 10%', tolerance: 0.1, weights: { lossAversion: 2 } },
+      { label: 'About 15%', tolerance: 0.15, weights: { lossAversion: 1 } },
+      { label: 'About 20%', tolerance: 0.2 },
+      { label: 'About 30%, or I would not sell', tolerance: 0.3 },
+    ],
+  },
 ]
+
+export const DEFAULT_TOLERANCE = 0.2
+
+export function statedTolerance(answers: Record<string, number>): number {
+  const question = BIAS_QUESTIONS.find((item) => item.id === 'tolerance')
+  const choice = question ? answers[question.id] : undefined
+  const option = question && choice !== undefined ? question.options[choice] : undefined
+  return option?.tolerance ?? DEFAULT_TOLERANCE
+}
 
 export const BIAS_INFO: Record<Bias, { name: string; explanation: string }> = {
   lossAversion: {
@@ -95,22 +122,3 @@ export function detectBiases(answers: Record<string, number>): Bias[] {
   return (Object.keys(score) as Bias[]).filter((bias) => score[bias] >= 2)
 }
 
-export interface Adjustment {
-  objective: Objective
-  maxWeightPct: number
-  tilt: 'conservative' | 'concentrated' | 'none'
-  driver: Bias | null
-}
-
-export function biasAdjustment(biases: Bias[]): Adjustment {
-  if (biases.includes('lossAversion')) {
-    return { objective: 'min_variance', maxWeightPct: 25, tilt: 'conservative', driver: 'lossAversion' }
-  }
-  if (biases.includes('anchoring')) {
-    return { objective: 'min_variance', maxWeightPct: 30, tilt: 'conservative', driver: 'anchoring' }
-  }
-  if (biases.includes('overconfidence')) {
-    return { objective: 'max_sharpe', maxWeightPct: 70, tilt: 'concentrated', driver: 'overconfidence' }
-  }
-  return { objective: 'max_sharpe', maxWeightPct: 35, tilt: 'none', driver: null }
-}

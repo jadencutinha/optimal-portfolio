@@ -4243,6 +4243,102 @@ table.weights td {
   color: var(--muted);
 }
 
+/* ---- Behavioral coach ---- */
+.behavioral-result {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 22px 0 8px;
+}
+
+.behavioral-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.behavioral-head h2 {
+  margin: 0;
+}
+
+.behavioral-head p {
+  margin: 0;
+}
+
+.behavioral-result > p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.behavioral-result > .bias-section,
+.behavioral-result > .behavior-headline,
+.behavioral-result > .tolerance-check {
+  margin: 0;
+}
+
+.behavioral-result > .provenance {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.behavioral-result > button {
+  align-self: flex-start;
+}
+
+.bias-behavior {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.behavioral-stake {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.behavior-headline {
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  line-height: 1.6;
+}
+
+.behavior-headline p {
+  margin: 0;
+}
+
+.behavior-headline.costly {
+  border-left-color: var(--danger);
+}
+
+.behavior-headline.favourable {
+  border-left-color: var(--accent);
+}
+
+.tolerance-check {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.tolerance-check h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.tolerance-check p {
+  margin: 0;
+  line-height: 1.6;
+}
+
 /* ---- Dollar growth projection on the optimizer ---- */
 .growth-projection {
   background: var(--bg);

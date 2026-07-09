@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { Objective, RiskModel } from '../api/types'
+import type { Objective, OptimizeRequest, RiskModel } from '../api/types'
 
 export interface LastOptimization {
   expectedReturn: number
@@ -8,6 +8,7 @@ export interface LastOptimization {
   objective: Objective
   riskModel: RiskModel
   tickers: string[]
+  request: OptimizeRequest
 }
 
 export interface LastOptimizationContextValue {
