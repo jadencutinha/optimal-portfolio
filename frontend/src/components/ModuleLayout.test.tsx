@@ -63,7 +63,7 @@ describe('ModuleLayout quiz', () => {
 
     expect(screen.getByRole('button', { name: '3✗' })).toHaveClass('incorrect')
     expect(screen.getByRole('button', { name: '4✓' })).toHaveClass('reveal-correct')
-    expect(screen.getByText('0/1 correct — review the highlighted answers above.')).toBeInTheDocument()
+    expect(screen.getByText('0/1 correct. Review the highlighted answers above.')).toBeInTheDocument()
     expect(onModuleComplete).not.toHaveBeenCalled()
   })
 
@@ -74,7 +74,7 @@ describe('ModuleLayout quiz', () => {
     await user.click(screen.getByRole('button', { name: '4' }))
 
     expect(screen.getByRole('button', { name: '4✓' })).toHaveClass('correct')
-    expect(screen.getByText('Perfect — 1/1 correct!')).toBeInTheDocument()
+    expect(screen.getByText('Perfect, 1/1 correct!')).toBeInTheDocument()
     expect(onModuleComplete).toHaveBeenCalledWith(1)
   })
 
@@ -93,7 +93,7 @@ describe('ModuleLayout quiz', () => {
     setup()
 
     await user.click(screen.getByRole('button', { name: '3' }))
-    expect(screen.getByText('0/1 correct — review the highlighted answers above.')).toBeInTheDocument()
+    expect(screen.getByText('0/1 correct. Review the highlighted answers above.')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Retake quiz' }))
 

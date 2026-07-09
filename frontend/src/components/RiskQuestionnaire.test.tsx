@@ -48,7 +48,7 @@ describe('RiskQuestionnaire', () => {
       'Buy more at the lower price',
       '7+ years',
       'Maximum growth, comfortable with big swings',
-      'Experienced — I actively manage investments',
+      'Experienced, I actively manage investments',
       'Likely 18%, but could be −20%',
     ])
 
@@ -68,7 +68,7 @@ describe('RiskQuestionnaire', () => {
       'Hold and wait for recovery',
       '7+ years',
       'Steady income with some growth',
-      'Moderate — I follow markets regularly',
+      'Moderate, I follow markets regularly',
       'Likely 6%, but could be −2%',
     ])
 
@@ -84,9 +84,9 @@ describe('RiskQuestionnaire', () => {
 
     await answerAll(user, [
       'Hold and wait for recovery',
-      '3–7 years',
+      '3 to 7 years',
       'Long-term growth, accept some dips',
-      'Some — I understand basic concepts',
+      'Some, I understand basic concepts',
       'Likely 10%, but could be −10%',
     ])
 
