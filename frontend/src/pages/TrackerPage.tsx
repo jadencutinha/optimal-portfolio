@@ -36,7 +36,7 @@ export function TrackerPage() {
       <div className="tracker-intro">
         <h2>Live tracking &amp; rebalance alerts</h2>
         <p className="muted">
-          Pick a saved portfolio to see how its weights have drifted from target as prices moved — and
+          Pick a saved portfolio to see how its weights have drifted from target as prices moved, and
           whether it's time to rebalance.
         </p>
       </div>

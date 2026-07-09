@@ -139,12 +139,12 @@ const FEATURES = [
   {
     icon: <SlidersIcon />,
     title: 'Constraint engine',
-    body: 'Cap sector exposure, bound individual positions, and throttle turnover — real-world guardrails on top of the mean-variance line.',
+    body: 'Cap sector exposure, bound individual positions, and throttle turnover. Real-world guardrails on top of the mean-variance line.',
   },
   {
     icon: <BrainIcon />,
     title: 'Behavioral coach',
-    body: 'Get flagged for loss aversion, over-concentration, and recency chasing as you build — so you invest on the math, not the mood.',
+    body: 'Get flagged for loss aversion, over-concentration, and recency chasing as you build, so you invest on the math, not the mood.',
   },
   {
     icon: <ShieldIcon />,
@@ -182,7 +182,7 @@ export function Landing() {
             Build <span className="hero-grad">mathematically optimal</span> stock portfolios.
           </h1>
           <p className="hero-sub">
-            PortfoliU turns modern portfolio theory into a tool you can actually use — solve for the optimal
+            PortfoliU turns modern portfolio theory into a tool you can actually use. Solve for the optimal
             mix of stocks with convex optimization, learn the theory as you go, and backtest every strategy
             against a plain index fund on real market data.
           </p>
@@ -206,7 +206,7 @@ export function Landing() {
         <div className="hero-glow shot-glow" />
         <ShotFrame
           src="/screenshots/optimizer.png"
-          alt="PortfoliU optimizer — allocation donut, expected return, volatility, Sharpe ratio, and weight table"
+          alt="PortfoliU optimizer, allocation donut, expected return, volatility, Sharpe ratio, and weight table"
           tab="PortfoliU · Optimizer"
         />
       </div>
@@ -233,22 +233,22 @@ export function Landing() {
       <div className="features-intro section-head">
         <span className="section-eyebrow">Everything inside</span>
         <h2>A quant desk, in the browser</h2>
-        <p>The same optimization stack a professional would use — made approachable, visual, and yours.</p>
+        <p>The same optimization stack a professional would use, made approachable, visual, and yours.</p>
       </div>
 
       <Showcase
         eyebrow="Backtesting"
         title="Prove every strategy out of sample"
-        body="Replay your portfolio through years of real history and stack it against SPY, an equal-weight basket, and 60/40 — with growth, drawdown, rolling Sharpe, and a full metrics table."
+        body="Replay your portfolio through years of real history and stack it against SPY, an equal-weight basket, and 60/40, with growth, drawdown, rolling Sharpe, and a full metrics table."
         src="/screenshots/backtest.png"
-        alt="PortfoliU backtest — growth of $1, drawdown, rolling Sharpe charts, and a metrics table versus benchmarks"
+        alt="PortfoliU backtest, growth of $1, drawdown, rolling Sharpe charts, and a metrics table versus benchmarks"
         tab="PortfoliU · Backtest"
       />
 
       <div className="spot-rows">
         <SpotlightRow
           eyebrow="Efficient frontier"
-          title="See the whole risk–return trade-off"
+          title="See the whole risk and return trade-off"
           body="Every portfolio is plotted on its efficient frontier, with the min-variance and max-Sharpe points marked and a full risk X-ray of your result."
           bullets={[
             'Min-variance, max-Sharpe, and your portfolio, side by side',
@@ -263,7 +263,7 @@ export function Landing() {
           reverse
           eyebrow="Goal planner"
           title="Plan for a number that actually matters"
-          body="Simulate thousands of possible futures for your plan and see the odds of hitting your goal — plus the risk of a deep drawdown on the way there."
+          body="Simulate thousands of possible futures for your plan and see the odds of hitting your goal, plus the risk of a deep drawdown on the way there."
           bullets={[
             'Monte Carlo projections with a likely-range fan',
             'Probability of reaching your target',
@@ -276,7 +276,7 @@ export function Landing() {
         <SpotlightRow
           eyebrow="Live tracking"
           title="Know exactly when to rebalance"
-          body="Save a portfolio and PortfoliU watches how its weights drift as prices move — and tells you when a position has wandered outside your band."
+          body="Save a portfolio and PortfoliU watches how its weights drift as prices move and tells you when a position has wandered outside your band."
           bullets={[
             'Per-holding drift versus target',
             'Rebalance-band alerts',
@@ -293,14 +293,14 @@ export function Landing() {
           reverse
           eyebrow="Learn as you invest"
           title="From saving basics to the math hedge funds use"
-          body="Three guided tracks build on each other — money fundamentals, behavioral finance, and portfolio optimization — with short modules, knowledge checks, and a certificate at the end."
+          body="Three guided tracks build on each other, from money fundamentals to behavioral finance to portfolio optimization. Each has short modules, knowledge checks, and a certificate at the end."
           bullets={[
             'Beginner to advanced, in bite-sized modules',
             'Knowledge checks that make it stick',
             'Earn a verifiable certificate per track',
           ]}
           src="/screenshots/learn.png"
-          alt="PortfoliU Learn — three learning tracks with progress and downloadable certificates"
+          alt="PortfoliU Learn, three learning tracks with progress and downloadable certificates"
           tab="PortfoliU · Learn"
         />
       </section>
@@ -327,7 +327,7 @@ export function Landing() {
         <h2>Grounded in real math and real data</h2>
         <p>
           Every portfolio comes from a Markowitz mean-variance program solved with <code>cvxpy</code>, over
-          expected returns and a covariance matrix estimated from genuine end-of-day price history — not a
+          expected returns and a covariance matrix estimated from genuine end-of-day price history, not a
           back-of-the-envelope heuristic.
         </p>
         <div className="stack-chips">
@@ -357,8 +357,8 @@ export function Landing() {
 
       <footer className="landing-footer">
         <p>
-          Built with equal contribution by <strong>Jaden</strong> (Princeton University) and{' '}
-          <strong>Nadia</strong> (Washington University, St.&nbsp;Louis).
+          Built with equal contribution by <strong>Jaden</strong> (Princeton University), {' '}
+          <strong>Nadia</strong> (Washington University, St.&nbsp;Louis) and {' '} <strong>Bernardo</strong> (Rutgers University).
         </p>
         <a href="https://github.com/jadencutinha/optimal-portfolio" target="_blank" rel="noreferrer">
           View source on GitHub

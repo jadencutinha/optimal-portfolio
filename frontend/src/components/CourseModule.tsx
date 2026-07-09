@@ -125,7 +125,7 @@ export function CourseModule({ courseId, onExam, onBack }: Props) {
               <p className={result.correct ? 'answer-correct' : 'answer-wrong'}>
                 {result.correct
                   ? 'Correct!'
-                  : `Not quite — the answer is "${topic.quiz.options[result.answer]}".`}
+                  : `Not quite. The answer is "${topic.quiz.options[result.answer]}".`}
               </p>
               {isLast ? (
                 <button className="primary" onClick={onExam}>

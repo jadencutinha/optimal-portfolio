@@ -207,8 +207,8 @@ export function ModuleLayout({
           {allAnswered && (
             <div className={`quiz-result ${correctCount === mod.quiz.length ? 'perfect' : ''}`}>
               {correctCount === mod.quiz.length
-                ? `Perfect — ${correctCount}/${mod.quiz.length} correct!`
-                : `${correctCount}/${mod.quiz.length} correct — review the highlighted answers above.`}
+                ? `Perfect, ${correctCount}/${mod.quiz.length} correct!`
+                : `${correctCount}/${mod.quiz.length} correct. Review the highlighted answers above.`}
               <button type="button" className="quiz-retake-btn" onClick={() => setAnswers({})}>
                 Retake quiz
               </button>

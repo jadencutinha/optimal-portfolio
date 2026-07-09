@@ -45,7 +45,7 @@ function FanTooltip({ active, payload }: TooltipProps) {
       <div className="fan-tooltip-year">Year {point.year.toFixed(1)}</div>
       <div className="mono">Median {money(point.p50)}</div>
       <div className="mono muted">
-        Range {money(point.p10)} – {money(point.p90)}
+        Range {money(point.p10)} to {money(point.p90)}
       </div>
     </div>
   )
@@ -88,7 +88,7 @@ export function PlannerPage() {
         <h2>Goal-based planner</h2>
         <p className="muted">
           Simulate thousands of possible futures for your portfolio to see the odds of reaching your
-          goal — and the risk of a deep drawdown along the way.
+          goal and the risk of a deep drawdown along the way.
         </p>
       </div>
 
@@ -200,9 +200,9 @@ function PlannerOutput({ result }: { result: PlanResponse }) {
         </div>
         <div className="planner-stat">
           <span className="planner-stat-value">
-            {money(result.p10_final)} – {money(result.p90_final)}
+            {money(result.p10_final)} - {money(result.p90_final)}
           </span>
-          <span className="planner-stat-label">likely range (10–90%)</span>
+          <span className="planner-stat-label">likely range (10-90%)</span>
         </div>
       </div>
 

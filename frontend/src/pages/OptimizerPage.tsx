@@ -120,7 +120,7 @@ export function OptimizerPage() {
       },
       {
         onSuccess: () => toast(`Saved "${name}"`, 'success'),
-        onError: () => toast("Couldn't save — you may have hit your plan's saved-portfolio limit.", 'error'),
+        onError: () => toast("Couldn't save. You may have hit your plan's saved-portfolio limit.", 'error'),
       },
     )
     setNaming(false)

@@ -47,7 +47,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
         <div>
           <h1>Free platform</h1>
           <p className="lead">
-            Core optimization, goal planning, and saved portfolios — free. Upgrade to Pro for the full toolkit.
+            Core optimization, goal planning, and saved portfolios, all free. Upgrade to Pro for the full toolkit.
           </p>
         </div>
         <div className="free-header-actions">
@@ -89,7 +89,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
           </ul>
         </section>
         <section>
-          <h3>Locked — upgrade to Pro</h3>
+          <h3>Upgrade to Pro to unlock</h3>
           <ul>
             <li>AI natural-language assistant</li>
             <li>Backtesting, strategy comparison &amp; historical stress tests</li>

@@ -62,7 +62,7 @@ const track1: Track = {
         {
           type: 'list',
           items: [
-            'Keep 3–6 months of living expenses in savings as an emergency fund',
+            'Keep 3 to 6 months of living expenses in savings as an emergency fund',
             'Invest everything beyond that for the long term',
           ],
         },
@@ -94,7 +94,7 @@ const track1: Track = {
           question: 'What is the recommended emergency fund size?',
           options: [
             { text: '1 month of expenses', correct: false },
-            { text: '3–6 months of expenses', correct: true },
+            { text: '3 to 6 months of expenses', correct: true },
             { text: '12 months of expenses', correct: false },
           ],
         },
@@ -201,9 +201,9 @@ const track1: Track = {
           type: 'list',
           items: [
             'Cash / savings account: very low risk, very low return (~2%)',
-            'Government bonds: low risk, low return (~3–4%)',
-            'Corporate bonds: medium risk, medium return (~5–6%)',
-            'Large-cap stocks: higher risk, higher return (~8–10% historically)',
+            'Government bonds: low risk, low return (~3 to 4%)',
+            'Corporate bonds: medium risk, medium return (~5 to 6%)',
+            'Large-cap stocks: higher risk, higher return (~8 to 10% historically)',
             'Small-cap stocks: even higher risk, even higher return potential',
             'Crypto: very high risk, unpredictable return',
           ],

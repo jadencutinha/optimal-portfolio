@@ -43,7 +43,7 @@ export function AuthModal({
         return
       }
       if (isSignup && 'needsConfirmation' in result && result.needsConfirmation) {
-        setNotice('Account created — check your email to confirm, then log in.')
+        setNotice('Account created. Check your email to confirm, then log in.')
         setMode('login')
         setPassword('')
         return

@@ -137,9 +137,9 @@ export function BacktestResults({ result }: { result: BacktestResponse }) {
                 <td className="mono">{percent(strategy.stats.max_drawdown)}</td>
                 <td className="mono">{ratio(strategy.stats.calmar_ratio)}</td>
                 <td className="mono">{percent(strategy.stats.avg_turnover)}</td>
-                <td className="mono">{strategy.relative ? percent(strategy.relative.alpha) : '—'}</td>
-                <td className="mono">{strategy.relative ? ratio(strategy.relative.beta) : '—'}</td>
-                <td className="mono">{strategy.relative ? ratio(strategy.relative.information_ratio) : '—'}</td>
+                <td className="mono">{strategy.relative ? percent(strategy.relative.alpha) : 'n/a'}</td>
+                <td className="mono">{strategy.relative ? ratio(strategy.relative.beta) : 'n/a'}</td>
+                <td className="mono">{strategy.relative ? ratio(strategy.relative.information_ratio) : 'n/a'}</td>
               </tr>
             ))}
           </tbody>

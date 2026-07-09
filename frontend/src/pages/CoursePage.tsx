@@ -89,7 +89,7 @@ export function CoursePage({
       <PlatformHeader onSwitch={onSwitch} />
       <h1 className="course-landing-title">PortfoliU Learn</h1>
       <p className="course-landing-desc">
-        From saving basics to the math behind hedge funds — three tracks that build on each
+        From saving basics to the math behind hedge funds. Three tracks that build on each
         other.
       </p>
 
