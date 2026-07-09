@@ -1419,6 +1419,10 @@ button.primary.modal-submit {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+
+  min-width: 9rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .switch-plan:hover {
@@ -5065,6 +5069,10 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+
+  min-width: 9rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .tour-launch:hover {
