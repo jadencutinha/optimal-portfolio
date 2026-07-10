@@ -1,5 +1,7 @@
 import type { OptimizeResponse } from '../api/types'
 import { percent, ratio } from '../lib/format'
+import { Tooltip } from './Tooltip'
+import { FINANCIAL_TERMS } from '../data/definitions'
 
 export function StatCards({ result }: { result: OptimizeResponse }) {
   const stats = [
@@ -10,13 +12,21 @@ export function StatCards({ result }: { result: OptimizeResponse }) {
 
   return (
     <div className="stat-cards">
-      {stats.map((stat) => (
-        <div key={stat.label} className="stat-card">
-          <span className="stat-label">{stat.label}</span>
-          <span className="stat-value">{stat.value}</span>
-          <span className="stat-hint">{stat.hint}</span>
-        </div>
-      ))}
+      {stats.map((stat) => {
+        const definition = FINANCIAL_TERMS[stat.label]?.definition;
+
+        return(
+          <div key={stat.label} className="stat-card">
+            {definition ? (
+              <Tooltip text={definition}>
+                <span className="stat-label">{stat.label}</span>
+              </Tooltip>
+              ): (<span className="stat-label">{stat.label}</span>)
+            }
+            <span className="stat-value">{stat.value}</span>
+            <span className="stat-hint">{stat.hint}</span>
+          </div>
+      )})}
     </div>
   )
 }

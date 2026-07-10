@@ -28,6 +28,8 @@ import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
 import { useLastOptimization } from '../optimizer/useLastOptimization'
 import { useToast } from '../toast/useToast'
+import { Tooltip } from '../components/Tooltip'
+import { FINANCIAL_TERMS } from '../data/definitions'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
@@ -350,7 +352,9 @@ export function OptimizerPage() {
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (
               <div className="frontier-section">
-                <h3>Efficient Frontier</h3>
+                <Tooltip text={FINANCIAL_TERMS["Efficient Frontier"]?.definition}>
+                  <h3>Efficient Frontier</h3>
+                </Tooltip>
                 <FrontierChart
                   frontier={frontierData}
                   portfolio={result.metrics}

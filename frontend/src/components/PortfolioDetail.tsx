@@ -1,6 +1,8 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import type { WeightAllocation } from '../api/types'
 import { percent, ratio } from '../lib/format'
+import { Tooltip as CustomTooltip } from './Tooltip'
+import { FINANCIAL_TERMS } from '../data/definitions'
 
 interface Props {
   title: string
@@ -58,11 +60,15 @@ export function PortfolioDetail({ title, weights, expectedReturn, volatility, sh
               <dd className="mono">{ratio(sharpe)}</dd>
             </div>
             <div>
-              <dt>Concentration (HHI)</dt>
+              <CustomTooltip text={FINANCIAL_TERMS["Concentration (HHI)"]?.definition}>
+                <dt>Concentration (HHI)</dt>
+              </CustomTooltip>
               <dd className="mono">{ratio(hhi, 3)}</dd>
             </div>
             <div>
-              <dt>Effective holdings</dt>
+              <CustomTooltip text={FINANCIAL_TERMS["Effective Holdings"]?.definition}>
+                <dt>Effective holdings</dt>
+              </CustomTooltip>
               <dd className="mono">{ratio(effectiveHoldings, 1)}</dd>
             </div>
             <div>
