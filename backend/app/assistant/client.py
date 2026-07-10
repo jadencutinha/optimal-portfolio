@@ -38,7 +38,7 @@ def _require_provider(settings: Settings) -> str:
     provider = resolve_provider(settings)
     if provider is None:
         raise AssistantError(
-            "The assistant is not configured. Set OPENAI_API_KEY (or ANTHROPIC_API_KEY) to enable it.",
+            "The assistant is not configured. Set OPENAI_API_KEY to enable it.",
             503,
         )
     return provider
