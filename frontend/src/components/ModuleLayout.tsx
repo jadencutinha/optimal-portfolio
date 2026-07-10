@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
-import { CheckIcon } from './icons'
+import { starsForRetakes, xpForStars } from '../lib/courseProgress'
+import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
 interface Props {
   track: Track
@@ -8,7 +9,22 @@ interface Props {
   onSelectModule: (index: number) => void
   onBackToTracks: () => void
   isModuleComplete: (moduleId: number) => boolean
-  onModuleComplete: (moduleId: number) => void
+  onModuleComplete: (moduleId: number, retakes: number) => void
+  getModuleStars?: (moduleId: number) => number
+  xp?: number
+  streak?: number
+}
+
+function StarRow({ stars }: { stars: number }) {
+  return (
+    <span className="star-row" aria-label={`${stars} out of 3 stars`}>
+      {[1, 2, 3].map((n) => (
+        <span key={n} className={n <= stars ? 'star-filled' : 'star-empty'}>
+          <StarIcon filled={n <= stars} />
+        </span>
+      ))}
+    </span>
+  )
 }
 
 function renderText(text: string) {
@@ -33,12 +49,18 @@ export function ModuleLayout({
   onBackToTracks,
   isModuleComplete,
   onModuleComplete,
+  getModuleStars,
+  xp,
+  streak,
 }: Props) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
+  const [retakeCount, setRetakeCount] = useState(0)
   const mod = track.modules[moduleIndex]
+  const wasAlreadyComplete = isModuleComplete(mod.id)
 
   useEffect(() => {
     setAnswers({})
+    setRetakeCount(0)
   }, [moduleIndex])
 
   function handleAnswer(qIndex: number, oIndex: number) {
@@ -52,10 +74,11 @@ export function ModuleLayout({
     return chosen !== undefined && q.options[chosen]?.correct
   }).length
   const allCorrect = mod.quiz.length > 0 && allAnswered && correctCount === mod.quiz.length
+  const earnedStars = starsForRetakes(retakeCount)
 
   useEffect(() => {
-    if (allCorrect) onModuleComplete(mod.id)
-  }, [allCorrect, mod.id, onModuleComplete])
+    if (allCorrect) onModuleComplete(mod.id, retakeCount)
+  }, [allCorrect, mod.id, onModuleComplete, retakeCount])
 
   const completedCount = track.modules.filter((m) => isModuleComplete(m.id)).length
   const progressPct = Math.round((completedCount / track.modules.length) * 100)
@@ -72,11 +95,23 @@ export function ModuleLayout({
           ← Back to Tracks
         </button>
         <h2 className="sidebar-track-title">{track.title}</h2>
+        {(xp !== undefined || streak !== undefined) && (
+          <div className="sidebar-stats">
+            {xp !== undefined && <span className="xp-badge">{xp} XP</span>}
+            {streak !== undefined && streak > 0 && (
+              <span className="streak-badge">
+                <FlameIcon />
+                {streak} day{streak === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
+        )}
         <nav className="sidebar-module-list">
           {track.modules.map((m, i) => {
             const isCurrent = i === moduleIndex
             const done = isModuleComplete(m.id)
             const statusClass = done ? 'completed' : 'available'
+            const stars = getModuleStars?.(m.id) ?? 0
             return (
               <button
                 key={m.id}
@@ -90,7 +125,7 @@ export function ModuleLayout({
                 <span className="sidebar-module-text">
                   <span className="sidebar-module-num">Module {i + 1}</span>
                   <span className="sidebar-module-title">{m.title}</span>
-                  {!done && <span className="sidebar-module-status">In progress</span>}
+                  {done ? <StarRow stars={stars} /> : <span className="sidebar-module-status">In progress</span>}
                 </span>
               </button>
             )
@@ -205,11 +240,26 @@ export function ModuleLayout({
           })}
 
           {allAnswered && (
-            <div className={`quiz-result ${correctCount === mod.quiz.length ? 'perfect' : ''}`}>
-              {correctCount === mod.quiz.length
-                ? `Perfect, ${correctCount}/${mod.quiz.length} correct!`
-                : `${correctCount}/${mod.quiz.length} correct. Review the highlighted answers above.`}
-              <button type="button" className="quiz-retake-btn" onClick={() => setAnswers({})}>
+            <div className={`quiz-result ${allCorrect ? 'perfect celebrate' : ''}`}>
+              <div className="quiz-result-text">
+                {allCorrect
+                  ? `Perfect, ${correctCount}/${mod.quiz.length} correct!`
+                  : `${correctCount}/${mod.quiz.length} correct. Review the highlighted answers above.`}
+              </div>
+              {allCorrect && (
+                <div className="quiz-mastery">
+                  <StarRow stars={earnedStars} />
+                  {!wasAlreadyComplete && <span className="quiz-xp-gain">+{xpForStars(earnedStars)} XP</span>}
+                </div>
+              )}
+              <button
+                type="button"
+                className="quiz-retake-btn"
+                onClick={() => {
+                  setAnswers({})
+                  setRetakeCount((n) => n + 1)
+                }}
+              >
                 Retake quiz
               </button>
             </div>

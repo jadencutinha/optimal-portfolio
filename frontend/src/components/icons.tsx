@@ -20,3 +20,27 @@ export function LockIcon() {
     </svg>
   )
 }
+
+export function StarIcon({ filled = true }: { filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 16 16" fill={filled ? 'currentColor' : 'none'}>
+      <path
+        d="M8 1.5l1.98 4.13 4.52.62-3.27 3.24.79 4.5L8 11.8l-4.02 2.19.79-4.5-3.27-3.24 4.52-.62L8 1.5Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function FlameIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1.5c.5 2 2.5 2.7 2.5 5.3 0 .9-.4 1.6-.9 2.1.7-.2 1.5-.9 1.7-2 .6.9.9 1.9.9 2.9 0 2.6-2 4.7-4.7 4.7S2.3 12.4 2.3 9.8c0-2.9 1.6-4.2 2.6-6 .3.8.3 1.7 0 2.3 1-.9 1.6-2.3 1.6-3.8.6.5 1.1 1.1 1.5 1.7Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}

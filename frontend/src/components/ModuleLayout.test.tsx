@@ -34,11 +34,11 @@ const track: Track = {
   ],
 }
 
-function setup() {
+function setup(overrides: { isModuleComplete?: (moduleId: number) => boolean } = {}) {
   const onSelectModule = vi.fn()
   const onBackToTracks = vi.fn()
   const onModuleComplete = vi.fn()
-  const isModuleComplete = vi.fn(() => false)
+  const isModuleComplete = overrides.isModuleComplete ?? vi.fn(() => false)
 
   render(
     <ModuleLayout
@@ -75,7 +75,40 @@ describe('ModuleLayout quiz', () => {
 
     expect(screen.getByRole('button', { name: '4✓' })).toHaveClass('correct')
     expect(screen.getByText('Perfect, 1/1 correct!')).toBeInTheDocument()
-    expect(onModuleComplete).toHaveBeenCalledWith(1)
+    expect(onModuleComplete).toHaveBeenCalledWith(1, 0)
+  })
+
+  it('awards 3 stars and shows the XP gain on a first-try perfect run', async () => {
+    const user = userEvent.setup()
+    setup()
+
+    await user.click(screen.getByRole('button', { name: '4' }))
+
+    expect(screen.getByLabelText('3 out of 3 stars')).toBeInTheDocument()
+    expect(screen.getByText('+50 XP')).toBeInTheDocument()
+  })
+
+  it('awards fewer stars and less XP after a retake', async () => {
+    const user = userEvent.setup()
+    const { onModuleComplete } = setup()
+
+    await user.click(screen.getByRole('button', { name: '3' }))
+    await user.click(screen.getByRole('button', { name: 'Retake quiz' }))
+    await user.click(screen.getByRole('button', { name: '4' }))
+
+    expect(onModuleComplete).toHaveBeenCalledWith(1, 1)
+    expect(screen.getByLabelText('2 out of 3 stars')).toBeInTheDocument()
+    expect(screen.getByText('+30 XP')).toBeInTheDocument()
+  })
+
+  it('does not show an XP gain for a module that was already complete', async () => {
+    const user = userEvent.setup()
+    setup({ isModuleComplete: vi.fn(() => true) })
+
+    await user.click(screen.getByRole('button', { name: '4' }))
+
+    expect(screen.getByLabelText('3 out of 3 stars')).toBeInTheDocument()
+    expect(screen.queryByText('+50 XP')).not.toBeInTheDocument()
   })
 
   it('locks in the answer so options cannot be changed after answering', async () => {

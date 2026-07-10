@@ -1,15 +1,24 @@
 import { useState } from 'react'
 import { Certificate } from '../components/Certificate'
-import { CheckIcon, LockIcon } from '../components/icons'
+import { CheckIcon, FlameIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { TRACKS, type Track } from '../data/courseData'
 import {
+  awardXP,
   ensureTrackCompletion,
+  loadMastery,
   loadProgress,
+  loadStreak,
+  loadXP,
   moduleKey,
+  recordMastery,
   saveProgress,
+  touchStreak,
+  xpForStars,
   type CourseProgress,
+  type MasteryMap,
+  type StreakState,
 } from '../lib/courseProgress'
 
 export function CoursePage({
@@ -24,15 +33,22 @@ export function CoursePage({
   const [search, setSearch] = useState('')
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
   const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
+  const [mastery, setMastery] = useState<MasteryMap>(loadMastery)
+  const [xp, setXp] = useState<number>(loadXP)
+  const [streak, setStreak] = useState<StreakState>(loadStreak)
 
   const isComplete = (trackId: number, moduleId: number) => Boolean(progress[moduleKey(trackId, moduleId)])
 
-  const markComplete = (trackId: number, moduleId: number) => {
+  const markComplete = (trackId: number, moduleId: number, retakes: number) => {
     setProgress((prev) => {
       const key = moduleKey(trackId, moduleId)
       if (prev[key]) return prev
       const next = { ...prev, [key]: true }
       saveProgress(next)
+      const stars = recordMastery(trackId, moduleId, retakes)
+      setMastery(loadMastery())
+      setXp(awardXP(xpForStars(stars)))
+      setStreak(touchStreak())
       return next
     })
   }
@@ -56,7 +72,10 @@ export function CoursePage({
         onSelectModule={setModuleIndex}
         onBackToTracks={() => setSelectedTrack(null)}
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
-        onModuleComplete={(moduleId) => markComplete(selectedTrack.id, moduleId)}
+        onModuleComplete={(moduleId, retakes) => markComplete(selectedTrack.id, moduleId, retakes)}
+        getModuleStars={(moduleId) => mastery[moduleKey(selectedTrack.id, moduleId)] ?? 0}
+        xp={xp}
+        streak={streak.current}
       />
     )
   }
@@ -87,11 +106,24 @@ export function CoursePage({
   return (
     <div className="course-landing">
       <PlatformHeader onSwitch={onSwitch} />
-      <h1 className="course-landing-title">PortfoliU Learn</h1>
-      <p className="course-landing-desc">
-        From saving basics to the math behind hedge funds. Three tracks that build on each
-        other.
-      </p>
+      <div className="course-landing-head">
+        <div>
+          <h1 className="course-landing-title">PortfoliU Learn</h1>
+          <p className="course-landing-desc">
+            From saving basics to the math behind hedge funds. Three tracks that build on each
+            other.
+          </p>
+        </div>
+        <div className="sidebar-stats course-landing-stats">
+          <span className="xp-badge">{xp} XP</span>
+          {streak.current > 0 && (
+            <span className="streak-badge">
+              <FlameIcon />
+              {streak.current} day{streak.current === 1 ? '' : 's'}
+            </span>
+          )}
+        </div>
+      </div>
 
       <div className="course-progress-summary">
         <span className="course-progress-summary-label">

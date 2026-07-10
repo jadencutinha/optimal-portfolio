@@ -5182,6 +5182,118 @@ body {
   margin-bottom: 10px;
 }
 
+/* ---- Course gamification: XP, streaks, mastery stars ---- */
+
+.course-landing-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.course-landing-stats {
+  flex-shrink: 0;
+}
+
+.sidebar-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.xp-badge,
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.xp-badge {
+  background: rgba(224, 151, 67, 0.15);
+  border: 1px solid rgba(224, 151, 67, 0.4);
+  color: var(--accent);
+}
+
+.streak-badge {
+  background: rgba(73, 145, 196, 0.14);
+  border: 1px solid rgba(73, 145, 196, 0.4);
+  color: var(--accent-hover);
+}
+
+.streak-badge svg {
+  width: 13px;
+  height: 13px;
+}
+
+.star-row {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.star-row svg {
+  width: 11px;
+  height: 11px;
+}
+
+.star-filled {
+  color: var(--accent);
+}
+
+.star-empty {
+  color: var(--border);
+  opacity: 0.5;
+}
+
+.quiz-mastery {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.quiz-mastery .star-row svg {
+  width: 15px;
+  height: 15px;
+}
+
+.quiz-xp-gain {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-hover);
+}
+
+.quiz-result.celebrate {
+  animation: quiz-celebrate 0.5s ease;
+}
+
+@keyframes quiz-celebrate {
+  0% {
+    transform: scale(0.97);
+    box-shadow: 0 0 0 0 rgba(224, 151, 67, 0.4);
+  }
+  60% {
+    transform: scale(1.015);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(224, 151, 67, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiz-result.celebrate {
+    animation: none;
+  }
+}
+
 .free-header-actions {
   display: flex;
   align-items: center;
