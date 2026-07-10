@@ -3,6 +3,7 @@ import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { Tour } from '../components/Tour'
 import { FREE_TOUR } from '../lib/tours'
+import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
@@ -28,6 +29,7 @@ interface Props {
 export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
   const [tab, setTab] = useState<Tab>('optimizer')
+  const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
   const [tour, setTour] = useState(false)
 
   useEffect(() => {
@@ -62,6 +64,27 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
         </div>
       </div>
 
+      <div className="platform-mode">
+        <button
+          type="button"
+          className={mode === 'analyze' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('analyze')}
+        >
+          Analyze
+        </button>
+        <button
+          type="button"
+          className={mode === 'invest' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('invest')}
+        >
+          Invest
+        </button>
+      </div>
+
+      {mode === 'invest' ? (
+        <InvestPlatform />
+      ) : (
+        <>
       <div className="tabs">
         {TABS.map((option) => (
           <button
@@ -95,8 +118,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
           <h3>Upgrade to Pro to unlock</h3>
           <ul>
             <li>AI natural-language assistant</li>
-            <li>Backtesting, strategy comparison &amp; historical stress tests</li>
-            <li>Factor analysis, rebalance tracking &amp; alerts</li>
+            <li>Backtesting &amp; historical stress tests</li>
             <li>Shrinkage/EWMA/factor models, advanced objectives &amp; unlimited saves</li>
           </ul>
         </section>
@@ -117,6 +139,8 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
           </button>
         )}
       </div>
+        </>
+      )}
 
       {tour && <Tour steps={FREE_TOUR} onClose={closeTour} />}
     </div>

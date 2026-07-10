@@ -6,13 +6,11 @@ import { Tour } from '../components/Tour'
 import { PRO_TOUR } from '../lib/tours'
 import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
-import { FactorsPage } from './FactorsPage'
+import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
 import { StressPage } from './StressPage'
-import { SweepPage } from './SweepPage'
-import { TrackerPage } from './TrackerPage'
 
 const TOUR_KEY = 'tour_pro_seen'
 
@@ -22,11 +20,8 @@ type Tab =
   | 'planner'
   | 'sidebyside'
   | 'backtest'
-  | 'compare'
   | 'stress'
-  | 'factors'
   | 'behavioral'
-  | 'tracker'
   | 'saved'
 
 const TABS: { id: Tab; label: string }[] = [
@@ -35,16 +30,14 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'planner', label: 'Planner' },
   { id: 'sidebyside', label: 'Side by Side' },
   { id: 'backtest', label: 'Backtest' },
-  { id: 'compare', label: 'Sweep' },
   { id: 'stress', label: 'Stress Test' },
-  { id: 'factors', label: 'Factors' },
   { id: 'behavioral', label: 'Behavioral' },
-  { id: 'tracker', label: 'Tracker' },
   { id: 'saved', label: 'My Portfolios' },
 ]
 
 export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   const [tab, setTab] = useState<Tab>('optimizer')
+  const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
   const [tour, setTour] = useState(false)
 
   useEffect(() => {
@@ -62,35 +55,54 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   return (
     <div className="pro-workspace">
       <PlatformHeader onSwitch={onSwitch} />
-      <div className="workspace-tools">
-        <button type="button" className="tour-launch" onClick={() => setTour(true)}>
-          Take a tour
+      <div className="platform-mode">
+        <button
+          type="button"
+          className={mode === 'analyze' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('analyze')}
+        >
+          Analyze
+        </button>
+        <button
+          type="button"
+          className={mode === 'invest' ? 'mode-btn active' : 'mode-btn'}
+          onClick={() => setMode('invest')}
+        >
+          Invest
         </button>
       </div>
-      <div className="tabs">
-        {TABS.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            data-tour={option.id}
-            className={tab === option.id ? 'tab active' : 'tab'}
-            onClick={() => setTab(option.id)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-      {tab === 'optimizer' && <OptimizerPage />}
-      {tab === 'assistant' && <AssistantPage />}
-      {tab === 'planner' && <PlannerPage />}
-      {tab === 'sidebyside' && <SideBySidePage />}
-      {tab === 'backtest' && <BacktestPage />}
-      {tab === 'compare' && <SweepPage />}
-      {tab === 'stress' && <StressPage />}
-      {tab === 'factors' && <FactorsPage />}
-      {tab === 'behavioral' && <BehavioralCoach />}
-      {tab === 'tracker' && <TrackerPage />}
-      {tab === 'saved' && <SavedPortfolios />}
+      {mode === 'invest' ? (
+        <InvestPlatform />
+      ) : (
+        <>
+          <div className="workspace-tools">
+            <button type="button" className="tour-launch" onClick={() => setTour(true)}>
+              Take a tour
+            </button>
+          </div>
+          <div className="tabs">
+            {TABS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                data-tour={option.id}
+                className={tab === option.id ? 'tab active' : 'tab'}
+                onClick={() => setTab(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {tab === 'optimizer' && <OptimizerPage />}
+          {tab === 'assistant' && <AssistantPage />}
+          {tab === 'planner' && <PlannerPage />}
+          {tab === 'sidebyside' && <SideBySidePage />}
+          {tab === 'backtest' && <BacktestPage />}
+          {tab === 'stress' && <StressPage />}
+          {tab === 'behavioral' && <BehavioralCoach />}
+          {tab === 'saved' && <SavedPortfolios />}
+        </>
+      )}
       {tour && <Tour steps={PRO_TOUR} onClose={closeTour} />}
     </div>
   )

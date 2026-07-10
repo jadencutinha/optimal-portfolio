@@ -283,16 +283,6 @@ export interface ExamResult {
   credential_id: string | null
 }
 
-export interface SweepCell {
-  objective: Objective
-  risk_model: RiskModel
-  status: 'ok' | 'error'
-  expected_return: number | null
-  volatility: number | null
-  sharpe_ratio: number | null
-  message?: string
-}
-
 export interface RiskContribution {
   ticker: string
   weight: number
@@ -512,47 +502,72 @@ export interface ResampledFrontierResponse {
   resampled: FrontierPoint[]
 }
 
-export interface FactorExposure {
-  key: string
-  label: string
-  beta: number
-  t_stat: number
-  factor_return: number
-  contribution: number
+export interface InvestAccount {
+  status: string
+  currency: string
+  cash: number
+  equity: number
+  portfolio_value: number
+  buying_power: number
+  long_market_value: number
+  configured: boolean
 }
 
-export interface FactorResponse {
-  objective: Objective
-  weights: WeightAllocation[]
-  exposures: FactorExposure[]
-  alpha: number
-  r_squared: number
-  idiosyncratic_vol: number
-  observations: number
-  note: string
+export interface InvestPosition {
+  symbol: string
+  qty: number
+  avg_entry_price: number
+  current_price: number
+  market_value: number
+  cost_basis: number
+  unrealized_pl: number
+  unrealized_plpc: number
+  change_today: number
 }
 
-export interface TrackHolding {
-  ticker: string
-  target: number
-  current: number
-  drift: number
+export interface InvestHistoryPoint {
+  timestamp: number
+  equity: number
+  profit_loss: number
 }
 
-export interface TrackPoint {
-  date: string
-  drift: number
+export interface InvestHistory {
+  window: string
+  timeframe: string
+  base_value: number
+  points: InvestHistoryPoint[]
 }
 
-export interface TrackResponse {
-  as_of: string
-  total_return: number
-  max_drift: number
-  turnover_to_rebalance: number
-  rebalance_needed: boolean
-  band: number
-  top_drifter: string | null
-  holdings: TrackHolding[]
-  timeline: TrackPoint[]
-  missing_tickers: string[]
+export interface InvestOrderResult {
+  symbol: string
+  notional: number
+  status: string
+  order_id: string | null
+  message: string | null
+}
+
+export interface InvestSummary {
+  amount: number
+  fee: number
+  fee_bps: number
+  invested: number
+  plan: string
+  orders: InvestOrderResult[]
+}
+
+export interface InvestOrderRecord {
+  id: string
+  symbol: string
+  side: string
+  notional: number | null
+  qty: number | null
+  filled_qty: number | null
+  status: string
+  submitted_at: string | null
+  filled_avg_price: number | null
+}
+
+export interface InvestRequest {
+  weights: Record<string, number>
+  amount: number
 }

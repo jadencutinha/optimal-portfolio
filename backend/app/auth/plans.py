@@ -15,6 +15,7 @@ _ENTITLEMENTS: dict[str, dict] = {
         "live_demo": False,
         "saved_portfolios": 3,
         "course_access": False,
+        "trade_fee_bps": 25,
     },
     "pro": {
         "max_tickers": 50,
@@ -26,6 +27,7 @@ _ENTITLEMENTS: dict[str, dict] = {
         "live_demo": True,
         "saved_portfolios": None,
         "course_access": True,
+        "trade_fee_bps": 0,
     },
     "course": {
         "max_tickers": 8,
@@ -37,6 +39,7 @@ _ENTITLEMENTS: dict[str, dict] = {
         "live_demo": False,
         "saved_portfolios": 3,
         "course_access": True,
+        "trade_fee_bps": 25,
     },
 }
 
