@@ -35,11 +35,11 @@ Mermaid so it renders directly on GitHub and in most editors.
 | Backend | FastAPI, Uvicorn | REST API and ASGI server |
 | Optimization | cvxpy, NumPy, pandas | Convex solvers and numerical work |
 | Persistence | SQLAlchemy 2 async, asyncpg | ORM and Postgres driver |
-| Cache | Redis, in memory fallback | Market data and computation cache |
+| Cache | Redis | Market data and computation cache |
 | Auth verification | PyJWT with JWKS | Validates Supabase access tokens |
 | Reports | ReportLab | PDF export |
 | Market data | Financial Modeling Prep | Real end of day prices |
-| AI assistant | OpenAI or Anthropic | Natural language answers |
+| AI assistant | OpenAI | Natural language answers |
 | Monitoring | Sentry | Error and performance tracking |
 | Hosting | Vercel, Render, Supabase | Frontend, backend, auth and database |
 
@@ -64,7 +64,7 @@ flowchart TD
     Auth["Supabase Auth"]
     DB[("Supabase Postgres")]
     FMP["Financial Modeling Prep"]
-    LLM["OpenAI or Anthropic"]
+    LLM["OpenAI"]
     Sentry["Sentry"]
 
     User --> FE
@@ -81,8 +81,8 @@ flowchart TD
 
 ## 3. Deployment topology
 
-Three managed platforms host the system, all on free tiers. The two custom
-environment variables that wire the pieces together are called out on the edges.
+Three managed platforms host the system, all on free tiers. The environment
+variables that wire the pieces together are called out on the edges.
 
 ```mermaid
 flowchart LR
@@ -93,7 +93,7 @@ flowchart LR
 
     subgraph Render["Render"]
       Web["FastAPI web service"]
-      Cache["In memory cache, optional Redis"]
+      Cache[("Redis cache")]
     end
 
     subgraph Supabase["Supabase"]
@@ -102,11 +102,11 @@ flowchart LR
     end
 
     ExtFMP["Financial Modeling Prep"]
-    ExtLLM["OpenAI or Anthropic"]
+    ExtLLM["OpenAI"]
 
     Static -->|"VITE_API_URL"| Web
     Web -->|"CORS_ORIGINS allowlist"| Static
-    Web --> Cache
+    Web -->|"REDIS_URL"| Cache
     Web --> SPG
     Web --> SAuth
     Static --> SAuth
@@ -118,7 +118,7 @@ Notes.
 
 - The frontend builds with Vite and deploys as static files behind Vercel's CDN. A rewrite rule sends only extensionless routes to `index.html` so real assets such as screenshots are served directly.
 - The backend runs as a single Render web service started with Uvicorn. On the free tier it sleeps after inactivity, so the first request after idle takes longer while it wakes.
-- Redis is optional. When `REDIS_URL` is absent the cache falls back to an in memory implementation.
+- Redis runs as a managed Render service and its connection string is injected into the web service as `REDIS_URL`. Locally, where that variable is absent, the cache falls back to an in memory implementation.
 - Postgres and Auth are Supabase managed. The API never holds user passwords, it only verifies signed tokens.
 
 ---
@@ -468,7 +468,7 @@ optimal-portfolio
 ## 12. Cross cutting concerns
 
 - Configuration. All settings load from environment variables through a typed settings model, with sensible defaults for local development.
-- Caching. Market data is cached first, which keeps repeated optimizations fast and reduces calls to the data provider. Redis is used when configured, otherwise an in memory store.
+- Caching. Market data is cached first, which keeps repeated optimizations fast and reduces calls to the data provider. Redis backs the deployed system and an in memory store covers local development.
 - Data provider. The system prefers real prices from Financial Modeling Prep and falls back to a deterministic synthetic provider, so the app runs with zero configuration.
 - Observability. A request logging middleware records method, path, status, and latency, a metrics collector exposes counts, and Sentry captures unhandled exceptions.
 - Error handling. A global exception handler returns a clean error payload and reports the exception rather than leaking internals.

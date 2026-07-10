@@ -14,7 +14,7 @@ function extractError(error: unknown): string {
   if (typeof error === 'object' && error !== null && 'response' in error) {
     const response = (error as { response?: { status?: number; data?: { detail?: unknown } } }).response
     if (response?.status === 503) {
-      return 'The assistant is not configured yet. Add an ANTHROPIC_API_KEY on the server to enable it.'
+      return 'The assistant is not configured yet. Add an OPENAI_API_KEY on the server to enable it.'
     }
     const detail = response?.data?.detail
     if (typeof detail === 'string') return detail

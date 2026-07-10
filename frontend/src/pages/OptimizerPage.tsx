@@ -64,6 +64,7 @@ export function OptimizerPage() {
   const [lastRequest, setLastRequest] = useState<OptimizeRequest | null>(null)
   const [naming, setNaming] = useState(false)
   const [uploadedWeights, setUploadedWeights] = useState<Record<string, number> | null>(null)
+  const [explanationOpen, setExplanationOpen] = useState(false)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -88,6 +89,7 @@ export function OptimizerPage() {
     setSelectedFrontierIndex(null)
     setLastRequest(request)
     explain.reset()
+    setExplanationOpen(false)
     resampled.reset()
     optimize.mutate(request, {
       onSuccess: (response) => {
@@ -326,14 +328,24 @@ export function OptimizerPage() {
               <button
                 type="button"
                 className="signin-trigger"
+                aria-expanded={explanationOpen}
                 disabled={!lastRequest || explain.isPending}
-                onClick={() => lastRequest && explain.mutate(lastRequest)}
+                onClick={() => {
+                  if (explanationOpen) {
+                    setExplanationOpen(false)
+                    return
+                  }
+                  setExplanationOpen(true)
+                  if (!explain.data && lastRequest) explain.mutate(lastRequest)
+                }}
               >
-                {explain.isPending ? 'Explaining…' : 'Why this portfolio?'}
+                {explain.isPending ? 'Explaining…' : explanationOpen ? 'Hide explanation' : 'Why this portfolio?'}
               </button>
             </div>
-            {explain.isError && <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>}
-            {explain.data && <Explanation data={explain.data} />}
+            {explanationOpen && explain.isError && (
+              <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>
+            )}
+            {explanationOpen && explain.data && <Explanation data={explain.data} />}
 
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (
