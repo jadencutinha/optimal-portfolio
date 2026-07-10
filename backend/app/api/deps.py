@@ -11,6 +11,7 @@ from app.data.provider import DataProvider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
 from app.education.repository import CourseRepository
+from app.invest.client import AlpacaClient
 from app.jobs.manager import JobManager
 from app.observability.metrics import MetricsCollector
 from app.optimizer.repository import OptimizationRepository
@@ -19,6 +20,10 @@ from app.portfolios.repository import PortfolioRepository
 
 def get_settings(request: Request) -> Settings:
     return request.app.state.settings
+
+
+def get_alpaca_client(request: Request) -> AlpacaClient:
+    return AlpacaClient(request.app.state.settings)
 
 
 def get_provider(request: Request) -> DataProvider:

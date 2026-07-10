@@ -32,16 +32,6 @@ export const PRO_TOUR: TourStep[] = [
     body: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock, including drawdown and recovery time.',
   },
   {
-    selector: '[data-tour="factors"]',
-    title: 'Factor Exposures',
-    body: 'Break your returns into market, momentum, and other style tilts, with alpha and R².',
-  },
-  {
-    selector: '[data-tour="tracker"]',
-    title: 'Tracker',
-    body: 'Track how a saved portfolio drifts from its target weights and get a rebalance alert when it crosses your band.',
-  },
-  {
     selector: '[data-tour="saved"]',
     title: 'My Portfolios',
     body: 'Save portfolios, reopen them anytime, and download a detailed PDF report.',
@@ -72,6 +62,6 @@ export const FREE_TOUR: TourStep[] = [
   {
     selector: '[data-tour="upgrade"]',
     title: 'Upgrade to Pro',
-    body: 'Unlock the AI assistant, backtesting, stress tests, factor analysis, rebalance tracking, advanced models, and unlimited saves.',
+    body: 'Unlock the AI assistant, backtesting, stress tests, live investing, advanced models, and unlimited saves.',
   },
 ]

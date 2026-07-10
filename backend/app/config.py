@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
     openai_timeout_seconds: float = 60.0
 
+    alpaca_api_key: str | None = None
+    alpaca_secret_key: str | None = None
+    alpaca_base_url: str = "https://paper-api.alpaca.markets"
+    alpaca_data_url: str = "https://data.alpaca.markets"
+    alpaca_timeout_seconds: float = 30.0
+
     sentry_dsn: str | None = None
     sentry_traces_sample_rate: float = 0.0
 
