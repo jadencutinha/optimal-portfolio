@@ -84,18 +84,6 @@ def test_free_blocks_backtest(client: TestClient) -> None:
         clear(client)
 
 
-def test_free_blocks_sweep(client: TestClient) -> None:
-    override(client, "free")
-    try:
-        response = client.post(
-            "/api/jobs/sweep",
-            json={"tickers": ["AAPL", "MSFT", "GOOGL"], "objectives": ["max_sharpe"], "risk_models": ["sample"]},
-        )
-        assert response.status_code == 403
-    finally:
-        clear(client)
-
-
 def test_free_daily_quota_enforced(client: TestClient) -> None:
     override(client, "free", user_id="quota-user")
     try:

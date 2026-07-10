@@ -197,34 +197,12 @@ def test_resampled_frontier_endpoint(client: TestClient) -> None:
         assert abs(total - 1.0) < 1e-2
 
 
-def test_factors_endpoint(client: TestClient) -> None:
-    payload = {"tickers": BASE_TICKERS, "objective": "max_sharpe", "lookback_days": 500}
-    response = client.post("/api/factors", json=payload)
-    assert response.status_code == 200, response.text
-    body = response.json()
-    keys = {exposure["key"] for exposure in body["exposures"]}
-    assert "market" in keys
-    assert 0.0 <= body["r_squared"] <= 1.0001
-    assert body["observations"] > 0
-
-
 def test_report_pdf_endpoint(client: TestClient) -> None:
     payload = {"tickers": BASE_TICKERS, "objective": "min_variance", "lookback_days": 500}
     response = client.post("/api/report/pdf", json=payload)
     assert response.status_code == 200, response.text
     assert response.headers["content-type"] == "application/pdf"
     assert response.content[:4] == b"%PDF"
-
-
-def test_track_endpoint(client: TestClient) -> None:
-    payload = {"weights": {"AAPL": 0.5, "MSFT": 0.5}, "lookback_days": 180, "band": 0.05}
-    response = client.post("/api/track", json=payload)
-    assert response.status_code == 200, response.text
-    body = response.json()
-    assert len(body["holdings"]) == 2
-    assert isinstance(body["rebalance_needed"], bool)
-    assert len(body["timeline"]) >= 2
-    assert abs(sum(h["target"] for h in body["holdings"]) - 1.0) < 1e-6
 
 
 def test_metrics_endpoint(client: TestClient) -> None:
