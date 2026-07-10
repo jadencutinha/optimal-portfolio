@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useValidateTickers } from '../api/queries'
 import type { UniverseAsset } from '../api/types'
+import { extractApiError } from '../lib/errors'
 
 interface Props {
   tickers: string[]
@@ -11,17 +12,26 @@ interface Props {
 export function TickerInput({ tickers, suggestions, onChange }: Props) {
   const [draft, setDraft] = useState('')
   const [invalid, setInvalid] = useState<Set<string>>(new Set())
+  const [unavailable, setUnavailable] = useState<string | null>(null)
   const validate = useValidateTickers()
   const validateMutate = validate.mutate
 
   useEffect(() => {
     if (tickers.length === 0) {
       setInvalid(new Set())
+      setUnavailable(null)
       return
     }
     const handle = window.setTimeout(() => {
       validateMutate(tickers, {
-        onSuccess: (data) => setInvalid(new Set(data.invalid)),
+        onSuccess: (data) => {
+          setInvalid(new Set(data.invalid))
+          setUnavailable(null)
+        },
+        onError: (error) => {
+          setInvalid(new Set())
+          setUnavailable(extractApiError(error, "Couldn't check these tickers right now."))
+        },
       })
     }, 400)
     return () => window.clearTimeout(handle)
@@ -87,7 +97,8 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
           ))}
         </div>
       )}
-      {invalid.size > 0 && (
+      {unavailable && <p className="ticker-warning">{unavailable}</p>}
+      {!unavailable && invalid.size > 0 && (
         <p className="ticker-warning">
           No price data for {Array.from(invalid).join(', ')}. They'll be ignored when you optimize.
         </p>

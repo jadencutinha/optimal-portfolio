@@ -9,6 +9,10 @@
   --accent-hover: #4991c4;
   --danger: #c0392b;
   --mono: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
+  --series-1: #2a78d6;
+  --series-2: #1baf7a;
+  --series-3: #eda100;
+  --series-4: #008300;
   color-scheme: light;
 }
 
@@ -1415,6 +1419,10 @@ button.primary.modal-submit {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+
+  min-width: 9rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .switch-plan:hover {
@@ -4024,6 +4032,368 @@ table.weights td {
   margin-bottom: 4px;
 }
 
+.planner-source {
+  font-size: 12px;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+/* ---- Side-by-side portfolio comparison ---- */
+.side-by-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.compare-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.compare-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.compare-slot-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.compare-slot-name {
+  flex: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 4px 6px;
+  min-width: 0;
+}
+
+.compare-slot-name:hover,
+.compare-slot-name:focus {
+  border-color: var(--border);
+  outline: none;
+}
+
+.compare-slot-remove {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.compare-slot-remove:hover {
+  color: var(--text);
+}
+
+.compare-add {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  min-height: 140px;
+  padding: 20px;
+}
+
+.compare-add:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.compare-add span {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.compare-run {
+  display: flex;
+  justify-content: center;
+}
+
+.compare-run .primary {
+  min-width: 220px;
+}
+
+.compare-results {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.compare-block h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.compare-note {
+  font-size: 12px;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.compare-failures {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.series-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: baseline;
+  flex: none;
+}
+
+.compare-legend-text {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.compare-table th,
+.compare-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 9px 12px;
+  text-align: right;
+}
+
+.compare-table thead th {
+  text-align: right;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.compare-table thead th:first-child,
+.compare-table .row-label {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.compare-best {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.compare-best-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-family: var(--sans, inherit);
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.compare-setup {
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.compare-weight {
+  position: relative;
+}
+
+.compare-weight-bar {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 3px;
+  opacity: 0.18;
+}
+
+.compare-weight-value {
+  position: relative;
+}
+
+.compare-absent {
+  color: var(--muted);
+}
+
+/* ---- Behavioral coach ---- */
+.behavioral-result {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 22px 0 8px;
+}
+
+.behavioral-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.behavioral-head h2 {
+  margin: 0;
+}
+
+.behavioral-head p {
+  margin: 0;
+}
+
+.behavioral-result > p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.behavioral-result > .bias-section,
+.behavioral-result > .behavior-headline,
+.behavioral-result > .tolerance-check {
+  margin: 0;
+}
+
+.behavioral-result > .provenance {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.behavioral-result > button {
+  align-self: flex-start;
+}
+
+.bias-behavior {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.behavioral-stake {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.behavior-headline {
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  line-height: 1.6;
+}
+
+.behavior-headline p {
+  margin: 0;
+}
+
+.behavior-headline.costly {
+  border-left-color: var(--danger);
+}
+
+.behavior-headline.favourable {
+  border-left-color: var(--accent);
+}
+
+.tolerance-check {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.tolerance-check h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.tolerance-check p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ---- Dollar growth projection on the optimizer ---- */
+.growth-projection {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.growth-projection h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.growth-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.growth-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.growth-inputs .planner-field {
+  margin-bottom: 0;
+}
+
+.growth-run {
+  height: 42px;
+  white-space: nowrap;
+}
+
+.growth-output {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.growth-output .planner-stat-value {
+  font-size: 19px;
+}
+
 /* ---- Natural-language assistant (#55) ---- */
 .assistant-composer {
   background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elevated) 100%);
@@ -4277,6 +4647,10 @@ table.weights td {
   --accent: #e8a24d;
   --accent-hover: #6fb3dd;
   --danger: #e8705f;
+  --series-1: #3987e5;
+  --series-2: #199e70;
+  --series-3: #c98500;
+  --series-4: #008300;
   color-scheme: dark;
 }
 
@@ -4791,6 +5165,10 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+
+  min-width: 9rem;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .tour-launch:hover {

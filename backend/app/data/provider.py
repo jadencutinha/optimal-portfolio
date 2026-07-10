@@ -8,6 +8,24 @@ from app.config import Settings
 from app.data.cache import Cache
 
 
+class ProviderError(Exception):
+    """Upstream market-data failure, distinct from a ticker having no data."""
+
+    status_code = 503
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
+
+
+class ProviderRateLimited(ProviderError):
+    pass
+
+
+class ProviderUnavailable(ProviderError):
+    pass
+
+
 class DataProvider(ABC):
     name: str
 

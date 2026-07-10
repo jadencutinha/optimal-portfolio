@@ -5,15 +5,17 @@ import { Tour } from '../components/Tour'
 import { FREE_TOUR } from '../lib/tours'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
+import { SideBySidePage } from './SideBySidePage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
 const TOUR_KEY = 'tour_free_seen'
 
-type Tab = 'optimizer' | 'planner' | 'saved'
+type Tab = 'optimizer' | 'planner' | 'sidebyside' | 'saved'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'optimizer', label: 'Optimizer' },
   { id: 'planner', label: 'Planner' },
+  { id: 'sidebyside', label: 'Side by Side' },
   { id: 'saved', label: 'My Portfolios' },
 ]
 
@@ -76,6 +78,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
 
       {tab === 'optimizer' && <OptimizerPage />}
       {tab === 'planner' && <PlannerPage />}
+      {tab === 'sidebyside' && <SideBySidePage />}
       {tab === 'saved' && <SavedPortfolios />}
 
       <div className="landing-grid free-extras">

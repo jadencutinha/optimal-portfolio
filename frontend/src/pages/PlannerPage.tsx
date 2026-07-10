@@ -1,59 +1,14 @@
 import { useState } from 'react'
-import {
-  Area,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-import { useOptimize, usePlan } from '../api/queries'
-import type { OptimizeRequest, PlanResponse } from '../api/types'
-import { percent } from '../lib/format'
-
-const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
-
-const optimizeRequest: OptimizeRequest = {
-  tickers: DEFAULT_TICKERS,
-  objective: 'max_sharpe',
-  risk_model: 'sample',
-  return_model: 'historical',
-  lookback_days: 756,
-  min_weight: 0,
-  max_weight: 0.35,
-}
-
-function money(value: number): string {
-  if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
-  if (Math.abs(value) >= 1_000) return `$${(value / 1_000).toFixed(0)}k`
-  return `$${Math.round(value)}`
-}
-
-interface TooltipProps {
-  active?: boolean
-  payload?: { payload: { year: number; p10: number; p50: number; p90: number } }[]
-}
-
-function FanTooltip({ active, payload }: TooltipProps) {
-  if (!active || !payload || payload.length === 0) return null
-  const point = payload[0].payload
-  return (
-    <div className="fan-tooltip">
-      <div className="fan-tooltip-year">Year {point.year.toFixed(1)}</div>
-      <div className="mono">Median {money(point.p50)}</div>
-      <div className="mono muted">
-        Range {money(point.p10)} to {money(point.p90)}
-      </div>
-    </div>
-  )
-}
+import { usePlan } from '../api/queries'
+import type { PlanResponse } from '../api/types'
+import { NumberInput } from '../components/NumberInput'
+import { ProjectionFan } from '../components/ProjectionFan'
+import { money, percent } from '../lib/format'
+import { useLastOptimization } from '../optimizer/useLastOptimization'
 
 export function PlannerPage() {
-  const optimize = useOptimize()
   const plan = usePlan()
+  const { lastRun } = useLastOptimization()
 
   const [expectedReturnPct, setExpectedReturnPct] = useState(12)
   const [volatilityPct, setVolatilityPct] = useState(15)
@@ -62,10 +17,15 @@ export function PlannerPage() {
   const [years, setYears] = useState(20)
   const [target, setTarget] = useState(500000)
 
-  const pullFromOptimizer = async () => {
-    const result = await optimize.mutateAsync(optimizeRequest)
-    setExpectedReturnPct(Number((result.metrics.expected_return * 100).toFixed(1)))
-    setVolatilityPct(Number((result.metrics.volatility * 100).toFixed(1)))
+  const pulledReturnPct = lastRun ? Number((lastRun.expectedReturn * 100).toFixed(2)) : null
+  const pulledVolatilityPct = lastRun ? Number((lastRun.volatility * 100).toFixed(2)) : null
+  const usingOptimized =
+    lastRun !== null && expectedReturnPct === pulledReturnPct && volatilityPct === pulledVolatilityPct
+
+  const pullFromOptimizer = () => {
+    if (pulledReturnPct === null || pulledVolatilityPct === null) return
+    setExpectedReturnPct(pulledReturnPct)
+    setVolatilityPct(pulledVolatilityPct)
   }
 
   const run = () => {
@@ -74,7 +34,7 @@ export function PlannerPage() {
       volatility: volatilityPct / 100,
       initial,
       monthly_contribution: monthly,
-      years,
+      years: Math.round(years),
       target: target > 0 ? target : null,
       trials: 3000,
     })
@@ -98,11 +58,12 @@ export function PlannerPage() {
           <div className="planner-field">
             <label>Expected annual return</label>
             <div className="planner-input-suffix">
-              <input
-                type="number"
+              <NumberInput
                 value={expectedReturnPct}
-                step={0.5}
-                onChange={(event) => setExpectedReturnPct(Number(event.target.value))}
+                min={-100}
+                max={200}
+                step={0.01}
+                onChange={setExpectedReturnPct}
               />
               <span>%</span>
             </div>
@@ -110,18 +71,38 @@ export function PlannerPage() {
           <div className="planner-field">
             <label>Annual volatility</label>
             <div className="planner-input-suffix">
-              <input
-                type="number"
+              <NumberInput
                 value={volatilityPct}
-                step={0.5}
-                onChange={(event) => setVolatilityPct(Number(event.target.value))}
+                min={0.01}
+                max={300}
+                step={0.01}
+                onChange={setVolatilityPct}
               />
               <span>%</span>
             </div>
           </div>
-          <button type="button" className="signin-trigger" onClick={pullFromOptimizer} disabled={optimize.isPending}>
-            {optimize.isPending ? 'Loading…' : 'Use optimized portfolio (max-Sharpe)'}
-          </button>
+
+          {lastRun ? (
+            <>
+              <button type="button" className="signin-trigger" onClick={pullFromOptimizer} disabled={usingOptimized}>
+                {usingOptimized ? 'Using your optimized portfolio ✓' : 'Use my optimized portfolio'}
+              </button>
+              <p className="muted planner-source">
+                Your last optimizer run was {lastRun.objective} over {lastRun.tickers.length} tickers,
+                giving {percent(lastRun.expectedReturn)} expected return at{' '}
+                {percent(lastRun.volatility)} volatility.
+              </p>
+            </>
+          ) : (
+            <>
+              <button type="button" className="signin-trigger" disabled>
+                Use my optimized portfolio
+              </button>
+              <p className="muted planner-source">
+                Run the optimizer first and its expected return and volatility will be available here.
+              </p>
+            </>
+          )}
 
           <div className="planner-divider" />
 
@@ -129,25 +110,25 @@ export function PlannerPage() {
             <label>Starting amount</label>
             <div className="planner-input-suffix">
               <span>$</span>
-              <input type="number" value={initial} step={1000} onChange={(event) => setInitial(Number(event.target.value))} />
+              <NumberInput value={initial} min={0} step={1000} onChange={setInitial} />
             </div>
           </div>
           <div className="planner-field">
             <label>Monthly contribution</label>
             <div className="planner-input-suffix">
               <span>$</span>
-              <input type="number" value={monthly} step={100} onChange={(event) => setMonthly(Number(event.target.value))} />
+              <NumberInput value={monthly} min={0} step={100} onChange={setMonthly} />
             </div>
           </div>
           <div className="planner-field">
             <label>Years</label>
-            <input type="number" value={years} min={1} max={50} onChange={(event) => setYears(Number(event.target.value))} />
+            <NumberInput value={years} min={1} max={50} step={1} integer onChange={setYears} />
           </div>
           <div className="planner-field">
             <label>Goal amount</label>
             <div className="planner-input-suffix">
               <span>$</span>
-              <input type="number" value={target} step={10000} onChange={(event) => setTarget(Number(event.target.value))} />
+              <NumberInput value={target} min={0} step={10000} onChange={setTarget} />
             </div>
           </div>
 
@@ -171,14 +152,6 @@ export function PlannerPage() {
 }
 
 function PlannerOutput({ result }: { result: PlanResponse }) {
-  const chartData = result.timeline.map((point) => ({
-    year: point.month / 12,
-    p10: point.p10,
-    p50: point.p50,
-    p90: point.p90,
-    bandWidth: point.p90 - point.p10,
-  }))
-
   return (
     <div className="planner-output">
       <div className="planner-stats">
@@ -206,39 +179,8 @@ function PlannerOutput({ result }: { result: PlanResponse }) {
         </div>
       </div>
 
-      <div className="planner-chart">
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 16, bottom: 4, left: 4 }}>
-            <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
-            <XAxis
-              dataKey="year"
-              tick={{ fontSize: 12 }}
-              tickFormatter={(value: number) => `${Math.round(value)}y`}
-            />
-            <YAxis tick={{ fontSize: 12 }} tickFormatter={money} width={54} />
-            <Tooltip content={<FanTooltip />} />
-            <Area type="monotone" dataKey="p10" stackId="band" stroke="none" fill="transparent" isAnimationActive={false} />
-            <Area
-              type="monotone"
-              dataKey="bandWidth"
-              stackId="band"
-              stroke="none"
-              fill="var(--accent)"
-              fillOpacity={0.2}
-              isAnimationActive={false}
-            />
-            <Line type="monotone" dataKey="p50" stroke="var(--accent)" strokeWidth={2} dot={false} />
-            {result.target !== null && (
-              <ReferenceLine
-                y={result.target}
-                stroke="var(--border)"
-                strokeDasharray="4 4"
-                label={{ value: 'Goal', fontSize: 11, fill: 'var(--muted)', position: 'insideTopRight' }}
-              />
-            )}
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      <ProjectionFan timeline={result.timeline} target={result.target} />
+
       <p className="provenance">
         {result.trials.toLocaleString()} simulations · {result.years} years · you invest{' '}
         {money(result.total_contributions)} in total

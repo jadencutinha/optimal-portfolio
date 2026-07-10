@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from app.api.routes import (
     assistant,
     backtest,
+    behavioral,
     courses,
     factors,
     frontier,
@@ -31,7 +32,7 @@ from app.auth.supabase import SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
 from app.config import get_settings
 from app.data.cache import build_cache
-from app.data.provider import CachingDataProvider, build_inner_provider
+from app.data.provider import CachingDataProvider, ProviderError, build_inner_provider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
 from app.db.session import create_engine, create_session_factory, init_models
@@ -104,6 +105,11 @@ def create_app() -> FastAPI:
         logger.info("%s %s -> %s (%.1fms)", request.method, request.url.path, response.status_code, elapsed)
         return response
 
+    @app.exception_handler(ProviderError)
+    async def provider_error_handler(request: Request, exc: ProviderError) -> JSONResponse:
+        logger.warning("Market data provider error on %s %s: %s", request.method, request.url.path, exc.message)
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
@@ -122,6 +128,7 @@ def create_app() -> FastAPI:
     app.include_router(courses.router, prefix=settings.api_prefix)
     app.include_router(portfolios.router, prefix=settings.api_prefix)
     app.include_router(planner.router, prefix=settings.api_prefix)
+    app.include_router(behavioral.router, prefix=settings.api_prefix)
     app.include_router(assistant.router, prefix=settings.api_prefix)
     app.include_router(stress.router, prefix=settings.api_prefix)
     app.include_router(factors.router, prefix=settings.api_prefix)

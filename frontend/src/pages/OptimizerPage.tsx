@@ -10,12 +10,14 @@ import {
   useUniverse,
 } from '../api/queries'
 import { downloadCsv } from '../lib/csv'
+import { extractApiError } from '../lib/errors'
 import type { AssetBound, Objective, OptimizeRequest, ReturnModel, RiskModel, SectorCap } from '../api/types'
 import { AllocationChart } from '../components/AllocationChart'
 import { ConstraintBuilder } from '../components/ConstraintBuilder'
 import { EmptyState } from '../components/EmptyState'
 import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
+import { GrowthProjection } from '../components/GrowthProjection'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
 import { PromptModal } from '../components/PromptModal'
@@ -24,6 +26,7 @@ import { SkeletonCards } from '../components/Skeleton'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
+import { useLastOptimization } from '../optimizer/useLastOptimization'
 import { useToast } from '../toast/useToast'
 import { Tooltip } from '../components/Tooltip'
 import { FINANCIAL_TERMS } from '../data/definitions'
@@ -39,6 +42,7 @@ export function OptimizerPage() {
   const me = useMe()
   const save = useSavePortfolio()
   const toast = useToast()
+  const { setLastRun } = useLastOptimization()
 
   const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
   const pro = Boolean(entitlements.advanced_optimizers)
@@ -62,6 +66,7 @@ export function OptimizerPage() {
   const [lastRequest, setLastRequest] = useState<OptimizeRequest | null>(null)
   const [naming, setNaming] = useState(false)
   const [uploadedWeights, setUploadedWeights] = useState<Record<string, number> | null>(null)
+  const [explanationOpen, setExplanationOpen] = useState(false)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -86,8 +91,21 @@ export function OptimizerPage() {
     setSelectedFrontierIndex(null)
     setLastRequest(request)
     explain.reset()
+    setExplanationOpen(false)
     resampled.reset()
-    optimize.mutate(request)
+    optimize.mutate(request, {
+      onSuccess: (response) => {
+        setLastRun({
+          expectedReturn: response.metrics.expected_return,
+          volatility: response.metrics.volatility,
+          sharpeRatio: response.metrics.sharpe_ratio,
+          objective: response.objective,
+          riskModel: response.risk_model,
+          tickers: response.weights.map((allocation) => allocation.ticker),
+          request,
+        })
+      },
+    })
     frontier.mutate({
       tickers,
       lookback_days: lookbackDays,
@@ -100,7 +118,9 @@ export function OptimizerPage() {
 
   const result = optimize.data
   const frontierData = frontier.data
-  const errorMessage = optimize.isError ? extractError(optimize.error) : null
+  const errorMessage = optimize.isError
+    ? extractApiError(optimize.error, 'Optimization failed. Adjust your inputs and try again.')
+    : null
 
   const selectedPoint =
     frontierData && selectedFrontierIndex !== null ? frontierData.points[selectedFrontierIndex] : null
@@ -280,6 +300,11 @@ export function OptimizerPage() {
               <AllocationChart weights={result.weights} />
               <WeightsTable weights={result.weights} />
             </div>
+            <GrowthProjection
+              key={`${result.metrics.expected_return}-${result.metrics.volatility}`}
+              expectedReturn={result.metrics.expected_return}
+              volatility={result.metrics.volatility}
+            />
             <p className="provenance">
               {result.n_assets} assets · {result.provider} data · {result.risk_model} ·{' '}
               {result.as_of_start} → {result.as_of_end} · solver {result.solver_status}
@@ -305,14 +330,24 @@ export function OptimizerPage() {
               <button
                 type="button"
                 className="signin-trigger"
+                aria-expanded={explanationOpen}
                 disabled={!lastRequest || explain.isPending}
-                onClick={() => lastRequest && explain.mutate(lastRequest)}
+                onClick={() => {
+                  if (explanationOpen) {
+                    setExplanationOpen(false)
+                    return
+                  }
+                  setExplanationOpen(true)
+                  if (!explain.data && lastRequest) explain.mutate(lastRequest)
+                }}
               >
-                {explain.isPending ? 'Explaining…' : 'Why this portfolio?'}
+                {explain.isPending ? 'Explaining…' : explanationOpen ? 'Hide explanation' : 'Why this portfolio?'}
               </button>
             </div>
-            {explain.isError && <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>}
-            {explain.data && <Explanation data={explain.data} />}
+            {explanationOpen && explain.isError && (
+              <p className="error">Couldn't build the explanation. Try running the optimizer again.</p>
+            )}
+            {explanationOpen && explain.data && <Explanation data={explain.data} />}
 
             {frontier.isPending && <p className="muted">Tracing the efficient frontier…</p>}
             {frontierData && (
@@ -395,21 +430,4 @@ export function OptimizerPage() {
       )}
     </div>
   )
-}
-
-function extractError(error: unknown): string {
-  if (typeof error === 'object' && error !== null && 'response' in error) {
-    const response = (error as { response?: { data?: { detail?: unknown } } }).response
-    const detail = response?.data?.detail
-    if (typeof detail === 'string') {
-      return detail
-    }
-    if (Array.isArray(detail)) {
-      return detail
-        .map((item: { msg?: string }) => item?.msg)
-        .filter(Boolean)
-        .join('; ')
-    }
-  }
-  return 'Optimization failed. Adjust your inputs and try again.'
 }
