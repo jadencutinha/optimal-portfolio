@@ -52,7 +52,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
   const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
   const [showHub, setShowHub] = useState(true)
 
-  useSurface('platform')
+  useSurface('platform', 'free')
 
   return (
     <div className="free-platform">

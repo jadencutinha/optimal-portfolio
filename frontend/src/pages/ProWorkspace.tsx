@@ -80,7 +80,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
   const [showHub, setShowHub] = useState(true)
 
-  useSurface('platform')
+  useSurface('platform', 'pro')
 
   return (
     <div className="pro-workspace">
