@@ -10,6 +10,7 @@ import {
 } from 'recharts'
 import { useStress, useUniverse } from '../api/queries'
 import type { Objective, StressWindow } from '../api/types'
+import { Loader } from '../components/Loader'
 import { TickerInput } from '../components/TickerInput'
 import { percent } from '../lib/format'
 
@@ -83,6 +84,8 @@ export function StressPage() {
         </button>
         {stress.isError && <p className="error">Couldn't run the stress test. Try again.</p>}
       </section>
+
+      {stress.isPending && <Loader fullscreen={false} label="Replaying market history…" />}
 
       {result && (
         <div className="stress-grid">

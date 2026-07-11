@@ -71,3 +71,58 @@ class OrderRecord(BaseModel):
     status: str
     submitted_at: str | None = None
     filled_avg_price: float | None = None
+
+
+class BenchmarkPoint(BaseModel):
+    timestamp: int
+    portfolio: float
+    benchmark: float
+
+
+class BenchmarkSeries(BaseModel):
+    window: str
+    symbol: str
+    base_value: float
+    portfolio_return: float
+    benchmark_return: float
+    alpha: float
+    tracking_error: float
+    points: list[BenchmarkPoint]
+
+
+class DriftRow(BaseModel):
+    symbol: str
+    current_value: float
+    current_weight: float
+    target_weight: float
+    target_value: float
+    delta: float
+    action: str
+
+
+class RebalancePlan(BaseModel):
+    portfolio_id: int
+    portfolio_name: str
+    total_value: float
+    max_drift: float
+    fee: float
+    fee_bps: int
+    rows: list[DriftRow]
+    tradable: bool
+    message: str | None = None
+
+
+class RebalanceRequest(BaseModel):
+    portfolio_id: int
+
+
+class RebalanceSummary(BaseModel):
+    sells: list[OrderResult]
+    buys: list[OrderResult]
+    fee: float
+
+
+class TradeRequest(BaseModel):
+    symbol: str = Field(..., min_length=1, max_length=12)
+    side: str = Field(..., pattern="^(buy|sell)$")
+    notional: float = Field(..., gt=0)

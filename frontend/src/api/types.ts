@@ -567,6 +567,57 @@ export interface InvestOrderRecord {
   filled_avg_price: number | null
 }
 
+export interface InvestBenchmarkPoint {
+  timestamp: number
+  portfolio: number
+  benchmark: number
+}
+
+export interface InvestBenchmark {
+  window: string
+  symbol: string
+  base_value: number
+  portfolio_return: number
+  benchmark_return: number
+  alpha: number
+  tracking_error: number
+  points: InvestBenchmarkPoint[]
+}
+
+export interface InvestDriftRow {
+  symbol: string
+  current_value: number
+  current_weight: number
+  target_weight: number
+  target_value: number
+  delta: number
+  action: 'buy' | 'sell' | 'hold'
+}
+
+export interface InvestRebalancePlan {
+  portfolio_id: number
+  portfolio_name: string
+  total_value: number
+  max_drift: number
+  fee: number
+  fee_bps: number
+  rows: InvestDriftRow[]
+  tradable: boolean
+  message: string | null
+}
+
+export interface InvestRebalanceSummary {
+  sells: InvestOrderResult[]
+  buys: InvestOrderResult[]
+  fee: number
+}
+
+export interface InvestTradeRequest {
+  symbol: string
+  side: 'buy' | 'sell'
+  notional: number
+}
+
 export interface InvestRequest {
   weights: Record<string, number>
   amount: number
