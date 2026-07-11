@@ -1,14 +1,26 @@
 import { useState } from 'react'
 import { useAssistant } from '../api/queries'
 import { AllocationChart } from '../components/AllocationChart'
+import { AssistantComposer } from '../components/AssistantComposer'
+import { Loader } from '../components/Loader'
 import { StatCards } from '../components/StatCards'
 import { WeightsTable } from '../components/WeightsTable'
 
-const EXAMPLES = [
+const STARTERS = [
   'I want steady growth for retirement in 30 years but hate big drops.',
   'Build me the most diversified portfolio you can from tech and banks.',
   'Protect me against a market crash while still earning a decent return.',
+  'Maximize my risk-adjusted return with no more than 30% in any one stock.',
+  'I want income and stability more than aggressive growth.',
+  'Give me an aggressive growth portfolio, I can handle big swings.',
 ]
+
+const GOALS = [
+  { id: 'growth', label: 'Growth', phrase: 'I want long-term growth and can take on more risk for higher returns.' },
+  { id: 'balanced', label: 'Balanced', phrase: 'I want a balanced mix of growth and stability.' },
+  { id: 'income', label: 'Income', phrase: 'I want steady income with lower volatility.' },
+  { id: 'preserve', label: 'Preserve capital', phrase: 'I want to preserve my capital and minimize losses.' },
+] as const
 
 function extractError(error: unknown): string {
   if (typeof error === 'object' && error !== null && 'response' in error) {
@@ -25,10 +37,24 @@ function extractError(error: unknown): string {
 export function AssistantPage() {
   const assistant = useAssistant()
   const [message, setMessage] = useState('')
+  const [goal, setGoal] = useState<string | null>(null)
+  const [horizon, setHorizon] = useState(20)
+  const [risk, setRisk] = useState(20)
 
+  const compose = () => {
+    const parts: string[] = []
+    if (message.trim()) parts.push(message.trim())
+    const chosen = GOALS.find((g) => g.id === goal)
+    if (chosen) parts.push(chosen.phrase)
+    parts.push(
+      `My time horizon is about ${horizon} years and I can tolerate a drop of at most around ${risk}% in a bad year.`,
+    )
+    return parts.join(' ')
+  }
+
+  const canAsk = (message.trim().length > 0 || goal !== null) && !assistant.isPending
   const ask = () => {
-    const goal = message.trim()
-    if (goal) assistant.mutate({ message: goal })
+    if (canAsk) assistant.mutate({ message: compose() })
   }
 
   const result = assistant.data
@@ -38,34 +64,29 @@ export function AssistantPage() {
       <div className="assistant-intro">
         <h2>Portfolio assistant</h2>
         <p className="muted">
-          Describe your goal in plain English. The assistant picks an objective and constraints,
-          runs the optimizer, and explains the result.
+          Describe your goal in plain English, or use the quick controls. The assistant picks an objective and
+          constraints, runs the optimizer, and explains the result.
         </p>
       </div>
 
-      <div className="assistant-composer">
-        <textarea
-          value={message}
-          rows={3}
-          placeholder="e.g. I want long-term growth but can't stomach losing more than 20% in a bad year."
-          onChange={(event) => setMessage(event.target.value)}
-        />
-        <div className="assistant-actions">
-          <div className="assistant-examples">
-            {EXAMPLES.map((example) => (
-              <button key={example} type="button" className="example-chip" onClick={() => setMessage(example)}>
-                {example}
-              </button>
-            ))}
-          </div>
-          <button className="primary" onClick={ask} disabled={assistant.isPending || !message.trim()}>
-            {assistant.isPending ? 'Thinking…' : 'Ask the assistant'}
-          </button>
-        </div>
-      </div>
+      <AssistantComposer
+        value={message}
+        onChange={setMessage}
+        onSubmit={ask}
+        pending={assistant.isPending}
+        canAsk={canAsk}
+        goals={GOALS}
+        goal={goal}
+        onGoal={setGoal}
+        horizon={horizon}
+        onHorizon={setHorizon}
+        risk={risk}
+        onRisk={setRisk}
+        starters={STARTERS}
+      />
 
       {assistant.isError && <p className="error">{extractError(assistant.error)}</p>}
-      {assistant.isPending && <p className="muted">Choosing a strategy and building your portfolio…</p>}
+      {assistant.isPending && <Loader fullscreen={false} label="Choosing a strategy and building your portfolio…" />}
 
       {result && (
         <div className="assistant-result">

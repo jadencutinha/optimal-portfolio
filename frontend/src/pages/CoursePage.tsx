@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { Certificate } from '../components/Certificate'
+import { CourseSearch } from '../components/CourseSearch'
 import { CheckIcon, FlameIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
@@ -21,6 +22,19 @@ import {
   type StreakState,
 } from '../lib/courseProgress'
 
+const ConstellationMap = lazy(() =>
+  import('../components/ConstellationMap').then((module) => ({ default: module.ConstellationMap })),
+)
+const TrackPlanet = lazy(() =>
+  import('../components/TrackPlanet').then((module) => ({ default: module.TrackPlanet })),
+)
+
+const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn'> = {
+  1: 'earth',
+  2: 'moon',
+  3: 'saturn',
+}
+
 export function CoursePage({
   onSwitch,
   learnerName,
@@ -29,13 +43,15 @@ export function CoursePage({
   learnerName?: string | null
 }) {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  const [viewingModule, setViewingModule] = useState(false)
   const [moduleIndex, setModuleIndex] = useState(0)
-  const [search, setSearch] = useState('')
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
   const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
   const [mastery, setMastery] = useState<MasteryMap>(loadMastery)
   const [xp, setXp] = useState<number>(loadXP)
   const [streak, setStreak] = useState<StreakState>(loadStreak)
+  const [zoomingTrackId, setZoomingTrackId] = useState<number | null>(null)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const isComplete = (trackId: number, moduleId: number) => Boolean(progress[moduleKey(trackId, moduleId)])
 
@@ -62,21 +78,61 @@ export function CoursePage({
   function openTrack(track: Track) {
     setSelectedTrack(track)
     setModuleIndex(0)
+    setViewingModule(false)
   }
 
-  if (selectedTrack) {
+  function flyToTrack(track: Track) {
+    if (zoomingTrackId !== null) return
+    if (reduceMotion) {
+      openTrack(track)
+      return
+    }
+    setZoomingTrackId(track.id)
+    window.setTimeout(() => openTrack(track), 480)
+  }
+
+  if (selectedTrack && viewingModule) {
     return (
       <ModuleLayout
         track={selectedTrack}
         moduleIndex={moduleIndex}
         onSelectModule={setModuleIndex}
-        onBackToTracks={() => setSelectedTrack(null)}
+        onBackToTracks={() => setViewingModule(false)}
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
         onModuleComplete={(moduleId, retakes) => markComplete(selectedTrack.id, moduleId, retakes)}
         getModuleStars={(moduleId) => mastery[moduleKey(selectedTrack.id, moduleId)] ?? 0}
         xp={xp}
         streak={streak.current}
       />
+    )
+  }
+
+  if (selectedTrack) {
+    return (
+      <div className="course-module">
+        <button
+          type="button"
+          className="sidebar-back constellation-back"
+          onClick={() => {
+            setSelectedTrack(null)
+            setZoomingTrackId(null)
+          }}
+        >
+          ← Back to Tracks
+        </button>
+        <h1 className="module-title">{selectedTrack.title}</h1>
+        <p className="track-card-desc" style={{ marginBottom: 20 }}>{selectedTrack.description}</p>
+        <Suspense fallback={<div className="constellation" />}>
+          <ConstellationMap
+            track={selectedTrack}
+            isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
+            onSelectModule={(index) => {
+              setModuleIndex(index)
+              setViewingModule(true)
+            }}
+          />
+        </Suspense>
+      </div>
     )
   }
 
@@ -92,16 +148,6 @@ export function CoursePage({
   }
 
   const completedTracks = TRACKS.filter((track) => track.modules.length > 0 && trackPct(track) === 100).length
-
-  const query = search.trim().toLowerCase()
-  const visibleTracks = query
-    ? TRACKS.filter(
-        (track) =>
-          track.title.toLowerCase().includes(query) ||
-          track.description.toLowerCase().includes(query) ||
-          track.modules.some((m) => m.title.toLowerCase().includes(query)),
-      )
-    : TRACKS
 
   return (
     <div className="course-landing">
@@ -137,30 +183,64 @@ export function CoursePage({
         </div>
       </div>
 
-      <div className="course-search">
-        <input
-          type="search"
-          className="course-search-input"
-          placeholder="Search courses…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      </div>
+      <CourseSearch
+        tracks={TRACKS}
+        onOpen={(trackId, mi) => {
+          const track = TRACKS.find((t) => t.id === trackId)
+          if (track) {
+            setSelectedTrack(track)
+            setModuleIndex(mi)
+            setViewingModule(true)
+          }
+        }}
+      />
 
-      {visibleTracks.length === 0 ? (
-        <p className="course-search-empty muted">No courses match “{search}”.</p>
-      ) : (
-        <div className="track-grid">
-          {visibleTracks.map((track) => {
+      <div className="track-grid">
+        {TRACKS.map((track) => {
             const available = track.modules.length > 0
             const pct = trackPct(track)
             const statusLabel = pct === 0 ? 'Not started' : pct === 100 ? 'Completed' : 'In progress'
             const buttonLabel = pct === 0 ? 'Start' : pct === 100 ? 'Review' : 'Continue'
+            const zooming = zoomingTrackId === track.id
             return (
-              <div key={track.id} className="track-card">
+              <div
+                key={track.id}
+                className={`track-card ${zooming ? 'is-zooming' : ''}`}
+                onMouseMove={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect()
+                  const px = (e.clientX - r.left) / r.width - 0.5
+                  const py = (e.clientY - r.top) / r.height - 0.5
+                  e.currentTarget.style.transform = `perspective(900px) rotateX(${py * -6}deg) rotateY(${px * 6}deg)`
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = ''
+                }}
+              >
+                <span className="track-card-drift" aria-hidden="true" />
+                <span className="track-card-corner track-card-corner--tl" aria-hidden="true" />
+                <span className="track-card-corner track-card-corner--br" aria-hidden="true" />
+                <span className="track-card-sheen" aria-hidden="true" />
+                <span className="track-card-particles" aria-hidden="true">
+                  <i /><i /><i /><i /><i />
+                </span>
+
+                <div className="track-card-body">
                 <div className="track-card-top">
                   <span className="track-card-num">Track {track.id}</span>
                 </div>
+
+                {available && (
+                  <button
+                    type="button"
+                    className="track-planet-btn"
+                    onClick={() => flyToTrack(track)}
+                    aria-label={`Fly into ${track.title}`}
+                  >
+                    <Suspense fallback={<div className="track-planet" />}>
+                      <TrackPlanet kind={PLANET_KIND_BY_TRACK[track.id] ?? 'moon'} progress={pct} />
+                    </Suspense>
+                  </button>
+                )}
 
                 <h3 className="track-card-title">{track.title}</h3>
                 <p className="track-card-desc">{track.description}</p>
@@ -170,31 +250,13 @@ export function CoursePage({
                 </span>
 
                 <p className="track-card-meta">
-                  {available ? `${track.modules.length} modules · ${track.estimatedTime}` : 'Coming soon'}
+                  {available
+                    ? `${track.modules.length} modules · ${track.estimatedTime} · ${statusLabel}${pct > 0 && pct < 100 ? ` · ${pct}%` : ''}`
+                    : 'Coming soon'}
                 </p>
 
-                {available && (
-                  <div className="track-card-progress">
-                    <div className="track-card-progress-track">
-                      <div className="track-card-progress-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="track-card-progress-label">
-                      {statusLabel}
-                      {pct > 0 && pct < 100 ? ` · ${pct}%` : ''}
-                    </span>
-                  </div>
-                )}
-
-                {available && (
-                  <ol className="track-card-module-preview">
-                    {track.modules.slice(0, 3).map((m) => (
-                      <li key={m.id}>{m.title}</li>
-                    ))}
-                  </ol>
-                )}
-
                 {available ? (
-                  <button type="button" className="track-card-btn" onClick={() => openTrack(track)}>
+                  <button type="button" className="track-card-btn" onClick={() => flyToTrack(track)}>
                     {buttonLabel}
                   </button>
                 ) : (
@@ -202,11 +264,11 @@ export function CoursePage({
                     Coming Soon
                   </button>
                 )}
+                </div>
               </div>
             )
           })}
         </div>
-      )}
 
       <div className="certificates-section">
         <h2 className="certificates-title">Your Certificates</h2>

@@ -92,7 +92,7 @@ export function ModuleLayout({
     <div className="module-shell">
       <aside className="module-sidebar">
         <button type="button" className="sidebar-back" onClick={onBackToTracks}>
-          ← Back to Tracks
+          ← Back to map
         </button>
         <h2 className="sidebar-track-title">{track.title}</h2>
         {(xp !== undefined || streak !== undefined) && (
@@ -145,7 +145,7 @@ export function ModuleLayout({
       <div className="module-main">
         <div className="module-breadcrumb">
           <button type="button" className="breadcrumb-link" onClick={onBackToTracks}>
-            Tracks
+            Map
           </button>
           <span className="breadcrumb-sep">/</span>
           <span className="breadcrumb-track">{track.title}</span>

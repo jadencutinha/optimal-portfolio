@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
 import { ErrorState } from '../components/ErrorState'
-import { Skeleton } from '../components/Skeleton'
+import { Loader } from '../components/Loader'
+import { MissionControlHUD } from '../components/MissionControlHUD'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
 import { CheckoutPage } from './CheckoutPage'
@@ -26,16 +27,7 @@ export function Home() {
   }
 
   if (me.isLoading) {
-    return (
-      <div className="workspace-skeleton">
-        <Skeleton width="240px" height="30px" />
-        <div className="skeleton-panels">
-          <Skeleton height="180px" radius="16px" />
-          <Skeleton height="180px" radius="16px" />
-        </div>
-        <Skeleton height="260px" radius="16px" />
-      </div>
-    )
+    return <Loader label="Loading your workspace…" />
   }
 
   if (me.isError || !me.data) {
@@ -86,6 +78,7 @@ export function Home() {
 
   return (
     <>
+      <MissionControlHUD plan={plan} />
       {plan === 'course' && <CoursePage onSwitch={onSwitch} learnerName={me.data.email} />}
       {plan === 'free' && (
         <FreePage

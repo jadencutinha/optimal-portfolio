@@ -22,7 +22,7 @@ import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
 import { PromptModal } from '../components/PromptModal'
 import { ResampledFrontierChart } from '../components/ResampledFrontierChart'
-import { SkeletonCards } from '../components/Skeleton'
+import { Loader } from '../components/Loader'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
@@ -292,7 +292,7 @@ export function OptimizerPage() {
             description="Configure your universe and objective, then run the optimizer to see the optimal allocation."
           />
         )}
-        {optimize.isPending && <SkeletonCards count={3} />}
+        {optimize.isPending && <Loader fullscreen={false} label="Optimizing your portfolio…" />}
         {result && (
           <div className="results-grid">
             <StatCards result={result} />

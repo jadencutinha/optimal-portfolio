@@ -90,6 +90,14 @@ class AlpacaClient:
         params = {"cancel_orders": "true"}
         return await self._request("DELETE", "/v2/positions", params=params) or []  # type: ignore[return-value]
 
+    async def close_position(self, symbol: str, percentage: float | None = None) -> dict | None:
+        params: dict[str, str] = {}
+        if percentage is not None:
+            params["percentage"] = f"{max(min(percentage, 100.0), 0.0):.2f}"
+        return await self._request(  # type: ignore[return-value]
+            "DELETE", f"/v2/positions/{symbol.upper()}", params=params or None
+        )
+
     async def cancel_all_orders(self) -> list:
         return await self._request("DELETE", "/v2/orders") or []  # type: ignore[return-value]
 

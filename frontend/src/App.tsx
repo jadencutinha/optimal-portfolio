@@ -1,4 +1,5 @@
 import { AuthBar } from './components/AuthBar'
+import { Starfield } from './components/Starfield'
 import { ThemeToggle } from './components/ThemeToggle'
 import { Home } from './pages/Home'
 import { VerifyPage } from './pages/VerifyPage'
@@ -9,6 +10,7 @@ export default function App() {
     const credentialId = decodeURIComponent(path.slice('/verify/'.length))
     return (
       <div className="app">
+        <Starfield />
         <header className="app-header">
           <div className="brand">
             <a href="/" className="brand-link">
@@ -25,6 +27,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <Starfield />
       <header className="app-header">
         <div className="brand">
           <div>

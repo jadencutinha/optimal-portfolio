@@ -3,7 +3,7 @@ import { useBacktest, useUniverse } from '../api/queries'
 import type { BacktestObjective, BacktestRequest, BenchmarkName, RebalanceCadence, RiskModel } from '../api/types'
 import { BacktestResults } from '../components/BacktestResults'
 import { EmptyState } from '../components/EmptyState'
-import { Skeleton, SkeletonCards } from '../components/Skeleton'
+import { Loader } from '../components/Loader'
 import { TickerInput } from '../components/TickerInput'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
@@ -185,12 +185,7 @@ export function BacktestPage() {
             description="Configure a strategy and run a walk-forward backtest against the benchmarks."
           />
         )}
-        {backtest.isPending && (
-          <div className="bt-skeleton">
-            <SkeletonCards count={4} />
-            <Skeleton height="240px" radius="14px" />
-          </div>
-        )}
+        {backtest.isPending && <Loader fullscreen={false} label="Running the walk-forward backtest…" />}
         {backtest.data && <BacktestResults result={backtest.data} />}
       </section>
     </div>
