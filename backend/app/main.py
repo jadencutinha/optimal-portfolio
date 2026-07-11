@@ -11,10 +11,9 @@ from app.api.routes import (
     backtest,
     behavioral,
     courses,
-    factors,
     frontier,
     health,
-    jobs,
+    invest,
     me,
     metrics as metrics_route,
     optimize,
@@ -24,7 +23,6 @@ from app.api.routes import (
     reports,
     stress,
     tickers,
-    tracking,
     universe,
 )
 from app.auth.repository import ProfileRepository
@@ -37,7 +35,6 @@ from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
 from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
-from app.jobs.manager import JobManager
 from app.observability.metrics import MetricsCollector
 from app.observability.sentry import capture_exception, init_sentry
 from app.optimizer.repository import OptimizationRepository
@@ -73,7 +70,6 @@ async def lifespan(app: FastAPI):
     app.state.backtest_repository = BacktestRepository(session_factory)
     app.state.course_repository = CourseRepository(session_factory)
     app.state.portfolio_repository = PortfolioRepository(session_factory)
-    app.state.job_manager = JobManager()
 
     try:
         yield
@@ -124,16 +120,14 @@ def create_app() -> FastAPI:
     app.include_router(frontier.router, prefix=settings.api_prefix)
     app.include_router(me.router, prefix=settings.api_prefix)
     app.include_router(backtest.router, prefix=settings.api_prefix)
-    app.include_router(jobs.router, prefix=settings.api_prefix)
     app.include_router(courses.router, prefix=settings.api_prefix)
     app.include_router(portfolios.router, prefix=settings.api_prefix)
     app.include_router(planner.router, prefix=settings.api_prefix)
     app.include_router(behavioral.router, prefix=settings.api_prefix)
     app.include_router(assistant.router, prefix=settings.api_prefix)
     app.include_router(stress.router, prefix=settings.api_prefix)
-    app.include_router(factors.router, prefix=settings.api_prefix)
     app.include_router(reports.router, prefix=settings.api_prefix)
-    app.include_router(tracking.router, prefix=settings.api_prefix)
+    app.include_router(invest.router, prefix=settings.api_prefix)
     app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)
     return app

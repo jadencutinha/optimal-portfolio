@@ -12,8 +12,13 @@ import type {
   CourseDetail,
   CourseSummary,
   ExplainResponse,
-  FactorResponse,
   FrontierParams,
+  InvestAccount,
+  InvestHistory,
+  InvestOrderRecord,
+  InvestPosition,
+  InvestRequest,
+  InvestSummary,
   FrontierResponse,
   MeResponse,
   OptimizeRequest,
@@ -28,7 +33,6 @@ import type {
   ResampledFrontierResponse,
   StressResponse,
   TickerValidationResponse,
-  TrackResponse,
   UniverseResponse,
 } from './types'
 
@@ -178,20 +182,6 @@ export function useStress() {
   })
 }
 
-export function useFactors() {
-  return useMutation({
-    mutationFn: async (request: OptimizeRequest) =>
-      (await apiClient.post<FactorResponse>('/api/factors', request)).data,
-  })
-}
-
-export function useTrack() {
-  return useMutation({
-    mutationFn: async (weights: Record<string, number>) =>
-      (await apiClient.post<TrackResponse>('/api/track', { weights })).data,
-  })
-}
-
 export function usePortfolioDetail(id: number | null) {
   return useQuery({
     queryKey: ['portfolio', id],
@@ -237,5 +227,79 @@ export function useFrontier() {
       }
       return (await apiClient.get<FrontierResponse>('/api/frontier', { params: query })).data
     },
+  })
+}
+
+export function useInvestAccount() {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'account', session?.user?.id ?? 'anon'],
+    enabled: Boolean(session),
+    refetchInterval: 30000,
+    queryFn: async () => (await apiClient.get<InvestAccount>('/api/invest/account')).data,
+  })
+}
+
+export function useInvestPositions() {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'positions', session?.user?.id ?? 'anon'],
+    enabled: Boolean(session),
+    refetchInterval: 30000,
+    queryFn: async () => (await apiClient.get<InvestPosition[]>('/api/invest/positions')).data,
+  })
+}
+
+export function useInvestHistory(window: string) {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'history', session?.user?.id ?? 'anon', window],
+    enabled: Boolean(session),
+    queryFn: async () =>
+      (await apiClient.get<InvestHistory>('/api/invest/history', { params: { range: window } })).data,
+  })
+}
+
+export function useInvestOrders() {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'orders', session?.user?.id ?? 'anon'],
+    enabled: Boolean(session),
+    refetchInterval: 30000,
+    queryFn: async () => (await apiClient.get<InvestOrderRecord[]>('/api/invest/orders')).data,
+  })
+}
+
+export function useInvest() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (request: InvestRequest) =>
+      (await apiClient.post<InvestSummary>('/api/invest/orders', request)).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useLiquidate() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async () => (await apiClient.delete<{ closed: number }>('/api/invest/positions')).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useCancelOrders() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async () => (await apiClient.delete<{ canceled: number }>('/api/invest/orders')).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useCancelOrder() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (orderId: string) =>
+      (await apiClient.delete<{ canceled: boolean }>(`/api/invest/orders/${orderId}`)).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
   })
 }

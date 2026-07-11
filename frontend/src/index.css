@@ -5342,3 +5342,341 @@ body {
   opacity: 1;
 }
 
+
+/* ---- Platform mode switch and Invest simulator ---- */
+.platform-mode {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  border-radius: 9px;
+  padding: 8px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mode-btn:hover {
+  color: var(--accent-hover);
+}
+
+.mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.invest-platform {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.invest-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.invest-hero h2 {
+  margin: 0 0 4px;
+}
+
+.invest-pill {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.invest-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.invest-stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.invest-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+.invest-stat strong {
+  font-size: 24px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.gain {
+  color: var(--series-2);
+}
+
+.loss {
+  color: var(--danger);
+}
+
+.invest-chart h3,
+.invest-buy h3,
+.invest-positions h3,
+.invest-orders h3 {
+  margin: 0 0 14px;
+}
+
+.invest-buy-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.invest-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.invest-field select,
+.invest-field input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.invest-fee {
+  font-size: 13px;
+  color: var(--muted);
+  flex: 1 1 200px;
+}
+
+.invest-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.invest-panel-head h3 {
+  margin: 0;
+}
+
+.invest-table-wrap {
+  overflow-x: auto;
+}
+
+.invest-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.invest-table th,
+.invest-table td {
+  text-align: right;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.invest-table th:first-child,
+.invest-table td:first-child {
+  text-align: left;
+}
+
+.invest-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.invest-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.invest-status-filled {
+  color: var(--series-2);
+  border-color: var(--series-2);
+}
+
+.invest-status-rejected,
+.invest-status-canceled,
+.invest-status-expired {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+@media (max-width: 720px) {
+  .invest-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.invest-cancel {
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.invest-cancel:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+
+.invest-cancel:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.invest-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+
+/* ---- Portfolio value chart ---- */
+.chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.chart-value {
+  font-size: 30px;
+  font-weight: 700;
+  font-family: var(--mono);
+  margin: 2px 0;
+}
+
+.chart-change {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chart-ranges {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.range-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.range-btn:hover {
+  color: var(--accent-hover);
+}
+
+.range-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.chart-empty {
+  padding: 40px 0;
+  text-align: center;
+}
+
+.chart-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.chart-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-stats strong {
+  font-size: 16px;
+  font-family: var(--mono);
+}
+
+.chart-tip {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.chart-tip-date {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.chart-tip-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+@media (max-width: 720px) {
+  .chart-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
