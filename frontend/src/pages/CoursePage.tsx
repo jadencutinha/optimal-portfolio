@@ -152,6 +152,7 @@ export function CoursePage({
   return (
     <div className="course-landing">
       <PlatformHeader onSwitch={onSwitch} />
+      <div className="course-landing-inner">
       <div className="course-landing-head">
         <div>
           <h1 className="course-landing-title">PortfoliU Learn</h1>
@@ -217,9 +218,6 @@ export function CoursePage({
                 }}
               >
                 <span className="track-card-drift" aria-hidden="true" />
-                <span className="track-card-corner track-card-corner--tl" aria-hidden="true" />
-                <span className="track-card-corner track-card-corner--br" aria-hidden="true" />
-                <span className="track-card-sheen" aria-hidden="true" />
                 <span className="track-card-particles" aria-hidden="true">
                   <i /><i /><i /><i /><i />
                 </span>
@@ -299,6 +297,7 @@ export function CoursePage({
       </div>
 
       <div className="course-callout">Complete all three tracks to unlock a Pro discount</div>
+      </div>
     </div>
   )
 }

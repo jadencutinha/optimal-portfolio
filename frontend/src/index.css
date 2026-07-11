@@ -3193,9 +3193,12 @@ table.weights td {
 /* ─── Course landing ─────────────────────────────────────────── */
 
 .course-landing {
+  padding: 12px 0 40px;
+}
+
+.course-landing-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 12px 0 40px;
 }
 
 .certificate-page {
@@ -3248,62 +3251,26 @@ table.weights td {
 .track-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 32px;
   margin-bottom: 48px;
 }
 
 /* Deliberately dark regardless of the light/dark toggle — same instrument-panel
    identity as the HUD bar and the constellation view they lead into. */
-@property --track-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-/* Holographic panel: glass body + a rotating gradient border ring behind it. */
+/* Blended into the page — no panel background/border, just the planet,
+   ambient dust, and rising particles floating directly on the page. */
 .track-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 31, 42, 0.55);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 214, 107, 0.18);
-  border-radius: 14px;
-  padding: 22px 22px 24px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  padding: 10px 12px 24px;
   overflow: hidden;
   transform-style: preserve-3d;
-  transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+  transition: transform 0.15s ease-out;
   isolation: isolate;
 }
 
-.track-card::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  z-index: -1;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: conic-gradient(from var(--track-angle), #3987e5, #ffd66b, #6fe0b0, #3987e5);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: trackBorderSpin 6s linear infinite;
-  opacity: 0.55;
-  transition: opacity 0.25s ease;
-}
-.track-card:hover::before {
-  opacity: 1;
-}
-@keyframes trackBorderSpin {
-  to { --track-angle: 360deg; }
-}
-.track-card:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 214, 107, 0.12);
-}
-
-/* Faint drifting star dots behind the glass. */
+/* Faint drifting star dots around the planet. */
 .track-card-drift {
   position: absolute;
   inset: 0;
@@ -3320,31 +3287,6 @@ table.weights td {
 @keyframes trackDrift {
   from { background-position: 0 0, 0 0, 0 0, 0 0; }
   to { background-position: -140px -140px, -140px -140px, -140px -140px, -140px -140px; }
-}
-
-/* Glowing corner blooms. */
-.track-card-corner {
-  position: absolute;
-  z-index: 0;
-  width: 90px;
-  height: 90px;
-  pointer-events: none;
-  border-radius: 50%;
-  filter: blur(18px);
-  opacity: 0.35;
-  transition: opacity 0.25s ease;
-}
-.track-card-corner--tl { top: -30px; left: -30px; background: radial-gradient(circle, #3987e5, transparent 70%); }
-.track-card-corner--br { bottom: -30px; right: -30px; background: radial-gradient(circle, #ffd66b, transparent 70%); }
-.track-card:hover .track-card-corner { opacity: 0.6; }
-
-/* Soft glass reflection sheen. */
-.track-card-sheen {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, transparent 30%, transparent 100%);
 }
 
 /* Particles that rise on hover. */
@@ -3382,7 +3324,6 @@ table.weights td {
 
 @media (prefers-reduced-motion: reduce) {
   .track-card { transition: none; }
-  .track-card::before { animation: none; }
   .track-card-drift { animation: none; }
   .track-card-particles i { animation: none; }
 }
@@ -5291,24 +5232,6 @@ body {
   margin: 0 0 20px;
 }
 
-.course-search-input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  padding: 10px 12px;
-  font-size: 14px;
-  outline: none;
-}
-
-.course-search-input:focus {
-  border-color: var(--accent);
-}
-
-.course-search-empty {
-  margin: 0 0 20px;
-}
 
 .sidebar-module-status {
   font-size: 10px;
