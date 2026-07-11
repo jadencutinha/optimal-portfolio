@@ -14,11 +14,16 @@ import type {
   ExplainResponse,
   FrontierParams,
   InvestAccount,
+  InvestBenchmark,
   InvestHistory,
   InvestOrderRecord,
+  InvestOrderResult,
   InvestPosition,
+  InvestRebalancePlan,
+  InvestRebalanceSummary,
   InvestRequest,
   InvestSummary,
+  InvestTradeRequest,
   FrontierResponse,
   MeResponse,
   OptimizeRequest,
@@ -300,6 +305,61 @@ export function useCancelOrder() {
   return useMutation({
     mutationFn: async (orderId: string) =>
       (await apiClient.delete<{ canceled: boolean }>(`/api/invest/orders/${orderId}`)).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useInvestBenchmark(window: string) {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'benchmark', session?.user?.id ?? 'anon', window],
+    enabled: Boolean(session),
+    queryFn: async () =>
+      (await apiClient.get<InvestBenchmark>('/api/invest/benchmark', { params: { range: window } })).data,
+  })
+}
+
+export function useRebalancePlan(portfolioId: number | null) {
+  const { session } = useAuth()
+  return useQuery({
+    queryKey: ['invest', 'rebalance', session?.user?.id ?? 'anon', portfolioId],
+    enabled: Boolean(session) && portfolioId !== null,
+    queryFn: async () =>
+      (
+        await apiClient.get<InvestRebalancePlan>('/api/invest/rebalance', {
+          params: { portfolio_id: portfolioId },
+        })
+      ).data,
+  })
+}
+
+export function useRebalance() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (portfolioId: number) =>
+      (await apiClient.post<InvestRebalanceSummary>('/api/invest/rebalance', { portfolio_id: portfolioId })).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useTrade() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (request: InvestTradeRequest) =>
+      (await apiClient.post<InvestOrderResult>('/api/invest/trade', request)).data,
+    onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useClosePosition() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ symbol, percentage }: { symbol: string; percentage?: number }) =>
+      (
+        await apiClient.delete<InvestOrderResult>(`/api/invest/positions/${symbol}`, {
+          params: percentage ? { percentage } : undefined,
+        })
+      ).data,
     onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
   })
 }

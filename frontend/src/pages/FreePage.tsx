@@ -1,23 +1,43 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { FeatureHub, type HubFeature } from '../components/FeatureHub'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
-import { Tour } from '../components/Tour'
-import { FREE_TOUR } from '../lib/tours'
+import { useSurface } from '../lib/useSurface'
 import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
 import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
-const TOUR_KEY = 'tour_free_seen'
 
-type Tab = 'optimizer' | 'planner' | 'sidebyside' | 'saved'
+type Feature = 'optimizer' | 'planner' | 'sidebyside' | 'saved'
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'optimizer', label: 'Optimizer' },
-  { id: 'planner', label: 'Planner' },
-  { id: 'sidebyside', label: 'Side by Side' },
-  { id: 'saved', label: 'My Portfolios' },
+const FREE_FEATURES: HubFeature[] = [
+  {
+    id: 'optimizer',
+    name: 'Optimizer',
+    kicker: 'Build',
+    description:
+      'Construct an optimized portfolio from up to 8 tickers with Max-Sharpe or Min-Variance, and see the efficient frontier.',
+  },
+  {
+    id: 'planner',
+    name: 'Goal Planner',
+    kicker: 'Project',
+    description: 'Project your wealth with Monte Carlo simulations and see your odds of hitting a savings goal.',
+  },
+  {
+    id: 'sidebyside',
+    name: 'Side by Side',
+    kicker: 'Compare',
+    description: 'Optimize a few portfolios at once and compare their risk, return, and holdings.',
+  },
+  {
+    id: 'saved',
+    name: 'My Portfolios',
+    kicker: 'Library',
+    description: 'Save up to 3 portfolios, reopen them, and export a PDF report.',
+  },
 ]
 
 interface Props {
@@ -28,21 +48,11 @@ interface Props {
 
 export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
-  const [tab, setTab] = useState<Tab>('optimizer')
+  const [feature, setFeature] = useState<Feature>('optimizer')
   const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
-  const [tour, setTour] = useState(false)
+  const [showHub, setShowHub] = useState(true)
 
-  useEffect(() => {
-    if (!localStorage.getItem(TOUR_KEY)) {
-      const timer = window.setTimeout(() => setTour(true), 600)
-      return () => window.clearTimeout(timer)
-    }
-  }, [])
-
-  const closeTour = () => {
-    setTour(false)
-    localStorage.setItem(TOUR_KEY, '1')
-  }
+  useSurface('platform')
 
   return (
     <div className="free-platform">
@@ -55,11 +65,11 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
           </p>
         </div>
         <div className="free-header-actions">
-          <button type="button" className="primary upgrade-btn" data-tour="upgrade" onClick={onUpgrade}>
+          <button type="button" className="primary upgrade-btn" onClick={onUpgrade}>
             Upgrade to Pro
           </button>
-          <button type="button" className="tour-launch" onClick={() => setTour(true)}>
-            Take a tour
+          <button type="button" className="tour-launch" onClick={onOpenRiskQ}>
+            {savedProfile ? `Risk profile · ${savedProfile}` : 'Take risk assessment'}
           </button>
         </div>
       </div>
@@ -83,66 +93,29 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
 
       {mode === 'invest' ? (
         <InvestPlatform />
+      ) : showHub ? (
+        <FeatureHub
+          title="Your free toolkit"
+          subtitle="Use the arrows to browse your tools. Hover a card to see what it does, then open it."
+          features={FREE_FEATURES}
+          onSelect={(id) => {
+            setFeature(id as Feature)
+            setShowHub(false)
+          }}
+        />
       ) : (
         <>
-      <div className="tabs">
-        {TABS.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            data-tour={option.id}
-            className={tab === option.id ? 'tab active' : 'tab'}
-            onClick={() => setTab(option.id)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === 'optimizer' && <OptimizerPage />}
-      {tab === 'planner' && <PlannerPage />}
-      {tab === 'sidebyside' && <SideBySidePage />}
-      {tab === 'saved' && <SavedPortfolios />}
-
-      <div className="landing-grid free-extras">
-        <section>
-          <h3>Your plan includes</h3>
-          <ul>
-            <li>Up to 8 tickers, Max-Sharpe &amp; Min-Variance</li>
-            <li>Efficient frontier &amp; the “Why this portfolio?” explainer</li>
-            <li>Monte Carlo goal planner</li>
-            <li>Save up to 3 portfolios with PDF export</li>
-          </ul>
-        </section>
-        <section>
-          <h3>Upgrade to Pro to unlock</h3>
-          <ul>
-            <li>AI natural-language assistant</li>
-            <li>Backtesting &amp; historical stress tests</li>
-            <li>Shrinkage/EWMA/factor models, advanced objectives &amp; unlimited saves</li>
-          </ul>
-        </section>
-      </div>
-
-      <div className="risk-profile-bar">
-        {savedProfile ? (
-          <div className="risk-profile-saved">
-            <span className="muted">Your risk profile:</span>
-            <span className="risk-profile-badge">{savedProfile}</span>
-            <button type="button" className="retake-btn" onClick={onOpenRiskQ}>
-              Retake assessment
+          <div className="workspace-tools">
+            <button type="button" className="tour-launch" onClick={() => setShowHub(true)}>
+              ← All features
             </button>
           </div>
-        ) : (
-          <button type="button" className="primary risk-q-btn" onClick={onOpenRiskQ}>
-            Take risk assessment
-          </button>
-        )}
-      </div>
+          {feature === 'optimizer' && <OptimizerPage />}
+          {feature === 'planner' && <PlannerPage />}
+          {feature === 'sidebyside' && <SideBySidePage />}
+          {feature === 'saved' && <SavedPortfolios />}
         </>
       )}
-
-      {tour && <Tour steps={FREE_TOUR} onClose={closeTour} />}
     </div>
   )
 }

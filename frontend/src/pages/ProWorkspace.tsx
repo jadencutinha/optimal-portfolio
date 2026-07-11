@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
+import { FeatureHub, type HubFeature } from '../components/FeatureHub'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
-import { Tour } from '../components/Tour'
-import { PRO_TOUR } from '../lib/tours'
+import { useSurface } from '../lib/useSurface'
 import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
 import { InvestPlatform } from './InvestPlatform'
@@ -12,9 +12,7 @@ import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
 import { StressPage } from './StressPage'
 
-const TOUR_KEY = 'tour_pro_seen'
-
-type Tab =
+type Feature =
   | 'optimizer'
   | 'assistant'
   | 'planner'
@@ -24,33 +22,65 @@ type Tab =
   | 'behavioral'
   | 'saved'
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'optimizer', label: 'Optimizer' },
-  { id: 'assistant', label: 'Assistant' },
-  { id: 'planner', label: 'Planner' },
-  { id: 'sidebyside', label: 'Side by Side' },
-  { id: 'backtest', label: 'Backtest' },
-  { id: 'stress', label: 'Stress Test' },
-  { id: 'behavioral', label: 'Behavioral' },
-  { id: 'saved', label: 'My Portfolios' },
+const PRO_FEATURES: HubFeature[] = [
+  {
+    id: 'optimizer',
+    name: 'Optimizer',
+    kicker: 'Build',
+    description:
+      'Construct a mathematically optimal portfolio from your tickers, with objectives, constraints, and the efficient frontier.',
+  },
+  {
+    id: 'assistant',
+    name: 'AI Assistant',
+    kicker: 'Ask',
+    description:
+      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
+  },
+  {
+    id: 'planner',
+    name: 'Goal Planner',
+    kicker: 'Project',
+    description: 'Run thousands of Monte Carlo simulations to see your odds of reaching a savings goal.',
+  },
+  {
+    id: 'sidebyside',
+    name: 'Side by Side',
+    kicker: 'Compare',
+    description: 'Optimize several portfolios at once and compare their risk, return, and holdings side by side.',
+  },
+  {
+    id: 'backtest',
+    name: 'Backtest',
+    kicker: 'Replay',
+    description: 'Walk your strategy through history against the index, equal weight, and a 60/40 benchmark.',
+  },
+  {
+    id: 'stress',
+    name: 'Stress Test',
+    kicker: 'Shock',
+    description: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock.',
+  },
+  {
+    id: 'behavioral',
+    name: 'Behavioral Coach',
+    kicker: 'Reflect',
+    description: 'Spot the behavior gap and the biases quietly costing you returns.',
+  },
+  {
+    id: 'saved',
+    name: 'My Portfolios',
+    kicker: 'Library',
+    description: 'Reopen your saved portfolios and export detailed PDF reports.',
+  },
 ]
 
 export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
-  const [tab, setTab] = useState<Tab>('optimizer')
+  const [feature, setFeature] = useState<Feature>('optimizer')
   const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
-  const [tour, setTour] = useState(false)
+  const [showHub, setShowHub] = useState(true)
 
-  useEffect(() => {
-    if (!localStorage.getItem(TOUR_KEY)) {
-      const timer = window.setTimeout(() => setTour(true), 600)
-      return () => window.clearTimeout(timer)
-    }
-  }, [])
-
-  const closeTour = () => {
-    setTour(false)
-    localStorage.setItem(TOUR_KEY, '1')
-  }
+  useSurface('platform')
 
   return (
     <div className="pro-workspace">
@@ -73,37 +103,33 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
       </div>
       {mode === 'invest' ? (
         <InvestPlatform />
+      ) : showHub ? (
+        <FeatureHub
+          title="Your Pro toolkit"
+          subtitle="Use the arrows to browse your tools. Hover a card to see what it does, then open it."
+          features={PRO_FEATURES}
+          onSelect={(id) => {
+            setFeature(id as Feature)
+            setShowHub(false)
+          }}
+        />
       ) : (
         <>
           <div className="workspace-tools">
-            <button type="button" className="tour-launch" onClick={() => setTour(true)}>
-              Take a tour
+            <button type="button" className="tour-launch" onClick={() => setShowHub(true)}>
+              ← All features
             </button>
           </div>
-          <div className="tabs">
-            {TABS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                data-tour={option.id}
-                className={tab === option.id ? 'tab active' : 'tab'}
-                onClick={() => setTab(option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-          {tab === 'optimizer' && <OptimizerPage />}
-          {tab === 'assistant' && <AssistantPage />}
-          {tab === 'planner' && <PlannerPage />}
-          {tab === 'sidebyside' && <SideBySidePage />}
-          {tab === 'backtest' && <BacktestPage />}
-          {tab === 'stress' && <StressPage />}
-          {tab === 'behavioral' && <BehavioralCoach />}
-          {tab === 'saved' && <SavedPortfolios />}
+          {feature === 'optimizer' && <OptimizerPage />}
+          {feature === 'assistant' && <AssistantPage />}
+          {feature === 'planner' && <PlannerPage />}
+          {feature === 'sidebyside' && <SideBySidePage />}
+          {feature === 'backtest' && <BacktestPage />}
+          {feature === 'stress' && <StressPage />}
+          {feature === 'behavioral' && <BehavioralCoach />}
+          {feature === 'saved' && <SavedPortfolios />}
         </>
       )}
-      {tour && <Tour steps={PRO_TOUR} onClose={closeTour} />}
     </div>
   )
 }

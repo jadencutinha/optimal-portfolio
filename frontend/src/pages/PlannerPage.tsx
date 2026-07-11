@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePlan } from '../api/queries'
 import type { PlanResponse } from '../api/types'
+import { Loader } from '../components/Loader'
 import { NumberInput } from '../components/NumberInput'
 import { ProjectionFan } from '../components/ProjectionFan'
 import { money, percent } from '../lib/format'
@@ -143,7 +144,7 @@ export function PlannerPage() {
           {!result && !plan.isPending && (
             <p className="muted">Set your plan and run the simulation to see the fan of outcomes.</p>
           )}
-          {plan.isPending && <p className="muted">Running 3,000 market simulations…</p>}
+          {plan.isPending && <Loader fullscreen={false} label="Running 3,000 market simulations…" />}
           {result && <PlannerOutput result={result} />}
         </section>
       </div>

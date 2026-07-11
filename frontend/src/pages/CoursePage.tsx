@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Certificate } from '../components/Certificate'
+import { CourseSearch } from '../components/CourseSearch'
 import { CheckIcon, FlameIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
@@ -30,7 +31,6 @@ export function CoursePage({
 }) {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [moduleIndex, setModuleIndex] = useState(0)
-  const [search, setSearch] = useState('')
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
   const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
   const [mastery, setMastery] = useState<MasteryMap>(loadMastery)
@@ -93,16 +93,6 @@ export function CoursePage({
 
   const completedTracks = TRACKS.filter((track) => track.modules.length > 0 && trackPct(track) === 100).length
 
-  const query = search.trim().toLowerCase()
-  const visibleTracks = query
-    ? TRACKS.filter(
-        (track) =>
-          track.title.toLowerCase().includes(query) ||
-          track.description.toLowerCase().includes(query) ||
-          track.modules.some((m) => m.title.toLowerCase().includes(query)),
-      )
-    : TRACKS
-
   return (
     <div className="course-landing">
       <PlatformHeader onSwitch={onSwitch} />
@@ -137,21 +127,19 @@ export function CoursePage({
         </div>
       </div>
 
-      <div className="course-search">
-        <input
-          type="search"
-          className="course-search-input"
-          placeholder="Search courses…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      </div>
+      <CourseSearch
+        tracks={TRACKS}
+        onOpen={(trackId, mi) => {
+          const track = TRACKS.find((t) => t.id === trackId)
+          if (track) {
+            setSelectedTrack(track)
+            setModuleIndex(mi)
+          }
+        }}
+      />
 
-      {visibleTracks.length === 0 ? (
-        <p className="course-search-empty muted">No courses match “{search}”.</p>
-      ) : (
-        <div className="track-grid">
-          {visibleTracks.map((track) => {
+      <div className="track-grid">
+        {TRACKS.map((track) => {
             const available = track.modules.length > 0
             const pct = trackPct(track)
             const statusLabel = pct === 0 ? 'Not started' : pct === 100 ? 'Completed' : 'In progress'
@@ -206,7 +194,6 @@ export function CoursePage({
             )
           })}
         </div>
-      )}
 
       <div className="certificates-section">
         <h2 className="certificates-title">Your Certificates</h2>

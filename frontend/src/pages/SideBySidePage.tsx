@@ -3,7 +3,7 @@ import { useComparePortfolios, useMe, useUniverse, type ComparisonSlot } from '.
 import type { Objective, OptimizeRequest, RiskModel } from '../api/types'
 import { CompareResults } from '../components/CompareResults'
 import { EmptyState } from '../components/EmptyState'
-import { SkeletonCards } from '../components/Skeleton'
+import { Loader } from '../components/Loader'
 import { TickerInput } from '../components/TickerInput'
 import { ADVANCED_OBJECTIVES, ADVANCED_RISK, LOOKBACKS, OBJECTIVES, RISK_MODELS } from '../lib/objectives'
 import { SERIES_COLORS } from '../lib/series'
@@ -211,7 +211,7 @@ export function SideBySidePage() {
 
       <section className="panel compare-output">
         <h2>Comparison</h2>
-        {compare.isPending && <SkeletonCards count={3} />}
+        {compare.isPending && <Loader fullscreen={false} label="Optimizing every portfolio…" />}
         {!compare.data && !compare.isPending && (
           <EmptyState
             icon="⚖"
