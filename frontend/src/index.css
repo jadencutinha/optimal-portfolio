@@ -35,12 +35,16 @@ textarea {
 }
 
 .app {
+  position: relative;
+  z-index: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .app-header {
+  position: relative;
+  z-index: 10;
   padding: 24px 32px;
   border-bottom: 1px solid var(--border);
   background: #daf1f8;
@@ -3260,15 +3264,147 @@ table.weights td {
   margin-bottom: 48px;
 }
 
+/* Deliberately dark regardless of the light/dark toggle — same instrument-panel
+   identity as the HUD bar and the constellation view they lead into. */
+@property --track-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Holographic panel: glass body + a rotating gradient border ring behind it. */
 .track-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
+  background: rgba(16, 31, 42, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 214, 107, 0.18);
   border-radius: 14px;
   padding: 22px 22px 24px;
-  box-shadow: 0 6px 18px rgba(15, 33, 30, 0.06);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+  isolation: isolate;
+}
+
+.track-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--track-angle), #3987e5, #ffd66b, #6fe0b0, #3987e5);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: trackBorderSpin 6s linear infinite;
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+}
+.track-card:hover::before {
+  opacity: 1;
+}
+@keyframes trackBorderSpin {
+  to { --track-angle: 360deg; }
+}
+.track-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 214, 107, 0.12);
+}
+
+/* Faint drifting star dots behind the glass. */
+.track-card-drift {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255, 255, 255, 0.5), transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 60%, rgba(255, 214, 107, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 45% 80%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 85% 20%, rgba(255, 255, 255, 0.4), transparent 60%);
+  background-size: 140px 140px;
+  animation: trackDrift 14s linear infinite;
+}
+@keyframes trackDrift {
+  from { background-position: 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: -140px -140px, -140px -140px, -140px -140px, -140px -140px; }
+}
+
+/* Glowing corner blooms. */
+.track-card-corner {
+  position: absolute;
+  z-index: 0;
+  width: 90px;
+  height: 90px;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(18px);
+  opacity: 0.35;
+  transition: opacity 0.25s ease;
+}
+.track-card-corner--tl { top: -30px; left: -30px; background: radial-gradient(circle, #3987e5, transparent 70%); }
+.track-card-corner--br { bottom: -30px; right: -30px; background: radial-gradient(circle, #ffd66b, transparent 70%); }
+.track-card:hover .track-card-corner { opacity: 0.6; }
+
+/* Soft glass reflection sheen. */
+.track-card-sheen {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, transparent 30%, transparent 100%);
+}
+
+/* Particles that rise on hover. */
+.track-card-particles {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.track-card-particles i {
+  position: absolute;
+  bottom: 6%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffd66b;
+  opacity: 0;
+  animation: trackParticleRise 3.2s ease-in infinite;
+  animation-play-state: paused;
+}
+.track-card:hover .track-card-particles i {
+  animation-play-state: running;
+}
+.track-card-particles i:nth-child(1) { left: 12%; animation-delay: 0s; }
+.track-card-particles i:nth-child(2) { left: 30%; animation-delay: 0.5s; background: #eaf2f0; }
+.track-card-particles i:nth-child(3) { left: 52%; animation-delay: 1s; }
+.track-card-particles i:nth-child(4) { left: 70%; animation-delay: 1.6s; background: #6fe0b0; }
+.track-card-particles i:nth-child(5) { left: 88%; animation-delay: 2.1s; }
+@keyframes trackParticleRise {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translateY(-160px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-card { transition: none; }
+  .track-card::before { animation: none; }
+  .track-card-drift { animation: none; }
+  .track-card-particles i { animation: none; }
+}
+
+.track-card-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .track-card-top {
@@ -3278,14 +3414,16 @@ table.weights td {
 }
 
 .track-card-num {
-  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
   border-radius: 999px;
   padding: 4px 11px;
-  background: rgba(224, 151, 67, 0.15);
-  color: var(--accent);
+  background: rgba(255, 214, 107, 0.12);
+  border: 1px solid rgba(255, 214, 107, 0.35);
+  color: #ffd66b;
 }
 
 .track-card-title {
@@ -3293,112 +3431,75 @@ table.weights td {
   font-size: 19px;
   font-weight: 700;
   line-height: 1.3;
+  color: #eaf2f0;
 }
 
 .track-card-desc {
   margin: 0 0 14px;
   font-size: 14px;
-  color: var(--muted);
+  color: #7f9490;
   line-height: 1.5;
 }
 
 .difficulty-badge {
   display: inline-block;
   align-self: flex-start;
-  font-size: 11px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   border-radius: 999px;
   padding: 4px 11px;
   margin-bottom: 14px;
 }
 
 .difficulty-badge.difficulty-beginner {
-  background: rgba(46, 125, 50, 0.14);
-  color: #2e7d32;
+  background: rgba(63, 209, 148, 0.14);
+  color: #6fe0b0;
 }
 
 .difficulty-badge.difficulty-intermediate {
-  background: rgba(212, 160, 23, 0.18);
-  color: #8a6d00;
+  background: rgba(255, 214, 107, 0.14);
+  color: #ffd66b;
 }
 
 .difficulty-badge.difficulty-advanced {
-  background: rgba(192, 57, 43, 0.14);
-  color: var(--danger);
+  background: rgba(232, 112, 95, 0.14);
+  color: #e8705f;
 }
 
 .track-card-meta {
   margin: 0 0 14px;
-  font-size: 13px;
-  font-variant: small-caps;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11.5px;
   font-weight: 600;
-  color: var(--muted);
-  letter-spacing: 0.3px;
-}
-
-.track-card-progress {
-  margin-bottom: 16px;
-}
-
-.track-card-progress-track {
-  width: 100%;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 6px;
-}
-
-.track-card-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 999px;
-}
-
-.track-card-progress-label {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.track-card-module-preview {
-  margin: 0 0 18px;
-  padding-left: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex: 1;
-}
-
-.track-card-module-preview li {
-  font-size: 12.5px;
-  color: var(--text);
-  line-height: 1.4;
+  color: #7f9490;
+  letter-spacing: 0.03em;
 }
 
 .track-card-btn {
   margin-top: auto;
   width: 100%;
-  background: var(--accent);
+  background: #ffd66b;
   border: none;
-  color: #fff;
+  color: #241a04;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   border-radius: 10px;
   padding: 10px 22px;
   cursor: pointer;
 }
 
 .track-card-btn:hover:not(:disabled) {
-  filter: brightness(0.92);
+  filter: brightness(0.94);
 }
 
 .track-card-btn.disabled,
 .track-card-btn:disabled {
-  background: var(--muted);
-  opacity: 0.5;
+  background: #1c2e33;
+  color: #7f9490;
+  opacity: 0.7;
   cursor: default;
 }
 
@@ -7803,5 +7904,452 @@ body[data-surface='space'] .app-header {
 @media (max-width: 640px) {
   .mstrip__head {
     margin-bottom: 8px;
+  }
+}
+
+/* ---------- Constellation learning path: a scrollable vertical galaxy ---------- */
+.constellation {
+  position: relative;
+  height: min(620px, 72vh);
+  border-radius: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+  /* Fixed backdrop (doesn't scroll with content) — nebula + dust + a static
+     star field. The foreground stars drifting past this while you scroll is
+     what reads as depth/parallax. */
+  background:
+    radial-gradient(1px 1px at 15% 20%, rgba(255, 255, 255, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 70% 65%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1.2px 1.2px at 40% 85%, rgba(255, 214, 107, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 85% 35%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 25% 55%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(1px 1px at 55% 15%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(1px 1px at 10% 75%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(60% 40% at 20% 30%, rgba(111, 62, 200, 0.14), transparent 70%),
+    radial-gradient(55% 45% at 80% 70%, rgba(57, 135, 229, 0.12), transparent 70%),
+    radial-gradient(120% 60% at 50% 100%, #101f2a 0%, #060b10 68%, #04070a 100%);
+}
+.constellation__content {
+  position: relative;
+  width: 100%;
+  transition: transform 0.42s cubic-bezier(0.6, 0, 0.9, 0.4), filter 0.42s ease, opacity 0.42s ease;
+}
+.constellation.is-warping .constellation__content {
+  transform: scale(2.4);
+  filter: blur(6px);
+  opacity: 0;
+}
+.constellation__sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.constellation__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Connecting path ---- */
+.constellation__lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.constellation__line {
+  stroke-width: 2.5px;
+}
+.constellation__line.is-done {
+  stroke: #ffd66b;
+  filter: drop-shadow(0 0 4px rgba(255, 214, 107, 0.7));
+  animation: lineShimmer 2.6s ease-in-out infinite;
+}
+.constellation__line.is-leading {
+  stroke: #6fb3dd;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 3px rgba(111, 179, 221, 0.5));
+}
+.constellation__line.is-locked {
+  stroke: #1c2e33;
+}
+.constellation__line.is-entering {
+  stroke-dasharray: var(--line-len);
+  stroke-dashoffset: var(--line-len);
+  animation: lineDraw 0.6s ease forwards;
+}
+@keyframes lineDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes lineShimmer {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* ---- Nodes ---- */
+.constellation__hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.constellation__hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  overflow: visible;
+}
+.constellation__hotspot.is-entering {
+  animation: nodePopIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+@keyframes nodePopIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.constellation__halo {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+.constellation__hotspot.is-done .constellation__halo {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255, 214, 107, 0.28), transparent 72%);
+}
+.constellation__hotspot.is-current .constellation__halo {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(111, 179, 221, 0.4), transparent 70%);
+  animation: haloPing 1.8s ease-out infinite;
+}
+@keyframes haloPing {
+  0% { transform: scale(0.75); opacity: 0.75; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.constellation__hotspot-num {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #234952;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 11, 16, 0.75);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.constellation__hotspot-mark {
+  font-size: 16px;
+  line-height: 1;
+  color: #93a8a4;
+}
+.constellation__hotspot.is-done .constellation__hotspot-num {
+  border-color: #ffd66b;
+  box-shadow: 0 0 14px rgba(255, 214, 107, 0.6);
+}
+.constellation__hotspot.is-done .constellation__hotspot-mark {
+  color: #ffd66b;
+}
+.constellation__hotspot.is-current .constellation__hotspot-num {
+  border-color: #6fb3dd;
+  animation: nodePulse 1.8s ease-in-out infinite;
+}
+.constellation__hotspot.is-current .constellation__hotspot-mark {
+  color: #eaf2f0;
+}
+@keyframes nodePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(111, 179, 221, 0.45); }
+  50% { box-shadow: 0 0 20px rgba(111, 179, 221, 0.85); }
+}
+.constellation__hotspot.is-hovered .constellation__hotspot-num {
+  transform: scale(1.12);
+}
+
+.constellation__hotspot-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  width: 150px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: #7f9490;
+  transition: color 0.2s ease;
+}
+.constellation__hotspot-index {
+  display: block;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #4b615e;
+  margin-bottom: 2px;
+}
+.constellation__hotspot.is-done .constellation__hotspot-label,
+.constellation__hotspot.is-current .constellation__hotspot-label,
+.constellation__hotspot.is-hovered .constellation__hotspot-label {
+  color: #eaf2f0;
+}
+
+/* Warp burst at the clicked star, then the whole scene rushes toward it. */
+.constellation__warp {
+  position: absolute;
+  inset: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 214, 107, 0.4) 40%, transparent 70%);
+  animation: constellationWarpBurst 0.42s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes constellationWarpBurst {
+  0% { transform: scale(0.2); opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (max-width: 620px) {
+  .constellation { height: 68vh; }
+  .constellation__hotspot-label { width: 120px; font-size: 11.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation__content { transition: none; }
+  .constellation.is-warping .constellation__content { transform: none; filter: none; opacity: 1; }
+  .constellation__warp { animation: none; display: none; }
+  .constellation__hotspot.is-entering { animation: none; opacity: 1; transform: translate(-50%, -50%); }
+  .constellation__line.is-entering { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+  .constellation__line.is-done { animation: none; }
+  .constellation__hotspot.is-current .constellation__hotspot-num { animation: none; }
+  .constellation__hotspot.is-current .constellation__halo { animation: none; opacity: 0.5; }
+}
+
+.constellation-back {
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ---------- Mission Control HUD ----------
+   Deliberately dark regardless of light/dark theme — an instrument panel
+   reads as a fixed identity, not something that goes pale in daylight mode. */
+.hud-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #060b0d;
+  border: 1px solid #1c2e33;
+  border-radius: 12px;
+  padding: 10px 18px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.hud-bar__signal {
+  position: absolute;
+  top: 0;
+  left: -30%;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 214, 107, 0.08), transparent);
+  animation: hudSweep 5s linear infinite;
+}
+@keyframes hudSweep {
+  from { left: -30%; }
+  to { left: 100%; }
+}
+.hud-bar__group {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hud-bar__label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #6b8288;
+}
+.hud-bar__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #eaf2f0;
+  font-variant-numeric: tabular-nums;
+}
+.hud-bar__value--plan {
+  color: #ffd66b;
+  letter-spacing: 0.06em;
+}
+.hud-bar__sep {
+  position: relative;
+  z-index: 1;
+  width: 1px;
+  height: 16px;
+  background: #1c2e33;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-bar__signal { animation: none; opacity: 0.4; }
+}
+
+@media (max-width: 620px) {
+  .hud-bar { gap: 14px; flex-wrap: wrap; }
+}
+
+/* ---------- Day/night sky: dawn in light mode, deep space in dark mode ----------
+   Fixed behind everything, very low visual weight — readability of actual
+   content always wins over the backdrop. */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% -10%, #eaf3f5 0%, #f6f6f6 55%, #f0ede6 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .starfield {
+    background: radial-gradient(120% 90% at 50% -10%, #0f2630 0%, #0a1519 55%, #05090b 100%);
+  }
+}
+:root[data-theme='dark'] .starfield {
+  background: radial-gradient(120% 90% at 50% -10%, #0f2630 0%, #0a1519 55%, #05090b 100%);
+}
+
+.starfield__layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -60px;
+  height: calc(100% + 120px);
+  transform: translateY(var(--star-offset, 0px));
+  background-repeat: repeat;
+  /* Dawn default: only the faintest last stars, mostly a soft pale wash. */
+  opacity: 0.05;
+}
+.starfield__layer--far {
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 20%, #234952 40%, transparent 60%),
+    radial-gradient(1.4px 1.4px at 62% 68%, #234952 40%, transparent 60%),
+    radial-gradient(1.4px 1.4px at 82% 30%, #234952 40%, transparent 60%),
+    radial-gradient(1.4px 1.4px at 30% 82%, #234952 40%, transparent 60%);
+  background-size: 340px 340px;
+  transform: translateY(calc(var(--star-offset, 0px) * 0.4));
+}
+.starfield__layer--near {
+  background-image:
+    radial-gradient(1.8px 1.8px at 22% 14%, #ffd66b 45%, transparent 65%),
+    radial-gradient(1.6px 1.6px at 74% 42%, #ffffff 45%, transparent 65%),
+    radial-gradient(1.8px 1.8px at 46% 76%, #ffffff 45%, transparent 65%),
+    radial-gradient(1.6px 1.6px at 88% 88%, #ffd66b 45%, transparent 65%),
+    radial-gradient(1.6px 1.6px at 8% 60%, #ffffff 45%, transparent 65%);
+  background-size: 420px 420px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .starfield__layer--far { opacity: 0.5; }
+  .starfield__layer--near { opacity: 0.7; }
+}
+:root[data-theme='dark'] .starfield__layer--far { opacity: 0.5; }
+:root[data-theme='dark'] .starfield__layer--near { opacity: 0.7; }
+:root[data-theme='light'] .starfield__layer--far,
+:root[data-theme='light'] .starfield__layer--near { opacity: 0.05; }
+
+/* ---------- Track planets: each track is its own celestial body ---------- */
+.track-planet {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  margin: 4px auto 14px;
+  border-radius: 50%;
+}
+.track-planet::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  filter: blur(20px);
+  opacity: 0.4;
+  z-index: 0;
+}
+.track-planet--earth::before { background: radial-gradient(circle, #4fd1c5, transparent 70%); }
+.track-planet--moon::before { background: radial-gradient(circle, #d8d2bc, transparent 70%); }
+.track-planet--saturn::before { background: radial-gradient(circle, #e8c98a, transparent 70%); }
+
+.track-planet__orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.track-planet__orbit circle:nth-child(2) {
+  filter: drop-shadow(0 0 3px rgba(255, 214, 107, 0.7));
+  transition: stroke-dasharray 0.4s ease;
+}
+.track-planet__sky {
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+}
+.track-planet__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-planet__orbit circle { transition: none; }
+}
+
+.track-planet-btn {
+  display: block;
+  margin: 0 auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+.track-planet-btn:hover,
+.track-planet-btn:focus-visible {
+  transform: scale(1.05);
+}
+
+/* Flying into a planet when its track opens. */
+.track-card {
+  transition: transform 0.15s ease-out, box-shadow 0.25s ease, opacity 0.48s ease;
+}
+.track-card.is-zooming {
+  z-index: 5;
+  animation: trackCardZoom 0.48s ease-in forwards;
+}
+.track-card.is-zooming .track-planet {
+  animation: trackPlanetZoom 0.48s ease-in forwards;
+}
+@keyframes trackCardZoom {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+@keyframes trackPlanetZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(4.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-card.is-zooming,
+  .track-card.is-zooming .track-planet {
+    animation: none;
   }
 }

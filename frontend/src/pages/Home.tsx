@@ -3,6 +3,7 @@ import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
 import { ErrorState } from '../components/ErrorState'
 import { Loader } from '../components/Loader'
+import { MissionControlHUD } from '../components/MissionControlHUD'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
 import { CheckoutPage } from './CheckoutPage'
@@ -77,6 +78,7 @@ export function Home() {
 
   return (
     <>
+      <MissionControlHUD plan={plan} />
       {plan === 'course' && <CoursePage onSwitch={onSwitch} learnerName={me.data.email} />}
       {plan === 'free' && (
         <FreePage

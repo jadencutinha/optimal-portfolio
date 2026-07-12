@@ -195,3 +195,11 @@ export function coronaCloud(count: number, from: number, span: number, tint: THR
   }
   return toGeometry(particles)
 }
+
+// A handful of individually-positioned bright stars (not a random cloud) — for
+// constellation nodes where each point has to stay at a caller-chosen spot.
+export function constellationStars(positions: [number, number, number][], color: THREE.Color, size = 6) {
+  const particles: Particle[] = positions.map((position) => ({ position, color, size }))
+  return toGeometry(particles)
+}
+
