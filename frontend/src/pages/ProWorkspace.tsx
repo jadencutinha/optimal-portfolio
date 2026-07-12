@@ -15,6 +15,7 @@ import { StressPage } from './StressPage'
 
 type Feature =
   | 'optimizer'
+  | 'frontier'
   | 'assistant'
   | 'planner'
   | 'sidebyside'
@@ -30,6 +31,13 @@ const PRO_FEATURES: HubFeature[] = [
     kicker: 'Build',
     description:
       'Construct a mathematically optimal portfolio from your tickers, with objectives, constraints, and the efficient frontier.',
+  },
+  {
+    id: 'frontier',
+    name: 'Frontier Walk',
+    kicker: 'Explore',
+    description:
+      'Drag your portfolio along the efficient frontier and watch the holdings re-form in real time. Every point on the curve is optimal.',
   },
   {
     id: 'assistant',
@@ -123,6 +131,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
             </button>
           </div>
           {feature === 'optimizer' && <OptimizerPage />}
+          {feature === 'frontier' && <OptimizerPage autoStart />}
           {feature === 'assistant' && <AssistantPage />}
           {feature === 'planner' && <PlannerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}

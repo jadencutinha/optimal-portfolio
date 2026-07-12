@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   downloadReportPdf,
   useExplain,
@@ -17,6 +17,7 @@ import { ConstraintBuilder } from '../components/ConstraintBuilder'
 import { EmptyState } from '../components/EmptyState'
 import { Explanation } from '../components/Explanation'
 import { FrontierChart } from '../components/FrontierChart'
+import { FrontierWalk } from '../components/FrontierWalk'
 import { GrowthProjection } from '../components/GrowthProjection'
 import { ObjectiveControls } from '../components/ObjectiveControls'
 import { PortfolioDetail } from '../components/PortfolioDetail'
@@ -34,7 +35,7 @@ import { FINANCIAL_TERMS } from '../data/definitions'
 
 const DEFAULT_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'JPM', 'JNJ', 'XOM', 'KO']
 
-export function OptimizerPage() {
+export function OptimizerPage({ autoStart = false }: { autoStart?: boolean } = {}) {
   const universe = useUniverse()
   const optimize = useOptimize()
   const frontier = useFrontier()
@@ -68,6 +69,8 @@ export function OptimizerPage() {
   const [naming, setNaming] = useState(false)
   const [uploadedWeights, setUploadedWeights] = useState<Record<string, number> | null>(null)
   const [explanationOpen, setExplanationOpen] = useState(false)
+  const [frontierMode, setFrontierMode] = useState<'walk' | 'chart'>('walk')
+  const started = useRef(false)
 
   const canSubmit = tickers.length >= 2 && !optimize.isPending
 
@@ -116,6 +119,14 @@ export function OptimizerPage() {
       points: 25,
     })
   }
+
+  // Entered from the Frontier Walk card: run the default basket immediately so
+  // the curve is already alive on arrival rather than an empty form.
+  useEffect(() => {
+    if (!autoStart || started.current || !canSubmit) return
+    started.current = true
+    submit()
+  })
 
   const result = optimize.data
   const frontierData = frontier.data
@@ -362,12 +373,42 @@ export function OptimizerPage() {
                 <Tooltip text={FINANCIAL_TERMS["Efficient Frontier"]?.definition}>
                   <h3>Efficient Frontier</h3>
                 </Tooltip>
-                <FrontierChart
-                  frontier={frontierData}
-                  portfolio={result.metrics}
-                  selectedIndex={selectedFrontierIndex}
-                  onSelect={setSelectedFrontierIndex}
-                />
+
+                <div className="frontier-modes" role="tablist" aria-label="Frontier view">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={frontierMode === 'walk'}
+                    className={frontierMode === 'walk' ? 'frontier-mode is-on' : 'frontier-mode'}
+                    onClick={() => setFrontierMode('walk')}
+                  >
+                    Walk
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={frontierMode === 'chart'}
+                    className={frontierMode === 'chart' ? 'frontier-mode is-on' : 'frontier-mode'}
+                    onClick={() => setFrontierMode('chart')}
+                  >
+                    Chart
+                  </button>
+                </div>
+
+                {frontierMode === 'walk' ? (
+                  <FrontierWalk
+                    frontier={frontierData}
+                    portfolio={result.metrics}
+                    onAdopt={setSelectedFrontierIndex}
+                  />
+                ) : (
+                  <FrontierChart
+                    frontier={frontierData}
+                    portfolio={result.metrics}
+                    selectedIndex={selectedFrontierIndex}
+                    onSelect={setSelectedFrontierIndex}
+                  />
+                )}
                 {selectedPoint ? (
                   <PortfolioDetail
                     title="Selected frontier portfolio"

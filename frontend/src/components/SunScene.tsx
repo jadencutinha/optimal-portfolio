@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { coronaCloud, makeMaterial, star } from './celestial/particles'
 
@@ -7,6 +7,7 @@ const WORLD_HEIGHT = 3.2
 
 export function SunScene() {
   const mountRef = useRef<HTMLDivElement>(null)
+  const [fallback, setFallback] = useState(false)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -18,6 +19,7 @@ export function SunScene() {
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' })
     } catch {
+      setFallback(true)
       return
     }
     renderer.setClearColor(0x000000, 0)
@@ -105,5 +107,5 @@ export function SunScene() {
     }
   }, [])
 
-  return <div className="sunscene" ref={mountRef} aria-hidden="true" />
+  return <div className={fallback ? 'sunscene is-fallback' : 'sunscene'} ref={mountRef} aria-hidden="true" />
 }

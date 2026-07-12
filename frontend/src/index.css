@@ -8353,3 +8353,355 @@ body[data-surface='space'] .app-header {
     animation: none;
   }
 }
+
+/* ---------- Locked (Pro-only) feature cards ---------- */
+.fhub__card.is-locked .fhub__glass {
+  background: linear-gradient(158deg, rgba(30, 36, 46, 0.5), rgba(18, 22, 28, 0.62));
+  border-color: rgba(200, 214, 236, 0.12);
+}
+.fhub__card.is-locked .fhub__name,
+.fhub__card.is-locked .fhub__kicker {
+  color: rgba(226, 235, 250, 0.55);
+}
+.fhub__card.is-locked .fhub__desc {
+  color: rgba(200, 214, 236, 0.42);
+}
+.fhub__card.is-locked .fhub__cta {
+  color: var(--accent);
+}
+.fhub__card.is-locked:hover .fhub__glass {
+  background: linear-gradient(158deg, rgba(224, 151, 67, 0.22), rgba(60, 42, 22, 0.55));
+  border-color: rgba(224, 151, 67, 0.6);
+}
+.fhub__card.is-locked:hover .fhub__name {
+  color: #fff;
+}
+.fhub__lock {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(224, 151, 67, 0.45);
+  background: rgba(224, 151, 67, 0.16);
+  color: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.fhub__lock svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ---------- Empty states: a small patch of sky ---------- */
+.empty-state {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(140, 170, 230, 0.14);
+  background: linear-gradient(168deg, rgba(18, 26, 54, 0.5), rgba(8, 12, 30, 0.62));
+  padding: 44px 28px;
+  max-width: 520px;
+}
+/* Hand-placed stars, so they read as a sky rather than a texture. */
+.empty-state__sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 22%, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1.4px 1.4px at 82% 16%, rgba(190, 220, 255, 0.7), transparent),
+    radial-gradient(1.2px 1.2px at 68% 74%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1.8px 1.8px at 28% 82%, rgba(180, 210, 255, 0.65), transparent),
+    radial-gradient(1.2px 1.2px at 46% 38%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.4px 1.4px at 92% 58%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.2px 1.2px at 6% 62%, rgba(200, 225, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 58% 8%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(520px 320px at 50% 40%, rgba(77, 155, 255, 0.12), transparent 70%);
+  animation: empty-drift 9s ease-in-out infinite alternate;
+}
+@keyframes empty-drift {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.empty-state__orb {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, rgba(126, 186, 255, 0.5), rgba(30, 60, 130, 0.32) 58%, transparent 72%);
+  box-shadow:
+    inset 0 0 22px rgba(120, 180, 255, 0.28),
+    0 0 44px -8px rgba(77, 155, 255, 0.55);
+  animation: empty-breathe 5s ease-in-out infinite;
+}
+@keyframes empty-breathe {
+  50% {
+    box-shadow:
+      inset 0 0 26px rgba(120, 180, 255, 0.4),
+      0 0 58px -6px rgba(77, 155, 255, 0.75);
+  }
+}
+.empty-state .state-icon {
+  font-size: 28px;
+  opacity: 0.95;
+  color: #dbeaff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .empty-state__sky,
+  .empty-state__orb {
+    animation: none;
+  }
+}
+
+/* ---------- No-WebGL fallbacks: a CSS orb instead of an empty hole ---------- */
+.cosmos__sky.is-fallback,
+.sunscene.is-fallback,
+.globe.is-fallback {
+  display: grid;
+  place-items: center;
+}
+.cosmos__sky.is-fallback::after,
+.sunscene.is-fallback::after,
+.globe.is-fallback::after {
+  content: '';
+  display: block;
+  width: min(72%, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  /* Dotted surface plus a lit limb, echoing the particle bodies. */
+  background-image:
+    radial-gradient(1.5px 1.5px at 30% 30%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 70% 62%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(circle at 36% 32%, rgba(150, 200, 255, 0.5), transparent 58%),
+    radial-gradient(circle, rgba(60, 120, 220, 0.55) 62%, rgba(120, 190, 255, 0.85) 74%, transparent 78%);
+  box-shadow: 0 0 90px -10px rgba(77, 155, 255, 0.6);
+  animation: fallback-breathe 6s ease-in-out infinite;
+}
+@keyframes fallback-breathe {
+  50% {
+    box-shadow: 0 0 120px -6px rgba(77, 155, 255, 0.85);
+  }
+}
+.cosmos.is-saturn .cosmos__sky.is-fallback::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 30% 30%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(circle at 36% 32%, rgba(150, 255, 210, 0.5), transparent 58%),
+    radial-gradient(circle, rgba(23, 107, 69, 0.6) 62%, rgba(118, 242, 180, 0.85) 74%, transparent 78%);
+  box-shadow: 0 0 90px -10px rgba(47, 214, 164, 0.6);
+}
+.cosmos.is-sun .cosmos__sky.is-fallback::after,
+.sunscene.is-fallback::after {
+  background-image:
+    radial-gradient(circle at 42% 38%, rgba(255, 244, 207, 0.95), transparent 55%),
+    radial-gradient(circle, rgba(255, 140, 31, 0.9) 55%, rgba(255, 122, 26, 0.5) 72%, transparent 80%);
+  box-shadow: 0 0 120px -6px rgba(255, 150, 60, 0.8);
+}
+
+/* ---------- Frontier Walk: drag your portfolio along the optimal curve ---------- */
+.fwalk {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fwalk__stats {
+  display: flex;
+  align-items: flex-end;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+.fwalk__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fwalk__stat span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fwalk__stat strong {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.fwalk__sharpe {
+  color: #7fc0ff;
+}
+button.fwalk__adopt {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0 0 0 auto;
+  padding: 11px 20px;
+}
+
+.fwalk__chart {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(140, 170, 230, 0.16);
+  background: radial-gradient(700px 420px at 70% 20%, rgba(46, 96, 224, 0.16), transparent 66%), rgba(6, 11, 28, 0.55);
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.fwalk.is-dragging .fwalk__chart {
+  cursor: grabbing;
+}
+.fwalk__chart:focus-visible {
+  border-color: var(--accent);
+}
+
+.fwalk__grid line {
+  stroke: rgba(160, 190, 235, 0.12);
+  stroke-width: 1;
+}
+.fwalk__grid text,
+.fwalk__axis {
+  fill: rgba(160, 180, 215, 0.65);
+  font-size: 11px;
+}
+.fwalk__axis {
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+}
+
+.fwalk__curve {
+  fill: none;
+  stroke: #6fb4ff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.fwalk__marker circle {
+  fill: #cfe6ff;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.5;
+}
+.fwalk__marker text {
+  fill: rgba(200, 220, 250, 0.8);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+}
+.fwalk__marker.is-tangency circle {
+  fill: #2fd6a4;
+}
+
+.fwalk__yours circle {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.fwalk__yours text {
+  fill: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.fwalk__drop {
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.fwalk__halo {
+  fill: rgba(255, 255, 255, 0.22);
+}
+.fwalk__core {
+  fill: #fff;
+}
+
+.fwalk__hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.fwalk__weights {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fwalk__bar {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.25s ease;
+}
+.fwalk__bar.is-empty {
+  opacity: 0.32;
+}
+.fwalk__ticker {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.fwalk__track {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+.fwalk__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4d9bff, #9ed3ff);
+}
+.fwalk__pct {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--muted);
+}
+
+.frontier-modes {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+}
+.frontier-mode {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.frontier-mode.is-on {
+  background: var(--accent);
+  color: #241503;
+}
+
+@media (max-width: 640px) {
+  button.fwalk__adopt {
+    margin-left: 0;
+    width: 100%;
+  }
+  .fwalk__bar {
+    grid-template-columns: 52px minmax(0, 1fr) 48px;
+    gap: 8px;
+  }
+}
