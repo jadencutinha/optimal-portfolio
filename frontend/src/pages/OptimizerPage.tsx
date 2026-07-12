@@ -23,6 +23,7 @@ import { PortfolioDetail } from '../components/PortfolioDetail'
 import { PromptModal } from '../components/PromptModal'
 import { ResampledFrontierChart } from '../components/ResampledFrontierChart'
 import { Loader } from '../components/Loader'
+import { DataProvenance } from '../components/DataProvenance'
 import { StatCards } from '../components/StatCards'
 import { TickerInput } from '../components/TickerInput'
 import { WeightsTable } from '../components/WeightsTable'
@@ -296,6 +297,12 @@ export function OptimizerPage() {
         {result && (
           <div className="results-grid">
             <StatCards result={result} />
+            <DataProvenance
+              provider={result.provider}
+              start={result.as_of_start}
+              end={result.as_of_end}
+              assets={result.n_assets}
+            />
             <div className="results-row">
               <AllocationChart weights={result.weights} />
               <WeightsTable weights={result.weights} />

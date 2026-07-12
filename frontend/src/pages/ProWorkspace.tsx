@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
 import { FeatureHub, type HubFeature } from '../components/FeatureHub'
+import { MarketStrip } from '../components/MarketStrip'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
@@ -85,6 +86,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   return (
     <div className="pro-workspace">
       <PlatformHeader onSwitch={onSwitch} />
+      <MarketStrip />
       <div className="platform-mode">
         <button
           type="button"

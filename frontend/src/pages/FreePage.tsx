@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FeatureHub, type HubFeature } from '../components/FeatureHub'
+import { MarketStrip } from '../components/MarketStrip'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
@@ -73,6 +74,8 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
           </button>
         </div>
       </div>
+
+      <MarketStrip />
 
       <div className="platform-mode">
         <button

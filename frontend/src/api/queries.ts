@@ -24,6 +24,7 @@ import type {
   InvestRequest,
   InvestSummary,
   InvestTradeRequest,
+  QuoteBoard,
   FrontierResponse,
   MeResponse,
   OptimizeRequest,
@@ -361,5 +362,17 @@ export function useClosePosition() {
         })
       ).data,
     onSuccess: () => client.invalidateQueries({ queryKey: ['invest'] }),
+  })
+}
+
+export function useQuotes(symbols: string[]) {
+  const key = symbols.map((symbol) => symbol.toUpperCase()).sort().join(',')
+  return useQuery({
+    queryKey: ['market', 'quotes', key],
+    enabled: key.length > 0,
+    refetchInterval: 30000,
+    staleTime: 15000,
+    queryFn: async () =>
+      (await apiClient.get<QuoteBoard>('/api/market/quotes', { params: { symbols: key } })).data,
   })
 }
