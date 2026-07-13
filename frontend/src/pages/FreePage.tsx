@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FeatureHub, type HubFeature } from '../components/FeatureHub'
+import { MarketStrip } from '../components/MarketStrip'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
@@ -40,6 +41,39 @@ const FREE_FEATURES: HubFeature[] = [
   },
 ]
 
+// Shown locked on Free so the Pro tools are visible rather than hidden.
+const LOCKED_FEATURES: HubFeature[] = [
+  {
+    id: 'assistant',
+    name: 'AI Assistant',
+    kicker: 'Ask',
+    description:
+      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
+    locked: true,
+  },
+  {
+    id: 'backtest',
+    name: 'Backtest',
+    kicker: 'Replay',
+    description: 'Walk your strategy through history against the index, equal weight, and a 60/40 benchmark.',
+    locked: true,
+  },
+  {
+    id: 'stress',
+    name: 'Stress Test',
+    kicker: 'Shock',
+    description: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock.',
+    locked: true,
+  },
+  {
+    id: 'behavioral',
+    name: 'Behavioral Coach',
+    kicker: 'Reflect',
+    description: 'Spot the behavior gap and the biases quietly costing you returns.',
+    locked: true,
+  },
+]
+
 interface Props {
   onOpenRiskQ: () => void
   onUpgrade: () => void
@@ -74,6 +108,8 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
         </div>
       </div>
 
+      <MarketStrip />
+
       <div className="platform-mode">
         <button
           type="button"
@@ -97,11 +133,12 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
         <FeatureHub
           title="Your free toolkit"
           subtitle="Use the arrows to browse your tools. Hover a card to see what it does, then open it."
-          features={FREE_FEATURES}
+          features={[...FREE_FEATURES, ...LOCKED_FEATURES]}
           onSelect={(id) => {
             setFeature(id as Feature)
             setShowHub(false)
           }}
+          onLockedSelect={onUpgrade}
         />
       ) : (
         <>

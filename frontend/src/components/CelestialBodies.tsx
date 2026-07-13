@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { bandedSphere, coronaCloud, makeMaterial, ringDisc, star } from './celestial/particles'
 
@@ -13,12 +13,14 @@ const BASE_SPACING = 2.35
 const SIDE_SCALE = 0.3
 const SIDE_EXTENT = 1.6 * SIDE_SCALE
 const ARROW_ZONE_PX = 74
+const COMPACT_PX = 620
 const ACTIVE_SCALE = 1.1
 
 export function CelestialBodies({ active }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef(active)
   activeRef.current = active
+  const [fallback, setFallback] = useState(false)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -30,6 +32,8 @@ export function CelestialBodies({ active }: Props) {
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' })
     } catch {
+      // No WebGL. Fall back to a CSS orb rather than rendering nothing at all.
+      setFallback(true)
       return
     }
     renderer.setClearColor(0x000000, 0)
@@ -93,6 +97,7 @@ export function CelestialBodies({ active }: Props) {
     const spins = [0.05, 0.042, 0.028]
     const state = groups.map(() => ({ x: 0, scale: SIDE_SCALE, weight: 0 }))
     let spacing = BASE_SPACING
+    let compact = false
 
     const layout = () => {
       const { clientWidth, clientHeight } = mount
@@ -112,6 +117,9 @@ export function CelestialBodies({ active }: Props) {
       const columnWidth = mount.parentElement?.clientWidth ?? clientWidth
       const arrowInner = Math.max(columnWidth / 2 - ARROW_ZONE_PX, 0) / pxPerWorld
       spacing = Math.min(BASE_SPACING, arrowInner - SIDE_EXTENT, worldWidth / 2 - SIDE_EXTENT - 0.12)
+
+      // On a phone there is no room to flank the active body, so show it alone.
+      compact = clientWidth < COMPACT_PX
 
       const scale = (clientHeight / WORLD_HEIGHT) * 0.0095
       allMaterials.forEach((material) => {
@@ -153,14 +161,15 @@ export function CelestialBodies({ active }: Props) {
 
         const isActive = offset === 0
         const item = state[index]
-        item.x += (offset * spacing - item.x) * ease
-        item.scale += ((isActive ? ACTIVE_SCALE : SIDE_SCALE) - item.scale) * ease
+        const targetScale = isActive ? ACTIVE_SCALE : compact ? 0.001 : SIDE_SCALE
+        item.x += ((compact ? 0 : offset * spacing) - item.x) * ease
+        item.scale += (targetScale - item.scale) * ease
         item.weight += ((isActive ? 1 : 0) - item.weight) * ease
 
         group.position.x = item.x
         group.scale.setScalar(item.scale)
 
-        const dim = 0.42 + item.weight * 0.58
+        const dim = compact ? item.weight : 0.42 + item.weight * 0.58
         bodyMaterials[index].uniforms.uAlpha.value = baseAlpha[index] * dim
         if (index === 2) coronaMaterial.uniforms.uAlpha.value = CORONA_BASE * dim
       })
@@ -179,5 +188,5 @@ export function CelestialBodies({ active }: Props) {
     }
   }, [])
 
-  return <div className="cosmos__sky" ref={mountRef} aria-hidden="true" />
+  return <div className={fallback ? 'cosmos__sky is-fallback' : 'cosmos__sky'} ref={mountRef} aria-hidden="true" />
 }

@@ -23,6 +23,14 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: ALPACA_API_KEY
+        sync: false
+      - key: ALPACA_SECRET_KEY
+        sync: false
+      - key: ALPACA_BASE_URL
+        value: https://paper-api.alpaca.markets
+      - key: ALPACA_DATA_URL
+        value: https://data.alpaca.markets
       - key: REDIS_URL
         fromService:
           type: redis

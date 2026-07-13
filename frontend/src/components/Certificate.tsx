@@ -18,6 +18,7 @@ export function Certificate({ track, completion, learner, onClose }: Props) {
   return (
     <div className="certificate-page">
       <div className="certificate">
+        <img src="/logo-wordmark.png" alt="Halo!" className="cert-logo" />
         <div className="cert-seal">✓</div>
         <h2>Certificate of Completion</h2>
         <p className="cert-name">{learner}</p>

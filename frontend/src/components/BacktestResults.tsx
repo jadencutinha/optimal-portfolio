@@ -3,7 +3,7 @@ import type { BacktestResponse, StrategyResult } from '../api/types'
 import { downloadCsv } from '../lib/csv'
 import { percent, ratio } from '../lib/format'
 
-const COLORS = ['#2e7d32', '#f59e0b', '#3b82f6', '#a855f7', '#ec4899']
+const COLORS = ['#d4af37', '#ede7da', '#8a8f98', '#b08d57', '#c0c4cc']
 
 const colorFor = (index: number) => COLORS[index % COLORS.length]
 

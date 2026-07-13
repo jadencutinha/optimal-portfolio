@@ -1,11 +1,13 @@
 import { AuthBar } from './components/AuthBar'
 import { Starfield } from './components/Starfield'
-import { ThemeToggle } from './components/ThemeToggle'
+import { useAuth } from './auth/useAuth'
 import { Home } from './pages/Home'
 import { VerifyPage } from './pages/VerifyPage'
 
 export default function App() {
+  const { session } = useAuth()
   const path = window.location.pathname
+
   if (path.startsWith('/verify/')) {
     const credentialId = decodeURIComponent(path.slice('/verify/'.length))
     return (
@@ -14,7 +16,7 @@ export default function App() {
         <header className="app-header">
           <div className="brand">
             <a href="/" className="brand-link">
-              <h1>PortfoliU</h1>
+              <img src="/logo-wordmark.png" alt="Halo!" className="brand-logo" />
             </a>
           </div>
         </header>
@@ -28,18 +30,19 @@ export default function App() {
   return (
     <div className="app">
       <Starfield />
-      <header className="app-header">
-        <div className="brand">
-          <div>
-            <h1>PortfoliU</h1>
-            <p>Convex portfolio optimization on real market data</p>
+      {session && (
+        <header className="app-header">
+          <div className="brand">
+            <div>
+              <img src="/logo-wordmark.png" alt="Halo!" className="brand-logo" />
+              <p>Convex portfolio optimization on real market data</p>
+            </div>
           </div>
-        </div>
-        <div className="header-actions">
-          <ThemeToggle />
-          <AuthBar />
-        </div>
-      </header>
+          <div className="header-actions">
+            <AuthBar />
+          </div>
+        </header>
+      )}
       <main className="app-main">
         <Home />
       </main>

@@ -28,7 +28,7 @@ def build_report(response: OptimizeResponse, title: str = "Optimized Portfolio")
         bottomMargin=0.7 * inch,
         leftMargin=0.8 * inch,
         rightMargin=0.8 * inch,
-        title=f"PortfoliU — {title}",
+        title=f"Halo — {title}",
     )
     styles = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=styles["Heading1"], textColor=_TEAL, fontSize=22, spaceAfter=2)
@@ -38,7 +38,7 @@ def build_report(response: OptimizeResponse, title: str = "Optimized Portfolio")
 
     metrics = response.metrics
     story = [
-        Paragraph("PortfoliU", h1),
+        Paragraph("Halo!", h1),
         Paragraph(f"{title} · generated {date.today().isoformat()}", sub),
     ]
 
@@ -160,7 +160,7 @@ def build_saved_report(
         bottomMargin=0.7 * inch,
         leftMargin=0.8 * inch,
         rightMargin=0.8 * inch,
-        title=f"PortfoliU — {name}",
+        title=f"Halo — {name}",
     )
     styles = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=styles["Heading1"], textColor=_TEAL, fontSize=22, spaceAfter=2)
@@ -174,7 +174,7 @@ def build_saved_report(
     largest = items[0] if items else ("—", 0.0)
 
     story = [
-        Paragraph("PortfoliU", h1),
+        Paragraph("Halo!", h1),
         Paragraph(f"{name} · saved {created_at}", sub),
         Paragraph("Configuration", h2),
         _kv_table(

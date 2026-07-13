@@ -14,6 +14,7 @@ from app.api.routes import (
     frontier,
     health,
     invest,
+    market,
     me,
     metrics as metrics_route,
     optimize,
@@ -128,6 +129,7 @@ def create_app() -> FastAPI:
     app.include_router(stress.router, prefix=settings.api_prefix)
     app.include_router(reports.router, prefix=settings.api_prefix)
     app.include_router(invest.router, prefix=settings.api_prefix)
+    app.include_router(market.router, prefix=settings.api_prefix)
     app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)
     return app

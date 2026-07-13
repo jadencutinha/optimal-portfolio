@@ -62,6 +62,7 @@ export function AuthModal({
         <button className="modal-close" aria-label="Close" onClick={onClose}>
           ×
         </button>
+        <img src="/logo-wordmark.png" alt="Halo!" className="modal-logo" />
         <h2>{isSignup ? 'Create account' : 'Log in'}</h2>
         <p className="modal-sub">
           {isSignup ? 'Sign up to save your portfolios and unlock more features.' : 'Welcome back.'}

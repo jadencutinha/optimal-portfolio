@@ -43,17 +43,19 @@ export function CheckoutPage({ onDone, onCancel }: { onDone: () => void; onCance
         <span className="cosmos__hue is-sun is-on" />
       </div>
 
-      <Suspense fallback={null}>
-        <SunScene />
-      </Suspense>
+      <div className="checkout__pitch">
+        <span className="checkout__eyebrow">Pro platform</span>
+        <h2>Step into the Sun</h2>
+        <p className="checkout__lead">
+          The full optimizer, unlocked. Everything else in the system orbits this tier.
+        </p>
+      </div>
 
       <div className="checkout__grid">
-        <div className="checkout__pitch">
-          <span className="checkout__eyebrow">Pro platform</span>
-          <h2>Step into the Sun</h2>
-          <p className="checkout__lead">
-            The full optimizer, unlocked. Everything else in the system orbits this tier.
-          </p>
+        <div className="checkout__orb">
+          <Suspense fallback={null}>
+            <SunScene />
+          </Suspense>
           <ul className="checkout__unlocks">
             {UNLOCKS.map((item) => (
               <li key={item}>{item}</li>

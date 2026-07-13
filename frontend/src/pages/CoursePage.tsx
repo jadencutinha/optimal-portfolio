@@ -278,7 +278,7 @@ export function CoursePage({
       <Certificate
         track={certificateTrack}
         completion={ensureTrackCompletion(certificateTrack.id)}
-        learner={learnerName?.trim() || 'PortfoliU Learner'}
+        learner={learnerName?.trim() || 'Halo Learner'}
         onClose={() => setCertificateTrack(null)}
       />
     )
@@ -297,7 +297,7 @@ export function CoursePage({
       <PlatformHeader onSwitch={onSwitch} />
       <div className="course-landing-head">
         <div>
-          <h1 className="course-landing-title">PortfoliU Learn</h1>
+          <h1 className="course-landing-title">Halo Learn</h1>
           <p className="course-landing-desc">
             Master the hidden curriculum of investing through interactive lessons and real
             portfolio building.

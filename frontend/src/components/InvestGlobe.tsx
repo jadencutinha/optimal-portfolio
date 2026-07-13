@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 interface Props {
@@ -135,6 +135,7 @@ export function InvestGlobe({ gain = 0, className }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
   const gainRef = useRef(gain)
   gainRef.current = gain
+  const [fallback, setFallback] = useState(false)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -146,6 +147,7 @@ export function InvestGlobe({ gain = 0, className }: Props) {
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' })
     } catch {
+      setFallback(true)
       return
     }
     renderer.setClearColor(0x000000, 0)
@@ -338,5 +340,6 @@ export function InvestGlobe({ gain = 0, className }: Props) {
     }
   }, [])
 
-  return <div className={className ? `globe ${className}` : 'globe'} ref={mountRef} aria-hidden="true" />
+  const classes = ['globe', className, fallback ? 'is-fallback' : ''].filter(Boolean).join(' ')
+  return <div className={classes} ref={mountRef} aria-hidden="true" />
 }

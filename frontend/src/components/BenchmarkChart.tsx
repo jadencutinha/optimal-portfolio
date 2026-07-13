@@ -5,8 +5,8 @@ import { money } from '../lib/format'
 
 const WINDOWS = ['1M', '3M', '6M', 'YTD', '1Y'] as const
 
-const PORTFOLIO_COLOR = '#e09743'
-const BENCHMARK_COLOR = '#4d9bff'
+const PORTFOLIO_COLOR = '#d4af37'
+const BENCHMARK_COLOR = '#8a8f98'
 
 const usd = (value: number) =>
   value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })

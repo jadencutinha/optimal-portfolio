@@ -29,13 +29,13 @@ class AlpacaClient:
             "APCA-API-SECRET-KEY": self._settings.alpaca_secret_key or "",
         }
 
-    async def _request(self, method: str, path: str, **kwargs) -> dict | list | None:
+    async def _request(self, method: str, path: str, base: str | None = None, **kwargs) -> dict | list | None:
         if not self.configured:
             raise InvestError(
                 "Investing is not configured. Set ALPACA_API_KEY and ALPACA_SECRET_KEY to enable it.",
                 503,
             )
-        url = f"{self._base}{path}"
+        url = f"{base or self._base}{path}"
         try:
             async with httpx.AsyncClient(timeout=self._timeout) as client:
                 response = await client.request(method, url, headers=self._headers(), **kwargs)
@@ -47,6 +47,19 @@ class AlpacaClient:
         if response.status_code == 204 or not response.content:
             return None
         return response.json()
+
+    async def get_snapshots(self, symbols: list[str]) -> dict:
+        """Latest trade plus today's and yesterday's daily bar, for live price and daily change.
+
+        The free Alpaca tier only serves the IEX feed, so the feed is pinned explicitly.
+        """
+        params = {"symbols": ",".join(symbol.upper() for symbol in symbols), "feed": "iex"}
+        payload = await self._request("GET", "/v2/stocks/snapshots", base=self._data, params=params)
+        if not isinstance(payload, dict):
+            return {}
+        # Alpaca has returned both a bare map and a {"snapshots": {...}} envelope over time.
+        snapshots = payload.get("snapshots")
+        return snapshots if isinstance(snapshots, dict) else payload
 
     @staticmethod
     def _client_status(upstream: int) -> int:

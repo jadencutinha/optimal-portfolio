@@ -622,3 +622,19 @@ export interface InvestRequest {
   weights: Record<string, number>
   amount: number
 }
+
+export interface MarketQuote {
+  symbol: string
+  price: number
+  previous_close: number
+  change: number
+  change_pct: number
+  as_of: string | null
+}
+
+export interface QuoteBoard {
+  quotes: MarketQuote[]
+  source: string
+  feed: string
+  as_of: string | null
+}

@@ -68,11 +68,11 @@ const track1: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'callout',
-          text: 'PortfoliU is an investing tool, not a savings tool. It assumes you already have an emergency fund and are ready to put money to work for the long term. If you\'re still building your emergency fund, do that first.',
+          text: 'Halo is an investing tool, not a savings tool. It assumes you already have an emergency fund and are ready to put money to work for the long term. If you\'re still building your emergency fund, do that first.',
         },
       ],
       quiz: [
@@ -218,11 +218,11 @@ const track1: Track = {
         },
         {
           type: 'subheading',
-          text: 'For PortfoliU',
+          text: 'For Halo',
         },
         {
           type: 'paragraph',
-          text: 'When you set your **risk tolerance** in PortfoliU, you\'re deciding where on this spectrum you want to sit. Higher risk tolerance → optimizer targets higher return portfolios. Lower risk tolerance → optimizer targets more stable portfolios.',
+          text: 'When you set your **risk tolerance** in Halo, you\'re deciding where on this spectrum you want to sit. Higher risk tolerance → optimizer targets higher return portfolios. Lower risk tolerance → optimizer targets more stable portfolios.',
         },
       ],
       quiz: [
@@ -294,7 +294,7 @@ const track1: Track = {
         },
         {
           type: 'subheading',
-          text: 'How PortfoliU uses this',
+          text: 'How Halo uses this',
         },
         {
           type: 'paragraph',
@@ -334,7 +334,7 @@ const track1: Track = {
       content: [
         {
           type: 'paragraph',
-          text: 'Once PortfoliU optimizes your portfolio, you\'ll see a bunch of numbers. Here\'s what they all mean in plain English.',
+          text: 'Once Halo optimizes your portfolio, you\'ll see a bunch of numbers. Here\'s what they all mean in plain English.',
         },
         {
           type: 'subheading',
@@ -456,15 +456,15 @@ const track2: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'paragraph',
-          text: 'PortfoliU\'s optimizer has no memory of what you paid for anything. It looks only at expected return, risk, and correlation going forward, so it cannot fall into the disposition effect the way a person can. When PortfoliU tells you to trim a position, it is because of where that asset sits in your portfolio today, not whether it happens to be a winner or a loser right now.',
+          text: 'Halo\'s optimizer has no memory of what you paid for anything. It looks only at expected return, risk, and correlation going forward, so it cannot fall into the disposition effect the way a person can. When Halo tells you to trim a position, it is because of where that asset sits in your portfolio today, not whether it happens to be a winner or a loser right now.',
         },
         {
           type: 'callout',
-          text: 'PortfoliU\'s Risk Assessment questionnaire, which you can take from the home screen, specifically checks whether your reaction to a hypothetical drop or your comfort with volatility shows signs of loss aversion, and flags it in your results if it does.',
+          text: 'Halo\'s Risk Assessment questionnaire, which you can take from the home screen, specifically checks whether your reaction to a hypothetical drop or your comfort with volatility shows signs of loss aversion, and flags it in your results if it does.',
         },
       ],
       quiz: [
@@ -485,7 +485,7 @@ const track2: Track = {
           ],
         },
         {
-          question: 'Why does an optimizer like PortfoliU avoid the disposition effect?',
+          question: 'Why does an optimizer like Halo avoid the disposition effect?',
           options: [
             { text: 'It only considers forward-looking risk and return, not your purchase price', correct: true },
             { text: 'It refuses to ever sell a losing position', correct: false },
@@ -532,15 +532,15 @@ const track2: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'paragraph',
-          text: 'This is exactly why PortfoliU offers a **net-of-cost** optimization objective: it targets a strong Sharpe ratio while explicitly penalizing turnover and trading costs, so the optimizer will not suggest constant small trades unless the benefit actually outweighs the cost. It also reports sector counts and concentration (HHI), so home bias toward one stock or sector is visible instead of hidden.',
+          text: 'This is exactly why Halo offers a **net-of-cost** optimization objective: it targets a strong Sharpe ratio while explicitly penalizing turnover and trading costs, so the optimizer will not suggest constant small trades unless the benefit actually outweighs the cost. It also reports sector counts and concentration (HHI), so home bias toward one stock or sector is visible instead of hidden.',
         },
         {
           type: 'callout',
-          text: 'PortfoliU\'s Risk Assessment questionnaire also checks for overconfidence directly: describing yourself as an experienced investor while also picking the highest-risk answer on every question flags overconfidence as a bias to watch for in your results.',
+          text: 'Halo\'s Risk Assessment questionnaire also checks for overconfidence directly: describing yourself as an experienced investor while also picking the highest-risk answer on every question flags overconfidence as a bias to watch for in your results.',
         },
       ],
       quiz: [
@@ -561,7 +561,7 @@ const track2: Track = {
           ],
         },
         {
-          question: "How does PortfoliU's net-of-cost objective address overtrading?",
+          question: "How does Halo's net-of-cost objective address overtrading?",
           options: [
             { text: 'It bans all trading after the initial allocation', correct: false },
             { text: 'It targets a strong Sharpe ratio while penalizing turnover and trading costs', correct: true },
@@ -608,11 +608,11 @@ const track2: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'paragraph',
-          text: 'PortfoliU builds your portfolio from a covariance matrix and optimization objective, not from whatever asset happens to be trending. Because the optimizer weighs every asset\'s expected return against its risk and its correlation with everything else you hold, a single hot performer will not automatically dominate your portfolio unless it genuinely improves your overall risk-adjusted return.',
+          text: 'Halo builds your portfolio from a covariance matrix and optimization objective, not from whatever asset happens to be trending. Because the optimizer weighs every asset\'s expected return against its risk and its correlation with everything else you hold, a single hot performer will not automatically dominate your portfolio unless it genuinely improves your overall risk-adjusted return.',
         },
       ],
       quiz: [
@@ -680,15 +680,15 @@ const track2: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'paragraph',
-          text: "PortfoliU's drift tracker watches your portfolio against your target weights and flags when any position has drifted outside your chosen tolerance band, regardless of whether that drift came from a gain or a loss. It treats every dollar in your portfolio the same way: as a claim on today's optimal allocation, not as money that is somehow different because of where it came from or what you originally paid for it.",
+          text: "Halo's drift tracker watches your portfolio against your target weights and flags when any position has drifted outside your chosen tolerance band, regardless of whether that drift came from a gain or a loss. It treats every dollar in your portfolio the same way: as a claim on today's optimal allocation, not as money that is somehow different because of where it came from or what you originally paid for it.",
         },
         {
           type: 'callout',
-          text: "PortfoliU's Risk Assessment questionnaire checks for anchoring too: a long time horizon paired with answers focused on capital preservation flags anchoring to overly conservative expectations as a bias worth watching.",
+          text: "Halo's Risk Assessment questionnaire checks for anchoring too: a long time horizon paired with answers focused on capital preservation flags anchoring to overly conservative expectations as a bias worth watching.",
         },
       ],
       quiz: [
@@ -709,7 +709,7 @@ const track2: Track = {
           ],
         },
         {
-          question: "How does PortfoliU's drift tracker avoid mental accounting?",
+          question: "How does Halo's drift tracker avoid mental accounting?",
           options: [
             { text: 'It ignores gains and only tracks losses', correct: false },
             { text: 'It flags drift from target weights regardless of whether it came from a gain or a loss', correct: true },
@@ -756,11 +756,11 @@ const track2: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'paragraph',
-          text: "This is the entire philosophy behind PortfoliU. You set your risk tolerance and optimization objective once, in advance. The optimizer computes the target allocation from data, not headlines. The drift tracker tells you exactly when a rebalance is actually warranted, using a band you set ahead of time. Every bias in this track (loss aversion, overconfidence, herding, anchoring) loses most of its power once the decision has already been made by a rules-based system instead of by you in the heat of the moment.",
+          text: "This is the entire philosophy behind Halo. You set your risk tolerance and optimization objective once, in advance. The optimizer computes the target allocation from data, not headlines. The drift tracker tells you exactly when a rebalance is actually warranted, using a band you set ahead of time. Every bias in this track (loss aversion, overconfidence, herding, anchoring) loses most of its power once the decision has already been made by a rules-based system instead of by you in the heat of the moment.",
         },
       ],
       quiz: [
@@ -796,7 +796,7 @@ const track2: Track = {
 const track3: Track = {
   id: 3,
   title: 'Portfolio Optimization',
-  description: 'Learn the math behind PortfoliU: the same methods hedge funds use',
+  description: 'Learn the math behind Halo: the same methods hedge funds use',
   estimatedTime: '45 min',
   difficulty: 'Advanced',
   modules: [
@@ -806,7 +806,7 @@ const track3: Track = {
       content: [
         {
           type: 'paragraph',
-          text: "Combining two investments isn't just averaging them. In 1952, Harry Markowitz showed that the **right** combination of assets can give you a better risk/return trade-off than any single asset alone, an insight that eventually won him a Nobel Prize. This track builds up the entire mathematical engine behind PortfoliU's optimizer, one concept at a time, using one running example throughout.",
+          text: "Combining two investments isn't just averaging them. In 1952, Harry Markowitz showed that the **right** combination of assets can give you a better risk/return trade-off than any single asset alone, an insight that eventually won him a Nobel Prize. This track builds up the entire mathematical engine behind Halo's optimizer, one concept at a time, using one running example throughout.",
         },
         {
           type: 'subheading',
@@ -845,11 +845,11 @@ const track3: Track = {
         },
         {
           type: 'subheading',
-          text: 'Why this matters for PortfoliU',
+          text: 'Why this matters for Halo',
         },
         {
           type: 'callout',
-          text: "PortfoliU's optimizer solves for exactly this: the mix of weights that gives you the best return-for-risk trade-off, using this same return/variance math scaled up to however many assets you hold. The next module covers how it decides which mix is actually \"best.\"",
+          text: "Halo's optimizer solves for exactly this: the mix of weights that gives you the best return-for-risk trade-off, using this same return/variance math scaled up to however many assets you hold. The next module covers how it decides which mix is actually \"best.\"",
         },
       ],
       quiz: [
@@ -927,7 +927,7 @@ const track3: Track = {
         },
         {
           type: 'callout',
-          text: 'PortfoliU\'s "Max Sharpe" objective solves exactly this optimization automatically across as many assets as you hold, and its Efficient Frontier chart plots this exact curve for your actual portfolio.',
+          text: 'Halo\'s "Max Sharpe" objective solves exactly this optimization automatically across as many assets as you hold, and its Efficient Frontier chart plots this exact curve for your actual portfolio.',
         },
       ],
       quiz: [
@@ -1001,7 +1001,7 @@ const track3: Track = {
         },
         {
           type: 'callout',
-          text: 'PortfoliU computes your full covariance matrix automatically and reports concentration (HHI) and effective holdings, so you can see whether you\'re actually diversified or just holding a lot of similar things.',
+          text: 'Halo computes your full covariance matrix automatically and reports concentration (HHI) and effective holdings, so you can see whether you\'re actually diversified or just holding a lot of similar things.',
         },
       ],
       quiz: [
@@ -1078,7 +1078,7 @@ const track3: Track = {
         },
         {
           type: 'callout',
-          text: 'This is exactly why PortfoliU lets you choose the risk model (Sample, Ledoit-Wolf shrinkage, EWMA, or PCA factor) instead of hardcoding raw sample covariance.',
+          text: 'This is exactly why Halo lets you choose the risk model (Sample, Ledoit-Wolf shrinkage, EWMA, or PCA factor) instead of hardcoding raw sample covariance.',
         },
       ],
       quiz: [
@@ -1154,7 +1154,7 @@ const track3: Track = {
         },
         {
           type: 'callout',
-          text: 'PortfoliU offers Black-Litterman return estimates as an alternative to plugging in raw historical averages, specifically to avoid the instability shown above.',
+          text: 'Halo offers Black-Litterman return estimates as an alternative to plugging in raw historical averages, specifically to avoid the instability shown above.',
         },
       ],
       quiz: [
@@ -1190,7 +1190,7 @@ const track3: Track = {
       content: [
         {
           type: 'paragraph',
-          text: 'Every objective so far (min variance, max Sharpe) treats risk symmetrically: a portfolio that swings up 20% counts as exactly as "risky" as one that swings down 20%. Most investors don\'t actually feel that way. This closing module covers two ideas that address that, plus a wrap-up of every objective PortfoliU offers.',
+          text: 'Every objective so far (min variance, max Sharpe) treats risk symmetrically: a portfolio that swings up 20% counts as exactly as "risky" as one that swings down 20%. Most investors don\'t actually feel that way. This closing module covers two ideas that address that, plus a wrap-up of every objective Halo offers.',
         },
         {
           type: 'subheading',
@@ -1234,7 +1234,7 @@ const track3: Track = {
         },
         {
           type: 'callout',
-          text: "Every objective above (Min Variance, Max Sharpe, Target Return/Risk, Risk Parity, Max Diversification, CVaR, Net-of-Cost) is selectable directly in PortfoliU's optimizer. You've just learned what each one is actually doing under the hood.",
+          text: "Every objective above (Min Variance, Max Sharpe, Target Return/Risk, Risk Parity, Max Diversification, CVaR, Net-of-Cost) is selectable directly in Halo's optimizer. You've just learned what each one is actually doing under the hood.",
         },
       ],
       quiz: [

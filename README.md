@@ -1,4 +1,4 @@
-# PortfoliU — Optimal Portfolio Construction via Convex Optimization
+# Halo! — Optimal Portfolio Construction via Convex Optimization
 
 A full-stack web application that builds mathematically optimal stock portfolios
 with convex optimization, backtests them against simple index strategies, and

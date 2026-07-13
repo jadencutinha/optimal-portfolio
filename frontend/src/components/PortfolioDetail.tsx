@@ -12,7 +12,7 @@ interface Props {
   sharpe: number
 }
 
-const SECTOR_COLORS = ['#2e7d32', '#1b5e20', '#66bb6a', '#f59e0b', '#a855f7', '#14b8a6', '#ef4444', '#3b82f6', '#ec4899']
+const SECTOR_COLORS = ['#d4af37', '#ede7da', '#b08d57', '#8a8f98', '#f0d98c', '#c0c4cc', '#8a6a1f', '#6e6a62', '#e0c98a']
 
 export function PortfolioDetail({ title, weights, expectedReturn, volatility, sharpe }: Props) {
   const bySector = new Map<string, number>()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BehavioralCoach } from '../components/BehavioralCoach'
 import { FeatureHub, type HubFeature } from '../components/FeatureHub'
+import { MarketStrip } from '../components/MarketStrip'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
@@ -14,6 +15,7 @@ import { StressPage } from './StressPage'
 
 type Feature =
   | 'optimizer'
+  | 'frontier'
   | 'assistant'
   | 'planner'
   | 'sidebyside'
@@ -29,6 +31,13 @@ const PRO_FEATURES: HubFeature[] = [
     kicker: 'Build',
     description:
       'Construct a mathematically optimal portfolio from your tickers, with objectives, constraints, and the efficient frontier.',
+  },
+  {
+    id: 'frontier',
+    name: 'Frontier Walk',
+    kicker: 'Explore',
+    description:
+      'Drag your portfolio along the efficient frontier and watch the holdings re-form in real time. Every point on the curve is optimal.',
   },
   {
     id: 'assistant',
@@ -85,6 +94,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
   return (
     <div className="pro-workspace">
       <PlatformHeader onSwitch={onSwitch} />
+      <MarketStrip />
       <div className="platform-mode">
         <button
           type="button"
@@ -121,6 +131,7 @@ export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
             </button>
           </div>
           {feature === 'optimizer' && <OptimizerPage />}
+          {feature === 'frontier' && <OptimizerPage autoStart />}
           {feature === 'assistant' && <AssistantPage />}
           {feature === 'planner' && <PlannerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}
