@@ -2981,9 +2981,6 @@ table.weights td {
   .module-main {
     max-width: none;
   }
-  .track-grid {
-    grid-template-columns: 1fr;
-  }
   .certificates-grid {
     grid-template-columns: 1fr;
   }
@@ -3248,136 +3245,150 @@ table.weights td {
   transition: width 0.2s;
 }
 
-.track-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 32px;
-  margin-bottom: 48px;
-}
-
-/* Deliberately dark regardless of the light/dark toggle — same instrument-panel
-   identity as the HUD bar and the constellation view they lead into. */
-/* Blended into the page — no panel background/border, just the planet,
-   ambient dust, and rising particles floating directly on the page. */
-.track-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 10px 12px 24px;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  transition: transform 0.15s ease-out;
-  isolation: isolate;
-}
-
-/* Faint drifting star dots around the planet. */
-.track-card-drift {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255, 255, 255, 0.5), transparent 60%),
-    radial-gradient(1.2px 1.2px at 70% 60%, rgba(255, 214, 107, 0.5), transparent 60%),
-    radial-gradient(1px 1px at 45% 80%, rgba(255, 255, 255, 0.4), transparent 60%),
-    radial-gradient(1px 1px at 85% 20%, rgba(255, 255, 255, 0.4), transparent 60%);
-  background-size: 140px 140px;
-  animation: trackDrift 14s linear infinite;
-}
-@keyframes trackDrift {
-  from { background-position: 0 0, 0 0, 0 0, 0 0; }
-  to { background-position: -140px -140px, -140px -140px, -140px -140px, -140px -140px; }
-}
-
-/* Particles that rise on hover. */
-.track-card-particles {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.track-card-particles i {
-  position: absolute;
-  bottom: 6%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #ffd66b;
-  opacity: 0;
-  animation: trackParticleRise 3.2s ease-in infinite;
-  animation-play-state: paused;
-}
-.track-card:hover .track-card-particles i {
-  animation-play-state: running;
-}
-.track-card-particles i:nth-child(1) { left: 12%; animation-delay: 0s; }
-.track-card-particles i:nth-child(2) { left: 30%; animation-delay: 0.5s; background: #eaf2f0; }
-.track-card-particles i:nth-child(3) { left: 52%; animation-delay: 1s; }
-.track-card-particles i:nth-child(4) { left: 70%; animation-delay: 1.6s; background: #6fe0b0; }
-.track-card-particles i:nth-child(5) { left: 88%; animation-delay: 2.1s; }
-@keyframes trackParticleRise {
-  0% { transform: translateY(0); opacity: 0; }
-  15% { opacity: 0.9; }
-  100% { transform: translateY(-160px); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .track-card { transition: none; }
-  .track-card-drift { animation: none; }
-  .track-card-particles i { animation: none; }
-}
-
-.track-card-body {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.track-card-top {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-
-.track-card-num {
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 999px;
-  padding: 4px 11px;
-  background: rgba(255, 214, 107, 0.12);
-  border: 1px solid rgba(255, 214, 107, 0.35);
-  color: #ffd66b;
-}
-
-.track-card-title {
-  margin: 0 0 10px;
-  font-family: ui-rounded, "SF Pro Rounded", sans-serif;
-  font-size: 27px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: #eaf2f0;
-  text-align: center;
-}
-
-.track-card-desc {
-  margin: 0 0 18px;
-  font-size: 13.5px;
-  font-weight: 300;
-  color: #6b8288;
+/* ---------- Sector spine: a vertical, connected progression instead of a grid ---------- */
+.sector-spine-tagline {
+  max-width: 460px;
+  margin: 0 auto 8px;
+  font-size: 14px;
+  color: #7f9490;
   line-height: 1.6;
   text-align: center;
 }
 
+.sector-spine {
+  position: relative;
+  max-width: 840px;
+  margin: 0 auto 48px;
+}
+
+.sector-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+.sector-line {
+  stroke-width: 2px;
+  stroke: #1c2e33;
+  transition: stroke 0.3s ease;
+}
+.sector-line.is-leading {
+  stroke: #6fb3dd;
+  filter: drop-shadow(0 0 3px rgba(111, 179, 221, 0.5));
+}
+.sector-line.is-done {
+  stroke: #ffd66b;
+  filter: drop-shadow(0 0 4px rgba(255, 214, 107, 0.6));
+}
+
+/* Margin notes: entry points for different experience levels, aligned to
+   their target sector's row regardless of which side that sector renders on. */
+.sector-annotation {
+  position: absolute;
+  left: -150px;
+  width: 128px;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.5;
+  color: #6fb3dd;
+  text-align: right;
+  z-index: 1;
+}
+.sector-annotation::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  width: 10px;
+  height: 1px;
+  background: #6fb3dd;
+  opacity: 0.6;
+}
+@media (max-width: 1000px) {
+  .sector-annotation {
+    display: none;
+  }
+}
+
+.sector-node-wrap {
+  position: relative;
+  display: flex;
+  width: 100%;
+  padding: 28px 0;
+}
+.sector-node-wrap:nth-of-type(odd) {
+  justify-content: flex-start;
+}
+.sector-node-wrap:nth-of-type(even) {
+  justify-content: flex-end;
+}
+
+.sector-node {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(50% - 40px);
+  padding: 0 8px;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .sector-node-wrap,
+  .sector-node-wrap:nth-of-type(odd),
+  .sector-node-wrap:nth-of-type(even) {
+    justify-content: center;
+  }
+  .sector-node {
+    width: calc(100% - 56px);
+  }
+}
+
+.sector-node-eyebrow {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #ffd66b;
+  margin-bottom: 8px;
+}
+
+.sector-node-archetype {
+  margin: 0;
+  font-family: ui-rounded, "SF Pro Rounded", sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #eaf2f0;
+}
+
+.sector-node-subtitle {
+  margin: 4px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5c716d;
+  letter-spacing: 0.02em;
+}
+
+.sector-node-desc {
+  max-width: 400px;
+  margin: 8px 0 16px;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: #6b8288;
+  line-height: 1.6;
+}
+
 .difficulty-badge {
   display: inline-block;
-  align-self: center;
   font-family: ui-monospace, Menlo, monospace;
   font-size: 10.5px;
   font-weight: 700;
@@ -3385,7 +3396,6 @@ table.weights td {
   letter-spacing: 0.08em;
   border-radius: 999px;
   padding: 4px 11px;
-  margin-bottom: 16px;
 }
 
 .difficulty-badge.difficulty-beginner {
@@ -3403,39 +3413,79 @@ table.weights td {
   color: #e8705f;
 }
 
-.track-card-meta {
-  margin: 0 0 20px;
+.sector-node-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.sector-node-status {
   font-family: ui-monospace, Menlo, monospace;
   font-size: 10px;
   font-weight: 600;
   color: #5c716d;
-  letter-spacing: 0.04em;
-  text-align: center;
+  letter-spacing: 0.03em;
 }
 
-.track-card-btn {
-  margin-top: auto;
-  width: 100%;
+.sector-node-becomes {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  color: #5c716d;
+}
+.sector-node-becomes strong {
+  color: #ffd66b;
+  font-weight: 700;
+}
+
+.sector-node-cta {
   background: #ffd66b;
   border: none;
   color: #241a04;
   font-size: 14px;
   font-weight: 700;
   border-radius: 10px;
-  padding: 10px 22px;
+  padding: 10px 28px;
   cursor: pointer;
 }
 
-.track-card-btn:hover:not(:disabled) {
+.sector-node-cta:hover:not(:disabled) {
   filter: brightness(0.94);
 }
 
-.track-card-btn.disabled,
-.track-card-btn:disabled {
+.sector-node-cta.disabled,
+.sector-node-cta:disabled {
   background: #1c2e33;
   color: #7f9490;
   opacity: 0.7;
   cursor: default;
+}
+
+.sector-node--stub {
+  opacity: 0.6;
+}
+.sector-node--stub .sector-node-eyebrow {
+  color: #5c716d;
+}
+.sector-node--stub .sector-node-archetype {
+  color: #93a8a4;
+}
+
+.sector-node-stub-planet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 230px;
+  height: 230px;
+  margin: 10px auto 18px;
+  border-radius: 50%;
+  border: 1px dashed #29403f;
+  color: #4b615e;
+}
+
+@media (max-width: 620px) {
+  .sector-node-archetype { font-size: 27px; }
 }
 
 /* ─── Certificates section ────────────────────────────────────── */
@@ -8121,23 +8171,24 @@ body[data-surface='space'] .app-header {
 /* ---------- Track planets: each track is its own celestial body ---------- */
 .track-planet {
   position: relative;
-  width: 172px;
-  height: 172px;
+  width: 230px;
+  height: 230px;
   margin: 10px auto 18px;
   border-radius: 50%;
 }
 .track-planet::before {
   content: '';
   position: absolute;
-  inset: -20px;
+  inset: -26px;
   border-radius: 50%;
-  filter: blur(20px);
+  filter: blur(26px);
   opacity: 0.4;
   z-index: 0;
 }
 .track-planet--earth::before { background: radial-gradient(circle, #4fd1c5, transparent 70%); }
 .track-planet--moon::before { background: radial-gradient(circle, #d8d2bc, transparent 70%); }
 .track-planet--saturn::before { background: radial-gradient(circle, #e8c98a, transparent 70%); }
+.track-planet--neptune::before { background: radial-gradient(circle, #6fe0ea, transparent 70%); }
 
 .track-planet__orbit {
   position: absolute;
@@ -8179,15 +8230,15 @@ body[data-surface='space'] .app-header {
   transform: scale(1.05);
 }
 
-/* Flying into a planet when its track opens. */
-.track-card {
-  transition: transform 0.15s ease-out, box-shadow 0.25s ease, opacity 0.48s ease;
+/* Flying into a planet when its sector opens. */
+.sector-node {
+  transition: opacity 0.48s ease;
 }
-.track-card.is-zooming {
+.sector-node.is-zooming {
   z-index: 5;
   animation: trackCardZoom 0.48s ease-in forwards;
 }
-.track-card.is-zooming .track-planet {
+.sector-node.is-zooming .track-planet {
   animation: trackPlanetZoom 0.48s ease-in forwards;
 }
 @keyframes trackCardZoom {
@@ -8200,8 +8251,8 @@ body[data-surface='space'] .app-header {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .track-card.is-zooming,
-  .track-card.is-zooming .track-planet {
+  .sector-node.is-zooming,
+  .sector-node.is-zooming .track-planet {
     animation: none;
   }
 }
