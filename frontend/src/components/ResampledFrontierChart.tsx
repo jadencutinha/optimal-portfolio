@@ -10,8 +10,8 @@ import {
 } from 'recharts'
 import type { ResampledFrontierResponse } from '../api/types'
 
-const SAMPLE_COLOR = '#4991c4'
-const RESAMPLED_COLOR = '#e09743'
+const SAMPLE_COLOR = '#8a8f98'
+const RESAMPLED_COLOR = '#d4af37'
 
 const toPoints = (points: ResampledFrontierResponse['sample']) =>
   points.map((point) => ({

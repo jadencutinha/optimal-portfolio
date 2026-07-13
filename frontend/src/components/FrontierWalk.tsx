@@ -208,8 +208,8 @@ export function FrontierWalk({ frontier, portfolio, onAdopt }: Props) {
       >
         <defs>
           <linearGradient id="fwalkArea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#4d9bff" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#4d9bff" stopOpacity="0" />
+            <stop offset="0%" stopColor="#d4af37" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#d4af37" stopOpacity="0" />
           </linearGradient>
           <filter id="fwalkGlow" x="-60%" y="-60%" width="220%" height="220%">
             <feGaussianBlur stdDeviation="5" result="blur" />

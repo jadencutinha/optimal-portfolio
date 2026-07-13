@@ -64,14 +64,14 @@ export function FrontierChart({ frontier, portfolio, selectedIndex, onSelect }: 
           <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value: number) => `${value.toFixed(2)}%`} />
           <Scatter
             data={data}
-            fill="#2e7d32"
-            line={{ stroke: '#2e7d32', strokeWidth: 1.5 }}
+            fill="#8a8f98"
+            line={{ stroke: '#8a8f98', strokeWidth: 1.5 }}
             onClick={(_, index) => onSelect(index)}
           />
-          <Scatter data={minVariance} fill="#1b5e20" shape="diamond" />
-          <Scatter data={tangency} fill="#f59e0b" shape="star" />
-          {yours.length > 0 && <Scatter data={yours} fill="#c0392b" shape="cross" />}
-          {selected.length > 0 && <Scatter data={selected} fill="#1b5e20" shape="circle" />}
+          <Scatter data={minVariance} fill="#c0c4cc" shape="diamond" />
+          <Scatter data={tangency} fill="#d4af37" shape="star" />
+          {yours.length > 0 && <Scatter data={yours} fill="#ede7da" shape="cross" />}
+          {selected.length > 0 && <Scatter data={selected} fill="#f0d98c" shape="circle" />}
         </ScatterChart>
       </ResponsiveContainer>
       <div className="legend">
