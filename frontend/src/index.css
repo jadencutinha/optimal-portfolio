@@ -3250,7 +3250,7 @@ table.weights td {
 
 .track-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 32px;
   margin-bottom: 48px;
 }

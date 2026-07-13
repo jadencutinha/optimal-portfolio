@@ -29,16 +29,18 @@ const TrackPlanet = lazy(() =>
   import('../components/TrackPlanet').then((module) => ({ default: module.TrackPlanet })),
 )
 
-const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn'> = {
+const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn' | 'neptune'> = {
   1: 'earth',
   2: 'moon',
   3: 'saturn',
+  4: 'neptune',
 }
 
 const SECTOR_BY_TRACK: Record<number, string> = {
   1: 'Sector I',
   2: 'Sector II',
   3: 'Sector III',
+  4: 'Sector IV',
 }
 
 export function CoursePage({

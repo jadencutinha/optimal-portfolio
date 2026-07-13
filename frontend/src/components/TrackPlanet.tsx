@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { bandedSphere, coronaCloud, constellationStars, makeMaterial, ringDisc } from './celestial/particles'
 
-export type PlanetKind = 'earth' | 'moon' | 'saturn'
+export type PlanetKind = 'earth' | 'moon' | 'saturn' | 'neptune'
 
 interface Props {
   kind: PlanetKind
@@ -95,6 +95,44 @@ export function TrackPlanet({ kind, progress }: Props) {
       glowMat = rimMat
       baseGlowAlpha = 0.1
       spin = 0.025
+    } else if (kind === 'neptune') {
+      body.rotation.z = 0.3
+      const mat = makeMaterial(dpr, { ambient: 0.06, front: 1.05, rim: 0.7 }, 0.97)
+      const geo = bandedSphere(7000, 0.9, new THREE.Color(0x0a1a3a), new THREE.Color(0x4fd8e8), 21)
+      body.add(new THREE.Points(geo, mat))
+      disposables.push(geo, mat)
+      allMaterials.push(mat)
+
+      // A ring of individually-placed "readout" points — data being read off the surface.
+      const readoutMat = makeMaterial(dpr, { ambient: 0.4, front: 0.9, rim: 0.4 }, 0.9)
+      const readoutGeo = constellationStars(
+        Array.from({ length: 18 }, (_, i) => {
+          const a = (i / 18) * Math.PI * 2
+          return [Math.cos(a) * 0.94, Math.sin(a) * 0.18, Math.sin(a * 1.7) * 0.3] as [number, number, number]
+        }),
+        new THREE.Color(0xeafcff),
+        3,
+      )
+      body.add(new THREE.Points(readoutGeo, readoutMat))
+      disposables.push(readoutGeo, readoutMat)
+      allMaterials.push(readoutMat)
+
+      // Thin analytical scan-ring.
+      const ringGeo = ringDisc(3600, 1.18, 1.34, 1.34, 1.34, new THREE.Color(0x8fe9f2))
+      const ringMat = makeMaterial(dpr, { ambient: 0.8, front: 0.4, rim: 0.2 }, 0.55)
+      body.add(new THREE.Points(ringGeo, ringMat))
+      disposables.push(ringGeo, ringMat)
+      allMaterials.push(ringMat)
+
+      // Atmosphere glow — brightens on hover.
+      const atmoMat = makeMaterial(dpr, { ambient: 1, front: 0, rim: 0 }, 0.32)
+      const atmoGeo = coronaCloud(600, 0.97, 0.13, new THREE.Color(0x6fe0ea))
+      body.add(new THREE.Points(atmoGeo, atmoMat))
+      disposables.push(atmoGeo, atmoMat)
+      allMaterials.push(atmoMat)
+      glowMat = atmoMat
+      baseGlowAlpha = 0.32
+      spin = 0.045
     } else {
       body.rotation.z = 0.42
       body.rotation.x = 0.1
