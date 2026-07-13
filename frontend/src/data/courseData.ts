@@ -1267,4 +1267,448 @@ const track3: Track = {
   ],
 }
 
-export const TRACKS: Track[] = [track1, track2, track3]
+const track4: Track = {
+  id: 4,
+  title: 'Portfolio Analysis',
+  description: 'Learn to read what your portfolio\'s numbers are actually telling you: Sharpe, beta, drawdown, and diversification, decoded',
+  estimatedTime: '30 min',
+  difficulty: 'Intermediate',
+  modules: [
+    {
+      id: 1,
+      title: 'The Sharpe Ratio: Grading a Portfolio, Not Just Its Return',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Two portfolios can post similar returns and still be nowhere near equally good. Return alone doesn't tell you how much risk was taken to get there, and that's exactly the gap the **Sharpe ratio** closes.",
+        },
+        {
+          type: 'subheading',
+          text: 'The formula',
+        },
+        {
+          type: 'paragraph',
+          text: 'Sharpe ratio = (portfolio return − risk-free rate) ÷ portfolio volatility. The same formula the optimizer uses internally to find the best mix of assets also works as a report card on a portfolio you already built.',
+        },
+        {
+          type: 'subheading',
+          text: 'A worked example',
+        },
+        {
+          type: 'paragraph',
+          text: "Say your portfolio returned **11%** this year with **16%** volatility, against a risk-free rate of **2%**. Sharpe = (11% − 2%) ÷ 16% = **0.56**. The S&P 500 returned **10%** with **18%** volatility over the same stretch: Sharpe = (10% − 2%) ÷ 18% = **0.44**.",
+        },
+        {
+          type: 'paragraph',
+          text: 'The raw return gap is only 1 point, but your portfolio earned more AND took less risk per unit of return, so its Sharpe ratio is meaningfully higher. That gap is invisible if you only compare returns.',
+        },
+        {
+          type: 'callout',
+          text: 'A higher Sharpe ratio means better risk-adjusted performance, not necessarily a higher return. A portfolio with a lower return can still have a higher Sharpe ratio if it took much less risk to get there.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: 'Every optimized portfolio shows its Sharpe ratio on the results screen, the Efficient Frontier chart marks the exact "Max Sharpe" point among every mix that was possible, and Max Sharpe is one of the optimizer\'s built-in objectives.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What does the Sharpe ratio measure?',
+          options: [
+            { text: 'Total return only', correct: false },
+            { text: 'Return earned per unit of risk taken', correct: true },
+            { text: "The portfolio's correlation with the market", correct: false },
+          ],
+        },
+        {
+          question: 'Portfolio X returns 11% at 16% volatility; Portfolio Y returns 13% at 30% volatility. Risk-free rate is 2%. Which has the higher Sharpe ratio?',
+          options: [
+            { text: 'Portfolio X (0.56 vs 0.37)', correct: true },
+            { text: 'Portfolio Y, because its return is higher', correct: false },
+            { text: 'They are equal', correct: false },
+          ],
+        },
+        {
+          question: 'Can a portfolio with a lower return ever have a higher Sharpe ratio than one with a higher return?',
+          options: [
+            { text: 'No, Sharpe ratio always follows return', correct: false },
+            { text: 'Yes, if it took proportionally less risk to earn that return', correct: true },
+            { text: 'Only if volatility is zero', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Beta: How Much Your Portfolio Swings With the Market',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Volatility measures how much your portfolio swings, full stop. **Beta** measures something more specific: how much of that swinging is explained by the broader market moving. It's the difference between \"risky\" and \"exposed to the market.\"",
+        },
+        {
+          type: 'subheading',
+          text: 'Reading a beta value',
+        },
+        {
+          type: 'list',
+          items: [
+            '**β = 1**: moves in step with the market (e.g. an S&P 500 index fund)',
+            '**β > 1**: amplifies market moves (up more in rallies, down more in selloffs)',
+            '**β < 1**: dampens market moves, a portfolio with real ballast',
+            '**β near 0 or negative**: little to no relationship with market direction',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'A worked example',
+        },
+        {
+          type: 'paragraph',
+          text: 'Beta = correlation with the benchmark × (portfolio volatility ÷ benchmark volatility). Your portfolio moves with the S&P 500 at a correlation of **0.85**, with volatility **16%** against the benchmark\'s **18%**: beta = 0.85 × (16% ÷ 18%) = **0.76**. For every 1% the S&P 500 moves, your portfolio tends to move about 0.76%: real market exposure, but dampened.',
+        },
+        {
+          type: 'subheading',
+          text: 'Alpha: the part beta doesn\'t explain',
+        },
+        {
+          type: 'paragraph',
+          text: 'Alpha = actual return − [risk-free rate + beta × (benchmark return − risk-free rate)]. Using the same numbers: alpha = 11% − [2% + 0.76 × (10% − 2%)] = 11% − 8.1% = **2.9%**. That 2.9% is return your portfolio produced beyond what its market exposure alone would predict.',
+        },
+        {
+          type: 'callout',
+          text: "Beta describes exposure: how much of the ride is just the market. Alpha describes edge: what's left over after accounting for that exposure. A high-beta portfolio isn't automatically a skillfully built one.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: "Backtesting your portfolio against a benchmark reports both alpha and beta side by side, so you can see how much of your performance came from market exposure versus how much was genuinely additive.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'A portfolio has a beta of 0.6. If the S&P 500 drops 10%, what would you roughly expect?',
+          options: [
+            { text: 'The portfolio drops about 6%', correct: true },
+            { text: 'The portfolio drops about 16%', correct: false },
+            { text: 'The portfolio is unaffected', correct: false },
+          ],
+        },
+        {
+          question: 'What does alpha represent?',
+          options: [
+            { text: 'The same thing as beta, just renamed', correct: false },
+            { text: "Return earned beyond what the portfolio's market exposure alone would predict", correct: true },
+            { text: 'Total portfolio volatility', correct: false },
+          ],
+        },
+        {
+          question: 'Is a beta of 1.4 inherently "better" than a beta of 0.7?',
+          options: [
+            { text: 'Yes, higher beta always means a better portfolio', correct: false },
+            { text: 'No, beta describes market exposure, not skill or quality', correct: true },
+            { text: 'Yes, but only if volatility is also high', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      title: 'Volatility: The Risk Number Behind Every Other Metric',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Volatility, the annualized standard deviation of returns, is the single most-reused number in portfolio analysis. It's the denominator in the Sharpe ratio, an input to beta, and the risk half of every risk/return tradeoff you've seen so far.",
+        },
+        {
+          type: 'subheading',
+          text: 'From daily swings to an annual number',
+        },
+        {
+          type: 'paragraph',
+          text: 'Volatility is usually measured day-to-day, then scaled up to an annual figure by multiplying by the square root of the number of trading days in a year (about 252): a daily standard deviation of roughly **1%** scales to about 1% × √252 ≈ **16%** annualized. That square-root scaling is why volatility grows slower than time: 4x the trading days is only 2x the volatility.',
+        },
+        {
+          type: 'subheading',
+          text: 'Volatility isn\'t inherently bad',
+        },
+        {
+          type: 'paragraph',
+          text: "Standard volatility treats a sharp rally and a sharp selloff identically: both are just \"big moves.\" Most investors only actually mind the downside half. That blind spot is exactly what the next two modules exist to fix.",
+        },
+        {
+          type: 'callout',
+          text: 'A higher-volatility portfolio isn\'t automatically worse. It only becomes a problem when it isn\'t compensated for with proportionally higher expected return, which is precisely what the Sharpe ratio checks.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: 'Every portfolio result reports annualized volatility directly, and it\'s the risk axis on the Efficient Frontier chart: every point on that curve is a real (volatility, return) pair.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What does "annualized volatility" mean?',
+          options: [
+            { text: 'Daily price swings scaled up to a yearly figure', correct: true },
+            { text: 'The highest single-day loss of the year', correct: false },
+            { text: 'The total return over the year', correct: false },
+          ],
+        },
+        {
+          question: 'A portfolio has a daily standard deviation of about 1%. Roughly what is its annualized volatility (√252 ≈ 15.9)?',
+          options: [
+            { text: 'About 1%', correct: false },
+            { text: 'About 16%', correct: true },
+            { text: 'About 252%', correct: false },
+          ],
+        },
+        {
+          question: 'Does standard volatility distinguish between upside and downside swings?',
+          options: [
+            { text: 'Yes, it only counts downside moves', correct: false },
+            { text: 'No, it treats a sharp rally and a sharp selloff the same way', correct: true },
+            { text: 'Yes, it only counts upside moves', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      title: "Max Drawdown: The Worst Ride You'd Have Actually Lived Through",
+      content: [
+        {
+          type: 'paragraph',
+          text: "Two portfolios can have the exact same average return and still feel completely different to hold, because average return hides the path. **Max drawdown** measures the path: the largest peak-to-trough decline a portfolio actually experienced.",
+        },
+        {
+          type: 'subheading',
+          text: 'What it measures',
+        },
+        {
+          type: 'paragraph',
+          text: "At every point in time, compare the portfolio's current value to its highest value so far. The largest drop from any peak to the lowest point that followed it, before a new peak was set, is the max drawdown. It's expressed as a negative percentage: **−18%** means the portfolio was once 18% below its prior high-water mark.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why it matters more than average return alone',
+        },
+        {
+          type: 'paragraph',
+          text: 'Say your portfolio and the S&P 500 both averaged similar returns over a rough year, but your portfolio\'s max drawdown was **−18%** while the S&P 500\'s was **−24%**. Same rough average, very different worst moment. That gap matters because a big enough drawdown is exactly what tends to push investors into panic-selling near the bottom, turning a paper loss into a permanent one.',
+        },
+        {
+          type: 'subheading',
+          text: 'The Calmar ratio: return relative to your worst drawdown',
+        },
+        {
+          type: 'paragraph',
+          text: 'Calmar ratio = annualized return ÷ |max drawdown|. Using the numbers above: 11% ÷ 18% = **0.61**. Like the Sharpe ratio, higher is better, but Calmar specifically rewards portfolios that avoid deep drawdowns rather than ones that merely avoid day-to-day wiggle.',
+        },
+        {
+          type: 'callout',
+          text: "A shallower max drawdown isn't just a nicer number: it's the difference between a portfolio an investor can actually stick with through a downturn and one that gets abandoned at the worst possible time.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: "Backtesting a portfolio charts its drawdown curve directly alongside its growth curve, and the metrics table reports Calmar ratio next to Sharpe so you can compare how each portfolio handled its worst stretch.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What does max drawdown measure?',
+          options: [
+            { text: 'The average annual return', correct: false },
+            { text: "The largest peak-to-trough decline a portfolio actually experienced", correct: true },
+            { text: 'The correlation with the benchmark', correct: false },
+          ],
+        },
+        {
+          question: 'Why can two portfolios with the same average return still be very different to actually hold?',
+          options: [
+            { text: 'Average return already accounts for the path taken', correct: false },
+            { text: 'One could have had a much deeper drawdown along the way, even with the same average', correct: true },
+            { text: 'They can\'t be different if the average return matches', correct: false },
+          ],
+        },
+        {
+          question: 'What does the Calmar ratio reward?',
+          options: [
+            { text: 'High return relative to a shallow max drawdown', correct: true },
+            { text: 'High volatility regardless of drawdown', correct: false },
+            { text: 'A high beta to the market', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      title: 'Concentration and Effective Holdings: Are You Actually Diversified?',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Owning more tickers isn't the same as being diversified: that was true back when we compared 20 similar tech stocks to 5 stocks across different sectors. This module gives you the actual number to check it for your own portfolio.",
+        },
+        {
+          type: 'subheading',
+          text: 'Concentration (HHI)',
+        },
+        {
+          type: 'paragraph',
+          text: "The Herfindahl-Hirschman Index sums the square of every position's weight. Say your portfolio is 40% / 25% / 20% / 10% / 5% across five holdings: HHI = 0.40² + 0.25² + 0.20² + 0.10² + 0.05² = 0.16 + 0.0625 + 0.04 + 0.01 + 0.0025 = **0.275**. HHI runs from near 0 (spread evenly across many positions) to 1 (100% in a single position).",
+        },
+        {
+          type: 'subheading',
+          text: 'Effective holdings: how many positions actually matter',
+        },
+        {
+          type: 'paragraph',
+          text: "Effective holdings = 1 ÷ HHI. For the portfolio above: 1 ÷ 0.275 ≈ **3.6**. Five positions on paper, but only about 3.6 of them are large enough to meaningfully move the portfolio. Compare that to five equal 20% positions: HHI = 5 × 0.20² = 0.20, effective holdings = 1 ÷ 0.20 = **5**, exactly matching the actual position count, because nothing is small enough to ignore.",
+        },
+        {
+          type: 'list',
+          items: [
+            'HHI close to 0 → broadly spread, few concentration risks',
+            'HHI close to 1 → dangerously concentrated in one or two positions',
+            'Effective holdings well below your actual position count → some of those positions are too small to matter',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'A portfolio can hold 20 tickers and still be effectively concentrated in 3 or 4 of them. Effective holdings is what tells you the difference between owning positions and being diversified across them.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: 'Every portfolio breakdown reports Concentration (HHI) and Effective Holdings directly, right alongside volatility and Sharpe ratio, so you can see whether your allocation is actually spread out or just looks that way on the weight table.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'A portfolio is split 50% / 30% / 20% across three positions. What is its HHI? (0.50² + 0.30² + 0.20² = 0.25 + 0.09 + 0.04)',
+          options: [
+            { text: '0.38', correct: true },
+            { text: '1.00', correct: false },
+            { text: '0.10', correct: false },
+          ],
+        },
+        {
+          question: 'A portfolio has an HHI of 0.25. What are its effective holdings (1 ÷ HHI)?',
+          options: [
+            { text: '2', correct: false },
+            { text: '4', correct: true },
+            { text: '0.25', correct: false },
+          ],
+        },
+        {
+          question: 'A portfolio holds 10 tickers but its effective holdings come out to 2.5. What does that tell you?',
+          options: [
+            { text: 'The portfolio is well diversified across all 10 positions', correct: false },
+            { text: 'A small number of positions dominate the portfolio despite holding 10 tickers', correct: true },
+            { text: 'The portfolio has negative correlation between its assets', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 6,
+      title: 'Beyond Sharpe: Sortino, Calmar, and Information Ratio',
+      content: [
+        {
+          type: 'paragraph',
+          text: "The Sharpe ratio treats every swing, up or down, as equally bad. Most investors don't actually mind upside swings. This module covers three more risk-adjusted metrics that each fix a different blind spot the Sharpe ratio leaves open.",
+        },
+        {
+          type: 'subheading',
+          text: 'Sortino ratio: only the downside counts',
+        },
+        {
+          type: 'paragraph',
+          text: "Sortino ratio = (portfolio return − risk-free rate) ÷ downside deviation, where downside deviation only measures the spread of negative-return periods. If your portfolio's downside deviation is **11%** (lower than its full 16% volatility, since it ignores the good days): Sortino = (11% − 2%) ÷ 11% = **0.82**, noticeably higher than its 0.56 Sharpe ratio, because Sortino stops penalizing the upside noise Sharpe counts against it.",
+        },
+        {
+          type: 'subheading',
+          text: 'Calmar ratio, revisited',
+        },
+        {
+          type: 'paragraph',
+          text: "Calmar ratio, covered last module, is return relative to max drawdown rather than to overall volatility. Use it when you care more about surviving the worst stretch than about smoothing out everyday noise.",
+        },
+        {
+          type: 'subheading',
+          text: 'Information ratio: is the edge repeatable?',
+        },
+        {
+          type: 'paragraph',
+          text: "Information ratio = average active return (portfolio − benchmark) ÷ tracking error (the volatility of that difference). Where alpha tells you the average edge over a benchmark, information ratio tells you how consistently that edge showed up: a small, steady edge can have a higher information ratio than a large, erratic one.",
+        },
+        {
+          type: 'list',
+          items: [
+            '**Sharpe**: return per unit of total risk (up and down)',
+            '**Sortino**: return per unit of downside-only risk',
+            '**Calmar**: return relative to the worst drawdown actually experienced',
+            '**Information ratio**: how consistently a portfolio beats its benchmark, not just by how much on average',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'No single ratio tells the whole story. A portfolio can look great on Sharpe and mediocre on Calmar, or vice versa: the four together describe different shapes of the same risk.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for PortfoliU',
+        },
+        {
+          type: 'callout',
+          text: 'A full backtest report puts CAGR, Volatility, Sharpe, Sortino, Max Drawdown, Calmar, Alpha, Beta, and Information Ratio side by side in one table, every metric from this entire track, on your own portfolio.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is the key difference between the Sharpe ratio and the Sortino ratio?',
+          options: [
+            { text: 'Sortino only penalizes downside volatility, Sharpe penalizes both directions equally', correct: true },
+            { text: 'They are the same formula with different names', correct: false },
+            { text: 'Sharpe only looks at the most recent month of returns', correct: false },
+          ],
+        },
+        {
+          question: 'What does the information ratio measure?',
+          options: [
+            { text: 'How consistently a portfolio outperforms its benchmark, not just the average amount', correct: true },
+            { text: 'The total volatility of a single portfolio in isolation', correct: false },
+            { text: 'The number of positions in a portfolio', correct: false },
+          ],
+        },
+        {
+          question: 'Why might you look at more than one risk-adjusted metric instead of just the Sharpe ratio?',
+          options: [
+            { text: 'Because Sharpe is always wrong', correct: false },
+            { text: 'Because each metric highlights a different shape of risk, and a portfolio can look great on one and mediocre on another', correct: true },
+            { text: 'Because more metrics always means a higher score', correct: false },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+export const TRACKS: Track[] = [track1, track2, track3, track4]

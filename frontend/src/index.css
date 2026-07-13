@@ -3211,9 +3211,12 @@ table.weights td {
 /* ─── Course landing ─────────────────────────────────────────── */
 
 .course-landing {
+  padding: 12px 0 40px;
+}
+
+.course-landing-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 12px 0 40px;
 }
 
 .certificate-page {
@@ -3265,63 +3268,27 @@ table.weights td {
 
 .track-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
   margin-bottom: 48px;
 }
 
 /* Deliberately dark regardless of the light/dark toggle — same instrument-panel
    identity as the HUD bar and the constellation view they lead into. */
-@property --track-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-/* Holographic panel: glass body + a rotating gradient border ring behind it. */
+/* Blended into the page — no panel background/border, just the planet,
+   ambient dust, and rising particles floating directly on the page. */
 .track-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 31, 42, 0.55);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 214, 107, 0.18);
-  border-radius: 14px;
-  padding: 22px 22px 24px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  padding: 10px 12px 24px;
   overflow: hidden;
   transform-style: preserve-3d;
-  transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+  transition: transform 0.15s ease-out;
   isolation: isolate;
 }
 
-.track-card::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  z-index: -1;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: conic-gradient(from var(--track-angle), #3987e5, #ffd66b, #6fe0b0, #3987e5);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: trackBorderSpin 6s linear infinite;
-  opacity: 0.55;
-  transition: opacity 0.25s ease;
-}
-.track-card:hover::before {
-  opacity: 1;
-}
-@keyframes trackBorderSpin {
-  to { --track-angle: 360deg; }
-}
-.track-card:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 214, 107, 0.12);
-}
-
-/* Faint drifting star dots behind the glass. */
+/* Faint drifting star dots around the planet. */
 .track-card-drift {
   position: absolute;
   inset: 0;
@@ -3338,31 +3305,6 @@ table.weights td {
 @keyframes trackDrift {
   from { background-position: 0 0, 0 0, 0 0, 0 0; }
   to { background-position: -140px -140px, -140px -140px, -140px -140px, -140px -140px; }
-}
-
-/* Glowing corner blooms. */
-.track-card-corner {
-  position: absolute;
-  z-index: 0;
-  width: 90px;
-  height: 90px;
-  pointer-events: none;
-  border-radius: 50%;
-  filter: blur(18px);
-  opacity: 0.35;
-  transition: opacity 0.25s ease;
-}
-.track-card-corner--tl { top: -30px; left: -30px; background: radial-gradient(circle, #3987e5, transparent 70%); }
-.track-card-corner--br { bottom: -30px; right: -30px; background: radial-gradient(circle, #ffd66b, transparent 70%); }
-.track-card:hover .track-card-corner { opacity: 0.6; }
-
-/* Soft glass reflection sheen. */
-.track-card-sheen {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, transparent 30%, transparent 100%);
 }
 
 /* Particles that rise on hover. */
@@ -3400,7 +3342,6 @@ table.weights td {
 
 @media (prefers-reduced-motion: reduce) {
   .track-card { transition: none; }
-  .track-card::before { animation: none; }
   .track-card-drift { animation: none; }
   .track-card-particles i { animation: none; }
 }
@@ -3433,23 +3374,28 @@ table.weights td {
 }
 
 .track-card-title {
-  margin: 0 0 8px;
-  font-size: 19px;
-  font-weight: 700;
-  line-height: 1.3;
+  margin: 0 0 10px;
+  font-family: ui-rounded, "SF Pro Rounded", sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: #eaf2f0;
+  text-align: center;
 }
 
 .track-card-desc {
-  margin: 0 0 14px;
-  font-size: 14px;
-  color: #7f9490;
-  line-height: 1.5;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  font-weight: 300;
+  color: #6b8288;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .difficulty-badge {
   display: inline-block;
-  align-self: flex-start;
+  align-self: center;
   font-family: ui-monospace, Menlo, monospace;
   font-size: 10.5px;
   font-weight: 700;
@@ -3457,7 +3403,7 @@ table.weights td {
   letter-spacing: 0.08em;
   border-radius: 999px;
   padding: 4px 11px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .difficulty-badge.difficulty-beginner {
@@ -3476,12 +3422,13 @@ table.weights td {
 }
 
 .track-card-meta {
-  margin: 0 0 14px;
+  margin: 0 0 20px;
   font-family: ui-monospace, Menlo, monospace;
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 600;
-  color: #7f9490;
-  letter-spacing: 0.03em;
+  color: #5c716d;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .track-card-btn {
@@ -3820,6 +3767,21 @@ table.weights td {
   font-size: 28px;
   font-weight: 700;
   line-height: 1.3;
+}
+
+.track-page-title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.track-page-desc {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: #7f9490;
+  line-height: 1.6;
+  max-width: 560px;
 }
 
 /* ─── Lesson content ──────────────────────────────────────────── */
@@ -5254,24 +5216,6 @@ table.weights td {
   margin: 0 0 20px;
 }
 
-.course-search-input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  padding: 10px 12px;
-  font-size: 14px;
-  outline: none;
-}
-
-.course-search-input:focus {
-  border-color: var(--accent);
-}
-
-.course-search-empty {
-  margin: 0 0 20px;
-}
 
 .sidebar-module-status {
   font-size: 10px;
@@ -7627,14 +7571,18 @@ body[data-surface='space'] .app-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0 18px;
+  box-shadow: 0 20px 40px -28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .csearch.open {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(224, 151, 67, 0.16);
+  border-color: rgba(111, 179, 221, 0.55);
+  box-shadow: 0 0 0 3px rgba(111, 179, 221, 0.16), 0 20px 40px -28px rgba(0, 0, 0, 0.6);
 }
 .csearch-icon {
   width: 18px;
@@ -7649,8 +7597,12 @@ body[data-surface='space'] .app-header {
   color: var(--text);
   font: inherit;
   font-size: 15px;
-  padding: 13px 0;
+  padding: 14px 0;
   outline: none;
+}
+.csearch-input::placeholder {
+  color: var(--muted);
+  opacity: 0.85;
 }
 .csearch-clear {
   border: none;
@@ -7670,10 +7622,12 @@ body[data-surface='space'] .app-header {
   left: 0;
   right: 0;
   z-index: 20;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, rgba(20, 26, 32, 0.92), rgba(14, 18, 23, 0.92));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
   overflow: hidden;
 }
 .csearch-count {
@@ -8031,16 +7985,48 @@ body[data-surface='space'] .app-header {
 .constellation__hotspot.is-done .constellation__hotspot-mark {
   color: #ffd66b;
 }
+.constellation__hotspot.is-current {
+  width: 50px;
+  height: 50px;
+}
 .constellation__hotspot.is-current .constellation__hotspot-num {
   border-color: #6fb3dd;
+  border-width: 2.5px;
   animation: nodePulse 1.8s ease-in-out infinite;
 }
 .constellation__hotspot.is-current .constellation__hotspot-mark {
   color: #eaf2f0;
+  font-size: 19px;
 }
 @keyframes nodePulse {
   0%, 100% { box-shadow: 0 0 8px rgba(111, 179, 221, 0.45); }
   50% { box-shadow: 0 0 20px rgba(111, 179, 221, 0.85); }
+}
+
+/* One-time "explodes into light" burst when a module flips to complete. */
+.constellation__hotspot.is-bursting .constellation__hotspot-num {
+  animation: nodeBurst 0.7s ease-out;
+}
+@keyframes nodeBurst {
+  0% { box-shadow: 0 0 8px rgba(255, 214, 107, 0.5); transform: scale(1); }
+  35% { box-shadow: 0 0 36px 12px rgba(255, 214, 107, 0.9); transform: scale(1.4); }
+  100% { box-shadow: 0 0 14px rgba(255, 214, 107, 0.6); transform: scale(1); }
+}
+.constellation__hotspot.is-bursting .constellation__halo {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255, 214, 107, 0.6), transparent 70%);
+  animation: burstHalo 0.7s ease-out;
+}
+@keyframes burstHalo {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.constellation__line.is-flash {
+  animation: lineFlash 0.7s ease-out;
+}
+@keyframes lineFlash {
+  0% { stroke: #ffffff; filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.95)); }
+  100% { stroke: #ffd66b; filter: drop-shadow(0 0 4px rgba(255, 214, 107, 0.7)); }
 }
 .constellation__hotspot.is-hovered .constellation__hotspot-num {
   transform: scale(1.12);
@@ -8101,6 +8087,9 @@ body[data-surface='space'] .app-header {
   .constellation__line.is-done { animation: none; }
   .constellation__hotspot.is-current .constellation__hotspot-num { animation: none; }
   .constellation__hotspot.is-current .constellation__halo { animation: none; opacity: 0.5; }
+  .constellation__hotspot.is-bursting .constellation__hotspot-num { animation: none; }
+  .constellation__hotspot.is-bursting .constellation__halo { animation: none; }
+  .constellation__line.is-flash { animation: none; }
 }
 
 .constellation-back {
@@ -8222,9 +8211,9 @@ body[data-surface='space'] .app-header {
 /* ---------- Track planets: each track is its own celestial body ---------- */
 .track-planet {
   position: relative;
-  width: 118px;
-  height: 118px;
-  margin: 4px auto 14px;
+  width: 172px;
+  height: 172px;
+  margin: 10px auto 18px;
   border-radius: 50%;
 }
 .track-planet::before {

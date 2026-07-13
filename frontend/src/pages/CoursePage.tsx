@@ -29,10 +29,18 @@ const TrackPlanet = lazy(() =>
   import('../components/TrackPlanet').then((module) => ({ default: module.TrackPlanet })),
 )
 
-const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn'> = {
+const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn' | 'neptune'> = {
   1: 'earth',
   2: 'moon',
   3: 'saturn',
+  4: 'neptune',
+}
+
+const SECTOR_BY_TRACK: Record<number, string> = {
+  1: 'Sector I',
+  2: 'Sector II',
+  3: 'Sector III',
+  4: 'Sector IV',
 }
 
 export function CoursePage({
@@ -120,8 +128,8 @@ export function CoursePage({
         >
           ← Back to Tracks
         </button>
-        <h1 className="module-title">{selectedTrack.title}</h1>
-        <p className="track-card-desc" style={{ marginBottom: 20 }}>{selectedTrack.description}</p>
+        <h1 className="track-page-title">{selectedTrack.title}</h1>
+        <p className="track-page-desc">{selectedTrack.description}</p>
         <Suspense fallback={<div className="constellation" />}>
           <ConstellationMap
             track={selectedTrack}
@@ -152,6 +160,7 @@ export function CoursePage({
   return (
     <div className="course-landing">
       <PlatformHeader onSwitch={onSwitch} />
+      <div className="course-landing-inner">
       <div className="course-landing-head">
         <div>
           <h1 className="course-landing-title">Halo Learn</h1>
@@ -217,16 +226,13 @@ export function CoursePage({
                 }}
               >
                 <span className="track-card-drift" aria-hidden="true" />
-                <span className="track-card-corner track-card-corner--tl" aria-hidden="true" />
-                <span className="track-card-corner track-card-corner--br" aria-hidden="true" />
-                <span className="track-card-sheen" aria-hidden="true" />
                 <span className="track-card-particles" aria-hidden="true">
                   <i /><i /><i /><i /><i />
                 </span>
 
                 <div className="track-card-body">
                 <div className="track-card-top">
-                  <span className="track-card-num">Track {track.id}</span>
+                  <span className="track-card-num">{SECTOR_BY_TRACK[track.id] ?? `Track ${track.id}`}</span>
                 </div>
 
                 {available && (
@@ -299,6 +305,7 @@ export function CoursePage({
       </div>
 
       <div className="course-callout">Complete all three tracks to unlock a Pro discount</div>
+      </div>
     </div>
   )
 }
