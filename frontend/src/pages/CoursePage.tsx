@@ -35,6 +35,12 @@ const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn'> = {
   3: 'saturn',
 }
 
+const SECTOR_BY_TRACK: Record<number, string> = {
+  1: 'Sector I',
+  2: 'Sector II',
+  3: 'Sector III',
+}
+
 export function CoursePage({
   onSwitch,
   learnerName,
@@ -120,8 +126,8 @@ export function CoursePage({
         >
           ← Back to Tracks
         </button>
-        <h1 className="module-title">{selectedTrack.title}</h1>
-        <p className="track-card-desc" style={{ marginBottom: 20 }}>{selectedTrack.description}</p>
+        <h1 className="track-page-title">{selectedTrack.title}</h1>
+        <p className="track-page-desc">{selectedTrack.description}</p>
         <Suspense fallback={<div className="constellation" />}>
           <ConstellationMap
             track={selectedTrack}
@@ -224,7 +230,7 @@ export function CoursePage({
 
                 <div className="track-card-body">
                 <div className="track-card-top">
-                  <span className="track-card-num">Track {track.id}</span>
+                  <span className="track-card-num">{SECTOR_BY_TRACK[track.id] ?? `Track ${track.id}`}</span>
                 </div>
 
                 {available && (

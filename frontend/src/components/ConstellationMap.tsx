@@ -43,11 +43,33 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
   const [hovered, setHovered] = useState<number | null>(null)
   const [traveling, setTraveling] = useState<number | null>(null)
   const [entering, setEntering] = useState(true)
+  const [burstIndex, setBurstIndex] = useState<number | null>(null)
+  const prevCompleteRef = useRef<boolean[]>([])
+  const prevTrackIdRef = useRef<number | null>(null)
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const points = useMemo(() => layout(track.modules.length, track.id * 1.7), [track])
 
   const currentIndex = track.modules.findIndex((m) => !isModuleComplete(m.id))
+
+  // Detect a module flipping from incomplete → complete and fire a one-time
+  // "explodes into light" burst on that node + the line leading out of it.
+  useEffect(() => {
+    const now = track.modules.map((m) => isModuleComplete(m.id))
+    if (prevTrackIdRef.current !== track.id) {
+      prevTrackIdRef.current = track.id
+      prevCompleteRef.current = now
+      return
+    }
+    const prev = prevCompleteRef.current
+    const justDone = now.findIndex((done, i) => done && !prev[i])
+    prevCompleteRef.current = now
+    if (justDone !== -1 && !reduceMotion) {
+      setBurstIndex(justDone)
+      const t = window.setTimeout(() => setBurstIndex(null), 700)
+      return () => window.clearTimeout(t)
+    }
+  }, [track, isModuleComplete, reduceMotion])
 
   const topY = (track.modules.length - 1) * ROW_WORLD + WORLD_PAD
   const bottomY = -WORLD_PAD
@@ -195,7 +217,9 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
             return (
               <line
                 key={mod.id}
-                className={`constellation__line ${cls} ${entering ? 'is-entering' : ''}`}
+                className={`constellation__line ${cls} ${entering ? 'is-entering' : ''} ${
+                  burstIndex === i ? 'is-flash' : ''
+                }`}
                 x1={a.x}
                 y1={a.y}
                 x2={b.x}
@@ -222,7 +246,7 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
                 type="button"
                 className={`constellation__hotspot ${state} ${hovered === i ? 'is-hovered' : ''} ${
                   traveling === i ? 'is-traveling' : ''
-                } ${entering ? 'is-entering' : ''}`}
+                } ${entering ? 'is-entering' : ''} ${burstIndex === i ? 'is-bursting' : ''}`}
                 style={{
                   left: `${leftPx}px`,
                   top: `${topPx}px`,
