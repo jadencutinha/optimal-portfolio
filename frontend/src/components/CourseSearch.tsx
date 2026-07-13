@@ -79,9 +79,8 @@ export function CourseSearch({ tracks, onOpen }: Props) {
         </svg>
         <input
           ref={inputRef}
-          type="text"
           className="csearch-input"
-          placeholder="🔭 Search the galaxy…"
+          placeholder="Search the galaxy…"
           value={query}
           onChange={(event) => {
             setQuery(event.target.value)
