@@ -117,7 +117,7 @@ function trimLine(p: LinePoint, q: LinePoint, amount: number) {
   const len = Math.hypot(dx, dy)
 
   // If the line is shorter than the combined trim amount, collapse to center
-  if (len <= amount) {
+  if (len <= 2 * amount) {
     const mx = (p.x + q.x) / 2
     const my = (p.y + q.y) / 2
     return { x1: mx, y1: my, x2: mx, y2: my }
