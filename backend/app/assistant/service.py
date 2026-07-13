@@ -23,7 +23,7 @@ _RISK_MODELS = {"sample", "ledoit_wolf", "ewma", "factor"}
 _RETURN_MODELS = {"historical", "black_litterman"}
 
 CONFIG_SYSTEM = (
-    "You are the portfolio configuration engine for PortfoliU, a convex mean-variance "
+    "You are the portfolio configuration engine for Halo, a convex mean-variance "
     "optimizer. Convert the investor's plain-English goal into one configuration by calling "
     "the configure_portfolio tool. Guidance: use max_sharpe for the best risk-adjusted returns "
     "or growth; min_variance or target_risk for safe / low-risk goals; risk_parity or "
@@ -35,7 +35,7 @@ CONFIG_SYSTEM = (
 )
 
 EXPLAIN_SYSTEM = (
-    "You are a portfolio education assistant for PortfoliU. Given an optimization result, "
+    "You are a portfolio education assistant for Halo. Given an optimization result, "
     "explain in plain English (2-3 short paragraphs) what the portfolio does, why it fits the "
     "investor's goal, and the return-versus-risk trade-off, then end with one honest caveat. "
     "Reference the Sharpe ratio, expected return, and volatility. Do not use markdown headers "

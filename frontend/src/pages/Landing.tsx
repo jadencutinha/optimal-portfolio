@@ -175,6 +175,7 @@ export function Landing() {
     <div className="landing2">
       <section className="hero hero-center">
         <div className="hero-copy">
+          <img src="/logo-wordmark.png" alt="Halo!" className="hero-logo" />
           <span className="hero-badge">
             <span className="hero-badge-dot" /> Convex optimization · Real market data
           </span>
@@ -182,7 +183,7 @@ export function Landing() {
             Build <span className="hero-grad">mathematically optimal</span> stock portfolios.
           </h1>
           <p className="hero-sub">
-            PortfoliU turns modern portfolio theory into a tool you can actually use. Solve for the optimal
+            Halo turns modern portfolio theory into a tool you can actually use. Solve for the optimal
             mix of stocks with convex optimization, learn the theory as you go, and backtest every strategy
             against a plain index fund on real market data.
           </p>
@@ -206,8 +207,8 @@ export function Landing() {
         <div className="hero-glow shot-glow" />
         <ShotFrame
           src="/screenshots/optimizer.png"
-          alt="PortfoliU optimizer, allocation donut, expected return, volatility, Sharpe ratio, and weight table"
-          tab="PortfoliU · Optimizer"
+          alt="Halo optimizer, allocation donut, expected return, volatility, Sharpe ratio, and weight table"
+          tab="Halo · Optimizer"
         />
       </div>
 
@@ -241,8 +242,8 @@ export function Landing() {
         title="Prove every strategy out of sample"
         body="Replay your portfolio through years of real history and stack it against SPY, an equal-weight basket, and 60/40, with growth, drawdown, rolling Sharpe, and a full metrics table."
         src="/screenshots/backtest.png"
-        alt="PortfoliU backtest, growth of $1, drawdown, rolling Sharpe charts, and a metrics table versus benchmarks"
-        tab="PortfoliU · Backtest"
+        alt="Halo backtest, growth of $1, drawdown, rolling Sharpe charts, and a metrics table versus benchmarks"
+        tab="Halo · Backtest"
       />
 
       <div className="spot-rows">
@@ -256,8 +257,8 @@ export function Landing() {
             'Sector breakdown at a glance',
           ]}
           src="/screenshots/frontier.png"
-          alt="PortfoliU efficient frontier chart with an optimized-portfolio risk breakdown and sector allocation"
-          tab="PortfoliU · Efficient frontier"
+          alt="Halo efficient frontier chart with an optimized-portfolio risk breakdown and sector allocation"
+          tab="Halo · Efficient frontier"
         />
         <SpotlightRow
           reverse
@@ -270,21 +271,21 @@ export function Landing() {
             'Contributions, horizon, and starting balance',
           ]}
           src="/screenshots/planner.png"
-          alt="PortfoliU goal-based planner with Monte Carlo projected outcomes and probability of reaching the goal"
-          tab="PortfoliU · Goal planner"
+          alt="Halo goal-based planner with Monte Carlo projected outcomes and probability of reaching the goal"
+          tab="Halo · Goal planner"
         />
         <SpotlightRow
           eyebrow="Live tracking"
           title="Know exactly when to rebalance"
-          body="Save a portfolio and PortfoliU watches how its weights drift as prices move and tells you when a position has wandered outside your band."
+          body="Save a portfolio and Halo watches how its weights drift as prices move and tells you when a position has wandered outside your band."
           bullets={[
             'Per-holding drift versus target',
             'Rebalance-band alerts',
             'Turnover needed to get back on track',
           ]}
           src="/screenshots/tracker.png"
-          alt="PortfoliU live tracking and rebalance alerts with per-holding drift versus target weights"
-          tab="PortfoliU · Tracker"
+          alt="Halo live tracking and rebalance alerts with per-holding drift versus target weights"
+          tab="Halo · Tracker"
         />
       </div>
 
@@ -300,8 +301,8 @@ export function Landing() {
             'Earn a verifiable certificate per track',
           ]}
           src="/screenshots/learn.png"
-          alt="PortfoliU Learn, three learning tracks with progress and downloadable certificates"
-          tab="PortfoliU · Learn"
+          alt="Halo Learn, three learning tracks with progress and downloadable certificates"
+          tab="Halo · Learn"
         />
       </section>
 

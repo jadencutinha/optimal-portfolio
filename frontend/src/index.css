@@ -1,19 +1,19 @@
 :root {
-  --bg: #f6f6f6;
-  --bg-elevated: #afdaeb;
-  --panel: #dcf5fb;
-  --border: #006a7f;
-  --text: #0f211e;
-  --muted: #005a62;
-  --accent: #e09743;
-  --accent-hover: #4991c4;
-  --danger: #c0392b;
+  --bg: #0a1519;
+  --bg-elevated: #12303a;
+  --panel: #0f2630;
+  --border: #2c6374;
+  --text: #e7f2f5;
+  --muted: #93b7c0;
+  --accent: #e8a24d;
+  --accent-hover: #6fb3dd;
+  --danger: #e8705f;
   --mono: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
-  --series-1: #2a78d6;
-  --series-2: #1baf7a;
-  --series-3: #eda100;
+  --series-1: #3987e5;
+  --series-2: #199e70;
+  --series-3: #c98500;
   --series-4: #008300;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 * {
@@ -47,7 +47,7 @@ textarea {
   z-index: 10;
   padding: 24px 32px;
   border-bottom: 1px solid var(--border);
-  background: #daf1f8;
+  background: #0f2630;
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -4906,51 +4906,6 @@ table.weights td {
   margin: 10px 0;
 }
 
-/* ---- Dark mode (#7) ---- */
-:root[data-theme='dark'] {
-  --bg: #0a1519;
-  --bg-elevated: #12303a;
-  --panel: #0f2630;
-  --border: #2c6374;
-  --text: #e7f2f5;
-  --muted: #93b7c0;
-  --accent: #e8a24d;
-  --accent-hover: #6fb3dd;
-  --danger: #e8705f;
-  --series-1: #3987e5;
-  --series-2: #199e70;
-  --series-3: #c98500;
-  --series-4: #008300;
-  color-scheme: dark;
-}
-
-body {
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-[data-theme='dark'] .app-header {
-  background: #0f2630;
-}
-
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.theme-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent-hover);
-}
-
 /* ---- Toasts (#2) ---- */
 .toast-container {
   position: fixed;
@@ -5039,22 +4994,12 @@ body {
   display: block;
   background: linear-gradient(
     90deg,
-    rgba(0, 106, 127, 0.08) 25%,
-    rgba(0, 106, 127, 0.18) 37%,
-    rgba(0, 106, 127, 0.08) 63%
-  );
-  background-size: 400% 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-}
-
-[data-theme='dark'] .skeleton {
-  background: linear-gradient(
-    90deg,
     rgba(147, 183, 192, 0.08) 25%,
     rgba(147, 183, 192, 0.18) 37%,
     rgba(147, 183, 192, 0.08) 63%
   );
   background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
 }
 
 @keyframes skeleton-shimmer {
@@ -8215,15 +8160,6 @@ body[data-surface='space'] .app-header {
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: radial-gradient(120% 90% at 50% -10%, #eaf3f5 0%, #f6f6f6 55%, #f0ede6 100%);
-}
-
-@media (prefers-color-scheme: dark) {
-  .starfield {
-    background: radial-gradient(120% 90% at 50% -10%, #0f2630 0%, #0a1519 55%, #05090b 100%);
-  }
-}
-:root[data-theme='dark'] .starfield {
   background: radial-gradient(120% 90% at 50% -10%, #0f2630 0%, #0a1519 55%, #05090b 100%);
 }
 
@@ -8235,8 +8171,7 @@ body[data-surface='space'] .app-header {
   height: calc(100% + 120px);
   transform: translateY(var(--star-offset, 0px));
   background-repeat: repeat;
-  /* Dawn default: only the faintest last stars, mostly a soft pale wash. */
-  opacity: 0.05;
+  opacity: 0.5;
 }
 .starfield__layer--far {
   background-image:
@@ -8257,14 +8192,8 @@ body[data-surface='space'] .app-header {
   background-size: 420px 420px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .starfield__layer--far { opacity: 0.5; }
-  .starfield__layer--near { opacity: 0.7; }
-}
-:root[data-theme='dark'] .starfield__layer--far { opacity: 0.5; }
-:root[data-theme='dark'] .starfield__layer--near { opacity: 0.7; }
-:root[data-theme='light'] .starfield__layer--far,
-:root[data-theme='light'] .starfield__layer--near { opacity: 0.05; }
+.starfield__layer--far { opacity: 0.5; }
+.starfield__layer--near { opacity: 0.7; }
 
 /* ---------- Track planets: each track is its own celestial body ---------- */
 .track-planet {
@@ -8703,5 +8632,51 @@ button.fwalk__adopt {
   .fwalk__bar {
     grid-template-columns: 52px minmax(0, 1fr) 48px;
     gap: 8px;
+  }
+}
+
+.brand-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  filter: drop-shadow(0 0 14px rgb(224 151 67 / 0.28));
+}
+
+.hero-logo {
+  display: block;
+  width: min(400px, 72vw);
+  height: auto;
+  margin: 0 auto 28px;
+  filter: drop-shadow(0 0 44px rgb(224 151 67 / 0.3));
+}
+
+.cert-logo {
+  display: block;
+  width: 168px;
+  height: auto;
+  margin: 0 auto 14px;
+}
+
+.modal-logo {
+  display: block;
+  width: 116px;
+  height: auto;
+  margin: 4px auto 12px;
+}
+
+@media (max-width: 640px) {
+  .brand-logo {
+    height: 32px;
+  }
+
+  .hero-logo {
+    width: min(300px, 78vw);
+    margin-bottom: 20px;
+  }
+}
+
+@media print {
+  .cert-logo {
+    filter: none;
   }
 }

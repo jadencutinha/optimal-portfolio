@@ -1,6 +1,6 @@
-# PortfoliU System Architecture
+# Halo System Architecture
 
-PortfoliU is a full stack web application for building mathematically optimal
+Halo is a full stack web application for building mathematically optimal
 stock portfolios with convex optimization, learning the theory behind them, and
 backtesting every strategy against a plain index fund on real market data.
 
