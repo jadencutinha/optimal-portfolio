@@ -1,5 +1,48 @@
-import { useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { AuthModal } from '../components/AuthModal'
+
+const HeroHalo = lazy(() =>
+  import('../components/HeroHalo').then((module) => ({ default: module.HeroHalo })),
+)
+
+function useHeroDissolve() {
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [spent, setSpent] = useState(false)
+
+  useEffect(() => {
+    let frame = 0
+
+    const apply = () => {
+      const stage = stageRef.current
+      if (!stage) return
+      const span = (window.innerHeight || 1) * 0.58
+      const progress = Math.min(1, Math.max(0, window.scrollY / span))
+      const eased = Math.pow(progress, 1.5)
+      stage.style.opacity = String(1 - eased)
+      stage.style.transform = `scale(${1 - eased * 0.12})`
+      setSpent((previous) => {
+        const next = progress > 0.99
+        return previous === next ? previous : next
+      })
+    }
+
+    const onScroll = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(apply)
+    }
+
+    apply()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  return { stageRef, spent }
+}
 
 function ShotFrame({ src, alt, tab }: { src: string; alt: string; tab: string }) {
   return (
@@ -170,12 +213,40 @@ const FEATURES = [
 
 export function Landing() {
   const [modal, setModal] = useState<null | 'login' | 'signup'>(null)
+  const { stageRef, spent } = useHeroDissolve()
 
   return (
     <div className="landing2">
+      <div className="landing-auth">
+        <button type="button" className="landing-auth__ghost" onClick={() => setModal('signup')}>
+          Create account
+        </button>
+        <button type="button" className="landing-auth__login" onClick={() => setModal('login')}>
+          Log in
+        </button>
+      </div>
+
+      <section className="hero-stage" ref={stageRef}>
+        <p className="sr-only">Halo!</p>
+        <Suspense
+          fallback={
+            <div className="hero-halo is-fallback">
+              <img src="/logo-wordmark.png" alt="Halo!" className="hero-halo__fallback" />
+            </div>
+          }
+        >
+          <HeroHalo paused={spent} />
+        </Suspense>
+        <div className="hero-cue" aria-hidden="true">
+          <span>Scroll</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </section>
+
       <section className="hero hero-center">
         <div className="hero-copy">
-          <img src="/logo-wordmark.png" alt="Halo!" className="hero-logo" />
           <span className="hero-badge">
             <span className="hero-badge-dot" /> Convex optimization · Real market data
           </span>
