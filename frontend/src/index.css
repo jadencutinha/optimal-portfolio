@@ -468,7 +468,7 @@ button.primary.modal-submit {
 .landing2 {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 8px 4px 40px;
+  padding: 0 4px 40px;
 }
 
 .landing2 code {
@@ -9065,4 +9065,95 @@ body[data-surface='platform'] .pl {
   .landing-auth__ghost {
     display: none;
   }
+}
+
+.modal-overlay {
+  background: rgba(5, 5, 6, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.modal-card {
+  background: linear-gradient(168deg, #1a1813 0%, #0e0e11 100%);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 34px 80px -30px rgba(0, 0, 0, 0.9),
+    0 0 60px -30px rgba(212, 175, 55, 0.5);
+}
+
+.modal-card h2 {
+  color: #f4f1ea;
+}
+
+.modal-card .modal-sub {
+  color: #9c968b;
+}
+
+.modal-card .modal-close {
+  color: #9c968b;
+}
+
+.modal-card .modal-close:hover {
+  color: var(--gold-bright);
+}
+
+.modal-card .modal-fields label {
+  color: #9c968b;
+}
+
+.modal-card .modal-fields input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: #f4f1ea;
+}
+
+.modal-card .modal-fields input:focus {
+  border-color: var(--gold);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.16);
+}
+
+.modal-card .modal-submit {
+  background: linear-gradient(180deg, var(--gold-pale) 0%, var(--gold) 52%, var(--gold-deep) 100%);
+  border: 1px solid var(--gold-deep);
+  color: #17140c;
+  font-weight: 700;
+}
+
+.modal-card .modal-submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.modal-card .modal-submit:disabled {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(212, 175, 55, 0.18);
+  color: rgba(244, 241, 234, 0.38);
+}
+
+.modal-card .modal-toggle {
+  color: #9c968b;
+}
+
+.modal-card .modal-toggle:hover {
+  color: var(--gold-bright);
+}
+
+.modal-card .modal-divider span {
+  color: #6f6a62;
+}
+
+.modal-card .modal-divider::before,
+.modal-card .modal-divider::after {
+  background: rgba(212, 175, 55, 0.2);
+}
+
+.modal-card .google-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  color: #f4f1ea;
+}
+
+.modal-card .google-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
 }
