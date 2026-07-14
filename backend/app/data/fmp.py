@@ -4,7 +4,12 @@ from datetime import date
 import httpx
 import pandas as pd
 
-from app.data.provider import DataProvider, ProviderError, ProviderRateLimited, ProviderUnavailable
+from app.data.provider import (
+    DataProvider,
+    ProviderError,
+    ProviderRateLimited,
+    ProviderUnavailable,
+)
 
 _LEGACY_SUFFIX = "/api/v3"
 _STABLE_BASE = "https://financialmodelingprep.com/stable"
@@ -44,6 +49,49 @@ class FMPProvider(DataProvider):
         return prices
 
     async def _fetch_one(self, ticker: str, start: date, end: date) -> pd.Series | None:
+        ticker = ticker.strip().upper()
+        
+        series = await self._fetch_symbol(ticker, start, end)
+
+        if series is not None:
+            return series
+
+        # If direct lookup fails, resolve the ticker
+        # This is mainly needed for assets where FMP uses a different symbol.
+        # BTC -> BTCUSD
+        resolved_symbol = await self._resolve_symbol(ticker)
+
+        if resolved_symbol:
+            return await self._fetch_symbol(resolved_symbol,start,end)
+        return None
+
+    async def _resolve_symbol(self, query: str) -> str | None:
+        url = f"{self._base_url}/search-symbol"
+        params = {
+            "query": query,
+            "apikey": self._api_key,
+        }
+
+        try:
+            response = await self._client.get(url, params=params)
+            response.raise_for_status()
+        except httpx.HTTPError as error:
+            return None
+        results = response.json()
+        
+        if not isinstance(results, list) or not results:
+            return None
+        
+        for item in results:
+            if item.get("exchange") == "CRYPTO":
+                return item.get("symbol")
+            
+        for item in results:
+            if item.get("symbol", "").upper() == query:
+                return item.get("symbol")
+        return None
+
+    async def _fetch_symbol(self, ticker: str, start: date, end: date) -> pd.Series | None:
         url = f"{self._base_url}/historical-price-eod/full"
         params = {
             "symbol": ticker,
@@ -57,9 +105,7 @@ class FMPProvider(DataProvider):
                 response = await self._client.get(url, params=params)
             except (httpx.TimeoutException, httpx.TransportError) as error:
                 if attempt == attempts - 1:
-                    raise ProviderUnavailable(
-                        "Could not reach the market data provider. Check your connection and try again."
-                    ) from error
+                    raise ProviderUnavailable("Could not reach the market data provider. Check your connection and try again.") from error
                 await asyncio.sleep(0.5 * (attempt + 1))
                 continue
 
@@ -71,6 +117,9 @@ class FMPProvider(DataProvider):
                     )
                 await asyncio.sleep(0.5 * (attempt + 1))
                 continue
+        
+            if response.status_code == 402:
+                return None
 
             if response.status_code in (401, 403):
                 raise ProviderUnavailable(
@@ -85,7 +134,8 @@ class FMPProvider(DataProvider):
                 ) from error
 
             payload = response.json()
-            if isinstance(payload, dict) and payload.get("Error Message"):
+
+            if (isinstance(payload, dict) and payload.get("Error Message")):
                 raise ProviderUnavailable(f"Market data provider error: {payload['Error Message']}")
 
             rows = payload if isinstance(payload, list) else payload.get("historical", [])
