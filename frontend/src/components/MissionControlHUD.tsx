@@ -1,10 +1,9 @@
 import { loadStreak, loadXP } from '../lib/courseProgress'
 import { useAnimatedNumber } from '../lib/useAnimatedNumber'
 
-type Plan = 'course' | 'free' | 'pro'
+import type { Plan } from '../api/types'
 
 const PLAN_LABEL: Record<Plan, string> = {
-  course: 'COURSE',
   free: 'FREE',
   pro: 'PRO',
 }

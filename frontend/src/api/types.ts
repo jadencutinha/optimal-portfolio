@@ -110,7 +110,7 @@ export interface FrontierResponse {
   tangency_index: number
 }
 
-export type Plan = 'free' | 'pro' | 'course'
+export type Plan = 'free' | 'pro'
 
 export interface MeResponse {
   id: string
@@ -637,4 +637,21 @@ export interface QuoteBoard {
   source: string
   feed: string
   as_of: string | null
+}
+
+export interface PricePoint {
+  date: string
+  close: number
+}
+
+export interface TickerPrices {
+  ticker: string
+  points: PricePoint[]
+}
+
+export interface PricesResponse {
+  provider: string
+  start: string
+  end: string
+  series: TickerPrices[]
 }

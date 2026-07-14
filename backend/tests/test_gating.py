@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.api.deps import get_access
 from app.auth.gating import Access
-from app.auth.plans import entitlements_for
+from app.auth.plans import PLANS, entitlements_for, normalize_plan
 
 
 def _as_plan(plan: str, user_id: str | None = None) -> Access:
@@ -102,6 +102,25 @@ def test_free_daily_quota_enforced(client: TestClient) -> None:
         clear(client)
 
 
-@pytest.mark.parametrize("plan", ["pro", "course"])
+@pytest.mark.parametrize("plan", ["free", "pro"])
 def test_known_plans_resolve_entitlements(plan: str) -> None:
     assert entitlements_for(plan)["max_tickers"] >= 8
+
+
+def test_legacy_course_plan_normalizes_to_free() -> None:
+    assert normalize_plan("course") == "free"
+    assert normalize_plan("nonsense") == "free"
+    assert entitlements_for("course") == entitlements_for("free")
+
+
+def test_every_plan_can_reach_the_course() -> None:
+    for plan in PLANS:
+        assert entitlements_for(plan)["course_access"] is True
+
+
+def test_pro_keeps_its_entitlements_alongside_course_access() -> None:
+    pro = entitlements_for("pro")
+    assert pro["max_tickers"] == 50
+    assert pro["advanced_optimizers"] is True
+    assert pro["trade_fee_bps"] == 0
+    assert pro["saved_portfolios"] is None

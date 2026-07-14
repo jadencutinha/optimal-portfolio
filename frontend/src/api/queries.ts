@@ -13,6 +13,7 @@ import type {
   CourseSummary,
   ExplainResponse,
   FrontierParams,
+  FrontierResponse,
   InvestAccount,
   InvestBenchmark,
   InvestHistory,
@@ -24,8 +25,6 @@ import type {
   InvestRequest,
   InvestSummary,
   InvestTradeRequest,
-  QuoteBoard,
-  FrontierResponse,
   MeResponse,
   OptimizeRequest,
   OptimizeResponse,
@@ -35,6 +34,8 @@ import type {
   PortfolioCreate,
   PortfolioDetail,
   PortfolioSummary,
+  PricesResponse,
+  QuoteBoard,
   ResampledFrontierRequest,
   ResampledFrontierResponse,
   StressResponse,
@@ -106,6 +107,15 @@ export function useUniverse() {
   return useQuery({
     queryKey: ['universe'],
     queryFn: async () => (await apiClient.get<UniverseResponse>('/api/universe')).data,
+  })
+}
+
+export function usePrices(tickers: string[], enabled: boolean) {
+  return useQuery({
+    queryKey: ['prices', [...tickers].sort().join(',')],
+    enabled: enabled && tickers.length > 0,
+    queryFn: async () =>
+      (await apiClient.get<PricesResponse>('/api/prices', { params: { tickers: tickers.join(',') } })).data,
   })
 }
 

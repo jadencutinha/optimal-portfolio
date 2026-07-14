@@ -1,8 +1,10 @@
 from typing import Literal
 
-Plan = Literal["free", "pro", "course"]
+Plan = Literal["free", "pro"]
 
-PLANS: tuple[Plan, ...] = ("free", "pro", "course")
+PLANS: tuple[Plan, ...] = ("free", "pro")
+
+LEGACY_PLANS: dict[str, Plan] = {"course": "free"}
 
 _ENTITLEMENTS: dict[str, dict] = {
     "free": {
@@ -14,7 +16,7 @@ _ENTITLEMENTS: dict[str, dict] = {
         "advanced_optimizers": False,
         "live_demo": False,
         "saved_portfolios": 3,
-        "course_access": False,
+        "course_access": True,
         "trade_fee_bps": 25,
     },
     "pro": {
@@ -29,20 +31,14 @@ _ENTITLEMENTS: dict[str, dict] = {
         "course_access": True,
         "trade_fee_bps": 0,
     },
-    "course": {
-        "max_tickers": 8,
-        "risk_models": ["sample"],
-        "objectives": ["min_variance", "max_sharpe"],
-        "max_lookback_days": 756,
-        "daily_optimizations": 10,
-        "advanced_optimizers": False,
-        "live_demo": False,
-        "saved_portfolios": 3,
-        "course_access": True,
-        "trade_fee_bps": 25,
-    },
 }
 
 
+def normalize_plan(value: str) -> Plan:
+    if value in PLANS:
+        return value  # type: ignore[return-value]
+    return LEGACY_PLANS.get(value, "free")
+
+
 def entitlements_for(plan: str) -> dict:
-    return _ENTITLEMENTS.get(plan, _ENTITLEMENTS["free"])
+    return _ENTITLEMENTS[normalize_plan(plan)]

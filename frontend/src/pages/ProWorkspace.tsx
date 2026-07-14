@@ -84,9 +84,15 @@ const PRO_FEATURES: HubFeature[] = [
   },
 ]
 
-export function ProWorkspace({ onSwitch }: { onSwitch: () => void }) {
+export function ProWorkspace({
+  onSwitch,
+  initialMode = 'analyze',
+}: {
+  onSwitch: () => void
+  initialMode?: 'analyze' | 'invest'
+}) {
   const [feature, setFeature] = useState<Feature>('optimizer')
-  const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
+  const [mode, setMode] = useState<'analyze' | 'invest'>(initialMode)
   const [showHub, setShowHub] = useState(true)
 
   useSurface('platform', 'pro')

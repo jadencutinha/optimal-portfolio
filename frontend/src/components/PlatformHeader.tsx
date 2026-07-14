@@ -5,7 +5,7 @@ export function PlatformHeader({ onSwitch }: { onSwitch: () => void }) {
     <div className="platform-bar">
       <Greeting />
       <button type="button" className="switch-plan" onClick={onSwitch}>
-        Switch platform
+        ← Home
       </button>
     </div>
   )

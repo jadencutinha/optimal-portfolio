@@ -7,12 +7,12 @@ from app.auth.repository import ProfileData
 from app.education.content import COURSES
 
 
-def as_user(client: TestClient, uid: str) -> None:
+def as_user(client: TestClient, uid: str, plan: str = "free") -> None:
     client.app.dependency_overrides[get_current_user] = lambda: ProfileData(
-        id=uid, email=None, plan="course", plan_selected=True
+        id=uid, email=None, plan=plan, plan_selected=True
     )
     client.app.dependency_overrides[get_access] = lambda: Access(
-        plan="course", user_id=uid, entitlements=entitlements_for("course")
+        plan=plan, user_id=uid, entitlements=entitlements_for(plan)
     )
 
 
@@ -114,3 +114,30 @@ def test_credential_verification(client: TestClient) -> None:
     assert verified["course"] == course["title"]
 
     assert client.get("/api/verify/not-a-real-credential").json()["valid"] is False
+
+
+def test_pro_user_can_take_the_course_without_losing_entitlements(client: TestClient) -> None:
+    as_user(client, "u-pro-learner", plan="pro")
+    try:
+        course = COURSES[0]
+        answers = {question["id"]: question["answer"] for question in course["final_exam"]}
+        exam = client.post(f"/api/courses/{course['id']}/exam", json={"answers": answers})
+        assert exam.status_code == 200
+
+        me = client.get("/api/me").json()
+        assert me["plan"] == "pro"
+        assert me["entitlements"]["max_tickers"] == 50
+        assert me["entitlements"]["advanced_optimizers"] is True
+        assert me["entitlements"]["trade_fee_bps"] == 0
+    finally:
+        clear(client)
+
+
+def test_free_user_has_course_access(client: TestClient) -> None:
+    as_user(client, "u-free-learner", plan="free")
+    try:
+        me = client.get("/api/me").json()
+        assert me["plan"] == "free"
+        assert me["entitlements"]["course_access"] is True
+    finally:
+        clear(client)

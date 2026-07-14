@@ -78,12 +78,13 @@ interface Props {
   onOpenRiskQ: () => void
   onUpgrade: () => void
   onSwitch: () => void
+  initialMode?: 'analyze' | 'invest'
 }
 
-export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch }: Props) {
+export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'analyze' }: Props) {
   const savedProfile = localStorage.getItem(RISK_PROFILE_KEY)
   const [feature, setFeature] = useState<Feature>('optimizer')
-  const [mode, setMode] = useState<'analyze' | 'invest'>('analyze')
+  const [mode, setMode] = useState<'analyze' | 'invest'>(initialMode)
   const [showHub, setShowHub] = useState(true)
 
   useSurface('platform', 'free')

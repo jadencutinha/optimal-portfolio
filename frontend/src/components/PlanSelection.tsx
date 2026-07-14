@@ -11,7 +11,7 @@ interface PlanCard {
   id: Plan
   name: string
   price: string
-  hue: 'neptune' | 'saturn' | 'sun'
+  hue: 'saturn' | 'sun'
   tagline: string
   features: string[]
   featured?: boolean
@@ -19,19 +19,6 @@ interface PlanCard {
 }
 
 const PLANS: PlanCard[] = [
-  {
-    id: 'course',
-    name: 'Course',
-    price: 'Learn',
-    hue: 'neptune',
-    tagline: 'Learn investing and optimization from the ground up.',
-    features: [
-      'Guided lessons: investing, Markowitz, risk & Sharpe',
-      'Interactive, hands-on examples',
-      'Quizzes and progress tracking',
-      'Verifiable certificate on completion',
-    ],
-  },
   {
     id: 'free',
     name: 'Free',
@@ -44,6 +31,7 @@ const PLANS: PlanCard[] = [
       'Sample covariance risk model',
       '10 optimizations / day',
       'Save up to 3 portfolios',
+      'Full access to every learning track',
     ],
   },
   {
@@ -59,6 +47,7 @@ const PLANS: PlanCard[] = [
       'Sector & position constraints',
       'Efficient frontier & live analysis',
       'Unlimited saved portfolios',
+      'No paper-trading fee',
     ],
     featured: true,
     note: 'Demo. No payment required yet',
@@ -155,8 +144,8 @@ export function PlanSelection({ current, pending, onChoose, onUpgradeToPro, onCa
         </ul>
         {plan.note && <p className="plan-note">{plan.note}</p>}
         {current === plan.id ? (
-          <button type="button" className="plan-current" disabled>
-            Current platform
+          <button type="button" className="plan-current" disabled={!onCancel} onClick={onCancel}>
+            {onCancel ? `Jump into ${plan.name}` : 'Current platform'}
           </button>
         ) : (
           <button type="button" className="primary" disabled={pending} onClick={choose}>

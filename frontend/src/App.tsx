@@ -1,11 +1,13 @@
 import { AuthBar } from './components/AuthBar'
 import { Starfield } from './components/Starfield'
 import { useAuth } from './auth/useAuth'
+import { useView } from './nav/useView'
 import { Home } from './pages/Home'
 import { VerifyPage } from './pages/VerifyPage'
 
 export default function App() {
   const { session } = useAuth()
+  const { setView } = useView()
   const path = window.location.pathname
 
   if (path.startsWith('/verify/')) {
@@ -34,7 +36,14 @@ export default function App() {
         <header className="app-header">
           <div className="brand">
             <div>
-              <img src="/logo-wordmark.png" alt="Halo!" className="brand-logo" />
+              <button
+                type="button"
+                className="brand-home"
+                onClick={() => setView('home')}
+                aria-label="Go to home"
+              >
+                <img src="/logo-wordmark.png" alt="Halo!" className="brand-logo" />
+              </button>
               <p>Convex portfolio optimization on real market data</p>
             </div>
           </div>

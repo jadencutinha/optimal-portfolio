@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import delete as sql_delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.auth.plans import PLANS, normalize_plan
 from app.db.models import (
     Certificate,
     Enrollment,
@@ -32,9 +33,16 @@ class ProfileRepository:
                 profile = Profile(id=user_id, email=email, plan="free")
                 session.add(profile)
                 await session.commit()
-            elif email and profile.email != email:
-                profile.email = email
-                await session.commit()
+            else:
+                dirty = False
+                if email and profile.email != email:
+                    profile.email = email
+                    dirty = True
+                if profile.plan not in PLANS:
+                    profile.plan = normalize_plan(profile.plan)
+                    dirty = True
+                if dirty:
+                    await session.commit()
             return ProfileData(profile.id, profile.email, profile.plan, profile.plan_selected)
 
     async def delete_account(self, user_id: str) -> None:

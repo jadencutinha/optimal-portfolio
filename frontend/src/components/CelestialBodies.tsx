@@ -6,7 +6,7 @@ interface Props {
   active: number
 }
 
-const COUNT = 3
+const COUNT = 2
 const CAMERA_Z = 10
 const WORLD_HEIGHT = 2.6
 const BASE_SPACING = 2.35
@@ -52,25 +52,13 @@ export function CelestialBodies({ active }: Props) {
     const disposables: { dispose: () => void }[] = []
     const baseAlpha: number[] = []
 
-    const neptune = new THREE.Group()
-    neptune.rotation.z = 0.24
-    const neptuneMaterial = makeMaterial(dpr, { ambient: 0.04, front: 1.05, rim: 0.75 }, 0.82)
-    const neptuneGeometry = bandedSphere(10000, 0.95, new THREE.Color(0x1d3f9e), new THREE.Color(0x5fa8ff), 9)
-    neptune.add(new THREE.Points(neptuneGeometry, neptuneMaterial))
-    disposables.push(neptuneGeometry, neptuneMaterial)
-    groups.push(neptune)
-    bodyMaterials.push(neptuneMaterial)
-    allMaterials.push(neptuneMaterial)
-    baseAlpha.push(0.82)
-    scene.add(neptune)
-
     const saturn = new THREE.Group()
     saturn.rotation.z = 0.47
     saturn.rotation.x = 0.12
     const saturnMaterial = makeMaterial(dpr, { ambient: 0.05, front: 1.05, rim: 0.7 }, 0.78)
-    const saturnGeometry = bandedSphere(9000, 0.72, new THREE.Color(0x176b45), new THREE.Color(0x76f2b4), 12)
+    const saturnGeometry = bandedSphere(9000, 0.72, new THREE.Color(0x6b4f22), new THREE.Color(0xe0c98a), 12)
     saturn.add(new THREE.Points(saturnGeometry, saturnMaterial))
-    const saturnRing = ringDisc(8000, 0.98, 1.6, 1.34, 1.41, new THREE.Color(0xbdf3d6))
+    const saturnRing = ringDisc(8000, 0.98, 1.6, 1.34, 1.41, new THREE.Color(0xd8b878))
     saturn.add(new THREE.Points(saturnRing, saturnMaterial))
     disposables.push(saturnGeometry, saturnRing, saturnMaterial)
     groups.push(saturn)
@@ -81,10 +69,10 @@ export function CelestialBodies({ active }: Props) {
 
     const sun = new THREE.Group()
     const sunMaterial = makeMaterial(dpr, { ambient: 1, front: 0, rim: 0 }, 0.52)
-    const sunGeometry = star(15000, 1, new THREE.Color(0xfff4cf), new THREE.Color(0xff8c1f))
+    const sunGeometry = star(15000, 1, new THREE.Color(0xfff6dc), new THREE.Color(0xd4af37))
     sun.add(new THREE.Points(sunGeometry, sunMaterial))
     const coronaMaterial = makeMaterial(dpr, { ambient: 1, front: 0, rim: 0 }, 0.3)
-    const coronaGeometry = coronaCloud(2600, 0.95, 0.5, new THREE.Color(0xffb457))
+    const coronaGeometry = coronaCloud(2600, 0.95, 0.5, new THREE.Color(0xf0cf6a))
     sun.add(new THREE.Points(coronaGeometry, coronaMaterial))
     disposables.push(sunGeometry, sunMaterial, coronaGeometry, coronaMaterial)
     groups.push(sun)
@@ -94,7 +82,7 @@ export function CelestialBodies({ active }: Props) {
     scene.add(sun)
 
     const CORONA_BASE = 0.3
-    const spins = [0.05, 0.042, 0.028]
+    const spins = [0.042, 0.028]
     const state = groups.map(() => ({ x: 0, scale: SIDE_SCALE, weight: 0 }))
     let spacing = BASE_SPACING
     let compact = false
@@ -171,7 +159,7 @@ export function CelestialBodies({ active }: Props) {
 
         const dim = compact ? item.weight : 0.42 + item.weight * 0.58
         bodyMaterials[index].uniforms.uAlpha.value = baseAlpha[index] * dim
-        if (index === 2) coronaMaterial.uniforms.uAlpha.value = CORONA_BASE * dim
+        if (index === 1) coronaMaterial.uniforms.uAlpha.value = CORONA_BASE * dim
       })
 
       renderer.render(scene, camera)

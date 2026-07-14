@@ -6,9 +6,12 @@ import { Loader } from '../components/Loader'
 import { MissionControlHUD } from '../components/MissionControlHUD'
 import { PlanSelection } from '../components/PlanSelection'
 import { RiskQuestionnaire } from '../components/RiskQuestionnaire'
+import { useView } from '../nav/useView'
+import { AboutPage } from './AboutPage'
 import { CheckoutPage } from './CheckoutPage'
 import { CoursePage } from './CoursePage'
 import { FreePage } from './FreePage'
+import { HomeDashboard } from './HomeDashboard'
 import { Landing } from './Landing'
 import { ProWorkspace } from './ProWorkspace'
 
@@ -18,7 +21,8 @@ export function Home() {
   const { session } = useAuth()
   const me = useMe()
   const setPlan = useSetPlan()
-  const [switching, setSwitching] = useState(false)
+  const { view, setView } = useView()
+  const [managingPlan, setManagingPlan] = useState(false)
   const [showRiskQ, setShowRiskQ] = useState(false)
   const [checkout, setCheckout] = useState(false)
 
@@ -41,23 +45,23 @@ export function Home() {
       <CheckoutPage
         onDone={() => {
           setCheckout(false)
-          setSwitching(false)
+          setManagingPlan(false)
         }}
         onCancel={() => setCheckout(false)}
       />
     )
   }
 
-  if (!planSelected || switching) {
+  if (!planSelected || managingPlan) {
     return (
       <PlanSelection
         current={planSelected ? plan : undefined}
         pending={setPlan.isPending}
-        onCancel={planSelected ? () => setSwitching(false) : undefined}
+        onCancel={planSelected ? () => setManagingPlan(false) : undefined}
         onUpgradeToPro={() => setCheckout(true)}
         onChoose={async (choice) => {
           await setPlan.mutateAsync(choice)
-          setSwitching(false)
+          setManagingPlan(false)
         }}
       />
     )
@@ -74,20 +78,39 @@ export function Home() {
     )
   }
 
-  const onSwitch = () => setSwitching(true)
+  const goHome = () => setView('home')
 
   return (
     <>
       <MissionControlHUD plan={plan} />
-      {plan === 'course' && <CoursePage onSwitch={onSwitch} learnerName={me.data.email} />}
-      {plan === 'free' && (
-        <FreePage
-          onOpenRiskQ={() => setShowRiskQ(true)}
+
+      {view === 'home' && (
+        <HomeDashboard
+          plan={plan}
+          onAnalyze={() => setView('analyze')}
+          onInvest={() => setView('invest')}
+          onLearn={() => setView('learn')}
+          onAbout={() => setView('about')}
+          onManagePlan={() => setManagingPlan(true)}
           onUpgrade={() => setCheckout(true)}
-          onSwitch={onSwitch}
         />
       )}
-      {plan === 'pro' && <ProWorkspace onSwitch={onSwitch} />}
+
+      {view === 'about' && <AboutPage onBack={goHome} />}
+
+      {view === 'learn' && <CoursePage onSwitch={goHome} learnerName={me.data.email} />}
+
+      {(view === 'analyze' || view === 'invest') &&
+        (plan === 'pro' ? (
+          <ProWorkspace onSwitch={goHome} initialMode={view === 'invest' ? 'invest' : 'analyze'} />
+        ) : (
+          <FreePage
+            onOpenRiskQ={() => setShowRiskQ(true)}
+            onUpgrade={() => setCheckout(true)}
+            onSwitch={goHome}
+            initialMode={view === 'invest' ? 'invest' : 'analyze'}
+          />
+        ))}
     </>
   )
 }
