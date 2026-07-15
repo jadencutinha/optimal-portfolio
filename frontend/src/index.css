@@ -3895,6 +3895,49 @@ table.weights td {
   color: var(--text);
 }
 
+/* Live snapshot of the learner's own saved portfolio, shown after a
+   perfect quiz run on a Portfolio Analysis lesson. */
+.lesson-portfolio-snapshot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: rgba(111, 179, 221, 0.1);
+  border: 1px solid rgba(111, 179, 221, 0.4);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 8px 0 28px;
+}
+.lesson-portfolio-snapshot.is-live {
+  box-shadow: 0 0 0 1px rgba(111, 179, 221, 0.15), 0 0 20px -8px rgba(111, 179, 221, 0.5);
+}
+.lesson-portfolio-snapshot-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.lesson-portfolio-snapshot-text strong {
+  color: #6fb3dd;
+  font-size: 16px;
+}
+.lesson-portfolio-snapshot-btn {
+  flex: 0 0 auto;
+  background: none;
+  border: 1px solid rgba(111, 179, 221, 0.5);
+  color: #6fb3dd;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lesson-portfolio-snapshot-btn:hover {
+  background: rgba(111, 179, 221, 0.12);
+}
+
 /* ─── Quiz ────────────────────────────────────────────────────── */
 
 .quiz {

@@ -1,8 +1,21 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { AuthContext, type AuthState } from '../auth/context'
 import type { Track } from '../data/courseData'
 import { ModuleLayout } from './ModuleLayout'
+
+const noAuth: AuthState = {
+  session: null,
+  loading: false,
+  signIn: vi.fn(),
+  signUp: vi.fn(),
+  signInWithGoogle: vi.fn(),
+  signOut: vi.fn(),
+  deleteAccount: vi.fn(),
+  updateProfile: vi.fn(),
+}
 
 const track: Track = {
   id: 99,
@@ -38,20 +51,27 @@ function setup(overrides: { isModuleComplete?: (moduleId: number) => boolean } =
   const onSelectModule = vi.fn()
   const onBackToTracks = vi.fn()
   const onModuleComplete = vi.fn()
+  const onGoToPortfolio = vi.fn()
   const isModuleComplete = overrides.isModuleComplete ?? vi.fn(() => false)
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
   render(
-    <ModuleLayout
-      track={track}
-      moduleIndex={0}
-      onSelectModule={onSelectModule}
-      onBackToTracks={onBackToTracks}
-      isModuleComplete={isModuleComplete}
-      onModuleComplete={onModuleComplete}
-    />
+    <AuthContext.Provider value={noAuth}>
+      <QueryClientProvider client={queryClient}>
+        <ModuleLayout
+          track={track}
+          moduleIndex={0}
+          onSelectModule={onSelectModule}
+          onBackToTracks={onBackToTracks}
+          onGoToPortfolio={onGoToPortfolio}
+          isModuleComplete={isModuleComplete}
+          onModuleComplete={onModuleComplete}
+        />
+      </QueryClientProvider>
+    </AuthContext.Provider>
   )
 
-  return { onSelectModule, onBackToTracks, onModuleComplete }
+  return { onSelectModule, onBackToTracks, onModuleComplete, onGoToPortfolio }
 }
 
 describe('ModuleLayout quiz', () => {

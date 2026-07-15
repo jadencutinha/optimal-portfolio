@@ -137,9 +137,11 @@ function trimLine(p: LinePoint, q: LinePoint, amount: number) {
 
 export function CoursePage({
   onSwitch,
+  onGoToPortfolio,
   learnerName,
 }: {
   onSwitch: () => void
+  onGoToPortfolio: () => void
   learnerName?: string | null
 }) {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
@@ -235,6 +237,7 @@ export function CoursePage({
         moduleIndex={moduleIndex}
         onSelectModule={setModuleIndex}
         onBackToTracks={() => setViewingModule(false)}
+        onGoToPortfolio={onGoToPortfolio}
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
         onModuleComplete={(moduleId, retakes) => markComplete(selectedTrack.id, moduleId, retakes)}
         getModuleStars={(moduleId) => mastery[moduleKey(selectedTrack.id, moduleId)] ?? 0}
@@ -297,7 +300,7 @@ export function CoursePage({
       <PlatformHeader onSwitch={onSwitch} />
       <div className="course-landing-head">
         <div>
-          <h1 className="course-landing-title">Halo Learn</h1>
+          <h1 className="course-landing-title">Welcome to Halo Learn!</h1>
           <p className="course-landing-desc">
             Master the hidden curriculum of investing through interactive lessons and real
             portfolio building.

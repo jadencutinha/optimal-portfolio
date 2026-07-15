@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useSavedPortfolios } from '../api/queries'
 import type { ContentBlock, Track } from '../data/courseData'
 import { starsForRetakes, xpForStars } from '../lib/courseProgress'
+import { percent, ratio } from '../lib/format'
 import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
 interface Props {
@@ -8,11 +10,79 @@ interface Props {
   moduleIndex: number
   onSelectModule: (index: number) => void
   onBackToTracks: () => void
+  onGoToPortfolio: () => void
   isModuleComplete: (moduleId: number) => boolean
   onModuleComplete: (moduleId: number, retakes: number) => void
   getModuleStars?: (moduleId: number) => number
   xp?: number
   streak?: number
+}
+
+// Portfolio Analysis (track 4) modules that map to a metric actually saved
+// with a portfolio today. The rest (beta, drawdown, diversification,
+// Sortino/Calmar) aren't stored yet, so they get an honest "see it in a
+// full report" nudge instead of a fabricated number.
+const PORTFOLIO_METRIC_BY_MODULE: Record<number, { key: 'sharpe_ratio' | 'volatility'; label: string }> = {
+  1: { key: 'sharpe_ratio', label: 'Sharpe ratio' },
+  3: { key: 'volatility', label: 'Volatility' },
+}
+
+function PortfolioSnapshot({
+  track,
+  moduleId,
+  onGoToPortfolio,
+}: {
+  track: Track
+  moduleId: number
+  onGoToPortfolio: () => void
+}) {
+  const saved = useSavedPortfolios()
+  if (track.id !== 4 || saved.isLoading) return null
+
+  const portfolios = saved.data ?? []
+  const latest = portfolios.length
+    ? portfolios.reduce((a, b) => (new Date(a.created_at) > new Date(b.created_at) ? a : b))
+    : null
+  const metric = PORTFOLIO_METRIC_BY_MODULE[moduleId]
+
+  if (!latest) {
+    return (
+      <div className="lesson-portfolio-snapshot">
+        <p className="lesson-portfolio-snapshot-text">
+          You haven&apos;t built a portfolio yet — try the optimizer to see this on your own numbers.
+        </p>
+        <button type="button" className="lesson-portfolio-snapshot-btn" onClick={onGoToPortfolio}>
+          Build a portfolio
+        </button>
+      </div>
+    )
+  }
+
+  const value = metric ? latest.metrics[metric.key] : undefined
+  if (!metric || value === undefined) {
+    return (
+      <div className="lesson-portfolio-snapshot">
+        <p className="lesson-portfolio-snapshot-text">
+          See this metric for &ldquo;{latest.name}&rdquo; in a full backtest report.
+        </p>
+        <button type="button" className="lesson-portfolio-snapshot-btn" onClick={onGoToPortfolio}>
+          Open backtest
+        </button>
+      </div>
+    )
+  }
+
+  const formatted = metric.key === 'volatility' ? percent(value) : ratio(value)
+  return (
+    <div className="lesson-portfolio-snapshot is-live">
+      <p className="lesson-portfolio-snapshot-text">
+        Your portfolio &ldquo;{latest.name}&rdquo;&rsquo;s {metric.label}: <strong>{formatted}</strong>
+      </p>
+      <button type="button" className="lesson-portfolio-snapshot-btn" onClick={onGoToPortfolio}>
+        See full breakdown
+      </button>
+    </div>
+  )
 }
 
 function StarRow({ stars }: { stars: number }) {
@@ -47,6 +117,7 @@ export function ModuleLayout({
   moduleIndex,
   onSelectModule,
   onBackToTracks,
+  onGoToPortfolio,
   isModuleComplete,
   onModuleComplete,
   getModuleStars,
@@ -195,6 +266,8 @@ export function ModuleLayout({
             return null
           })}
         </div>
+
+        <PortfolioSnapshot track={track} moduleId={mod.id} onGoToPortfolio={onGoToPortfolio} />
 
         <div className="quiz">
           <h2 className="quiz-heading">Check your knowledge</h2>

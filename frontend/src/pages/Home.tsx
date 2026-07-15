@@ -75,11 +75,14 @@ export function Home() {
   }
 
   const onSwitch = () => setSwitching(true)
+  const onGoToPortfolio = () => setPlan.mutateAsync('free')
 
   return (
     <>
       <MissionControlHUD plan={plan} />
-      {plan === 'course' && <CoursePage onSwitch={onSwitch} learnerName={me.data.email} />}
+      {plan === 'course' && (
+        <CoursePage onSwitch={onSwitch} onGoToPortfolio={onGoToPortfolio} learnerName={me.data.email} />
+      )}
       {plan === 'free' && (
         <FreePage
           onOpenRiskQ={() => setShowRiskQ(true)}
