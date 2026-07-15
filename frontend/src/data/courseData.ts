@@ -1711,4 +1711,1042 @@ const track4: Track = {
   ],
 }
 
-export const TRACKS: Track[] = [track1, track2, track3, track4]
+const track5: Track = {
+  id: 5,
+  title: 'Institutional Investing',
+  description: 'How hedge funds generate ideas, size positions, and manage risk.',
+  estimatedTime: '30 min',
+  difficulty: 'Advanced',
+  modules: [
+    {
+      id: 1,
+      title: 'How Institutional Investors Actually Generate Ideas',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Institutional investors don't pick stocks by browsing headlines. Funds run a repeatable idea-generation process long before a single trade is placed, and that process is what separates a hunch from a position.",
+        },
+        {
+          type: 'subheading',
+          text: 'Where ideas come from',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Fundamental research**: reading filings and earnings calls to find a business the market has mispriced',
+            '**Industry theses**: forming a macro or sector view first, then finding the best vehicle to express it',
+            '**Quantitative screens**: rules-based filters run across thousands of securities at once',
+            '**Alternative data**: satellite imagery, card-spend panels, web traffic — used to test a thesis before it shows up in official numbers',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'From idea to position: the variant view',
+        },
+        {
+          type: 'paragraph',
+          text: "An idea only becomes a position after it clears one test: is this a specific, falsifiable belief that differs from what the market is already pricing in? \"I think this company is good\" isn't an edge. \"I believe X will happen within Y months, and the current price assumes it won't\" is.",
+        },
+        {
+          type: 'callout',
+          text: 'An edge is a variant view against consensus, not a general opinion. If the market already agrees with you, there is no mispricing left to capture.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "The optimizer takes a list of tickers as a given input. Everything upstream of that — why THESE tickers and not others — is the idea-generation process this module describes. Halo picks up exactly where that process ends.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What separates a real investment edge from a general opinion?',
+          options: [
+            { text: 'Believing a company is well-run', correct: false },
+            { text: 'A specific, falsifiable view that differs from what the market is already pricing in', correct: true },
+            { text: 'Reading more news articles about it than other investors', correct: false },
+          ],
+        },
+        {
+          question: 'What is alternative data used for in idea generation?',
+          options: [
+            { text: 'Replacing financial statements entirely', correct: false },
+            { text: 'Testing a thesis against real-world signals before it shows up in official numbers', correct: true },
+            { text: 'Predicting the exact stock price a year out', correct: false },
+          ],
+        },
+        {
+          question: 'Why is "the market already agrees with me" a problem for an investment idea?',
+          options: [
+            { text: "It isn't a problem, consensus ideas are the safest", correct: false },
+            { text: 'If the price already reflects that belief, there is no mispricing left to profit from', correct: true },
+            { text: 'Because consensus views are always wrong', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      title: "Position Sizing: Why 'How Much' Matters More Than 'What'",
+      content: [
+        {
+          type: 'paragraph',
+          text: "A correct idea sized wrong can still hurt you: oversize a rare high-conviction bet and one bad surprise causes real damage; undersize it and it barely moves the portfolio even when you're right. Sizing is its own decision, not an afterthought to selection.",
+        },
+        {
+          type: 'subheading',
+          text: 'The Kelly criterion',
+        },
+        {
+          type: 'paragraph',
+          text: 'The Kelly criterion sizes a bet using edge relative to risk: roughly, the fraction of capital to risk grows with your expected edge and shrinks with the variance of the outcome. Say a strategy has an expected edge of 8% a year against a variance that implies a full-Kelly allocation of 40% of capital. Most professionals size well below that, often at "half-Kelly" or less.',
+        },
+        {
+          type: 'callout',
+          text: "Full Kelly is aggressive and assumes your edge estimate is exactly right. Professionals size at a fraction of Kelly specifically because edge estimates are noisy — betting the full theoretical amount on an imperfect estimate risks real capital on a number that's probably a little wrong.",
+        },
+        {
+          type: 'subheading',
+          text: 'Conviction-weighted sizing in practice',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Liquidity**: can you actually build and exit the position without moving the price against yourself?',
+            "**Correlation to the existing book**: a new \"diversifying\" idea that moves 80% in step with your biggest position isn't diversifying at all",
+            '**Catalyst and time horizon**: a thesis that plays out in a month can be sized differently than one that takes years',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "The optimizer's output weights are position sizes. Choosing max_sharpe or target_risk as an objective is a systematic way of answering the sizing question this module describes, instead of guessing at percentages.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What does the Kelly criterion size a position by?',
+          options: [
+            { text: 'Equal weight across every idea in the portfolio', correct: false },
+            { text: "Expected edge relative to the risk (variance) of the outcome", correct: true },
+            { text: 'How long the idea has been held', correct: false },
+          ],
+        },
+        {
+          question: 'Why do professionals typically size at a fraction of full Kelly, like half-Kelly?',
+          options: [
+            { text: 'Full Kelly is illegal for institutional investors', correct: false },
+            { text: 'Because edge estimates are noisy, and full Kelly assumes the estimate is exactly right', correct: true },
+            { text: 'Half-Kelly always produces higher returns than full Kelly', correct: false },
+          ],
+        },
+        {
+          question: 'A new position moves 80% in step with your largest existing holding. What does that mean for its diversification value?',
+          options: [
+            { text: "It adds meaningful diversification because it's a different company", correct: false },
+            { text: "It adds little diversification value despite being a separate name, due to the high correlation", correct: true },
+            { text: 'Correlation to existing holdings is irrelevant to sizing', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      title: 'Hedge Fund Strategy Taxonomy',
+      content: [
+        {
+          type: 'paragraph',
+          text: '"Hedge fund" describes a legal and fee structure, not a strategy. Funds differ enormously in what they actually do day to day, and the differences matter for understanding risk and return.',
+        },
+        {
+          type: 'subheading',
+          text: 'The main strategy families',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Long/Short Equity**: buy undervalued stocks, short overvalued ones, often to reduce net exposure to the overall market',
+            '**Global Macro**: bets on interest rates, currencies, and broad economic trends rather than individual companies',
+            '**Event-Driven**: profits from a specific corporate event resolving — mergers, spin-offs, bankruptcies',
+            '**Relative Value / Arbitrage**: exploits a pricing gap between two related securities that should converge, such as convertible or statistical arbitrage',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'Net and gross exposure',
+        },
+        {
+          type: 'paragraph',
+          text: 'Net exposure = long% − short%. Gross exposure = long% + short%. A market-neutral fund targets roughly 0% net exposure, so its returns come from stock selection rather than the market going up or down.',
+        },
+        {
+          type: 'callout',
+          text: 'Two funds can hold completely different net exposure while running the same amount of gross capital. Net exposure tells you how much the fund depends on the market direction being right; gross tells you how much leverage and concentration risk is actually in the book.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's optimizer currently builds long-only portfolios — every weight is a non-negative allocation, so net exposure is always 100%. Understanding net and gross exposure here is exactly what changes if a platform ever adds short positions.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What does "hedge fund" technically describe?',
+          options: [
+            { text: 'A specific investment strategy every fund follows', correct: false },
+            { text: 'A legal and fee structure, not a strategy — funds under it can do very different things', correct: true },
+            { text: 'A fund that only ever shorts stocks', correct: false },
+          ],
+        },
+        {
+          question: 'A fund is 70% long and 40% short. What is its net exposure?',
+          options: [
+            { text: '110%', correct: false },
+            { text: '30%', correct: true },
+            { text: '70%', correct: false },
+          ],
+        },
+        {
+          question: 'Why would a market-neutral fund target roughly 0% net exposure?',
+          options: [
+            { text: 'So its returns come from stock selection rather than the overall market direction', correct: true },
+            { text: 'Because 0% net exposure is required by law', correct: false },
+            { text: 'To maximize exposure to a rising market', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      title: 'Risk Management: Position Limits and Value at Risk',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Generating good ideas isn't enough on its own. Institutional risk management exists so that one bad idea — or one correct idea gone wrong — can't put the whole fund at risk.",
+        },
+        {
+          type: 'subheading',
+          text: 'Value at Risk (VaR)',
+        },
+        {
+          type: 'paragraph',
+          text: 'VaR is a statistical estimate of the maximum expected loss over a given horizon at a given confidence level. A "1-day 95% VaR of $2M" means there is roughly a 5% chance of losing more than $2M in a single day, based on historical or modeled volatility.',
+        },
+        {
+          type: 'callout',
+          text: "VaR describes typical bad days, not crisis days. It's built on statistical assumptions that tend to break down exactly when markets are most stressed — which is why risk managers also stress-test against specific historical crises instead of relying on a single statistical number.",
+        },
+        {
+          type: 'subheading',
+          text: 'Hard limits',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Position limits**: no single name over a set percentage of the book',
+            '**Sector or factor limits**: caps on exposure to one industry or shared risk factor',
+            '**Gross/net exposure caps**: bounding total leverage and market direction risk',
+            '**Stop-losses**: a predefined point at which a losing position is cut rather than argued about in the moment',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's stress-test feature runs your portfolio against specific historical windows — the 2008 financial crisis, the 2020 COVID crash, the 2022 rate shock — for exactly this reason: a statistical risk number alone doesn't tell you what actually happens to your portfolio in a real crisis.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'A fund reports a 1-day 95% VaR of $2M. What does that mean?',
+          options: [
+            { text: 'The fund will lose exactly $2M tomorrow', correct: false },
+            { text: 'There is roughly a 5% chance of losing more than $2M in a single day', correct: true },
+            { text: 'The fund is guaranteed not to lose more than $2M', correct: false },
+          ],
+        },
+        {
+          question: 'Why do risk managers stress-test against specific historical crises in addition to using VaR?',
+          options: [
+            { text: "Because VaR's statistical assumptions tend to break down in real crisis conditions", correct: true },
+            { text: 'Because VaR is illegal to use alone', correct: false },
+            { text: "Stress tests and VaR measure exactly the same thing", correct: false },
+          ],
+        },
+        {
+          question: 'What is a stop-loss?',
+          options: [
+            { text: 'A guarantee that a position cannot lose money', correct: false },
+            { text: 'A predefined point at which a losing position is cut, decided in advance rather than in the moment', correct: true },
+            { text: 'A tax on excessive trading', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      title: 'Prime Brokerage, Leverage, and Short Selling Mechanics',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Hedge funds don't just buy assets outright. Most use leverage and short selling, and both run through a prime broker — the institution that lends a fund shares and capital.",
+        },
+        {
+          type: 'subheading',
+          text: 'How short selling actually works',
+        },
+        {
+          type: 'paragraph',
+          text: "To short a stock, a fund borrows shares from the prime broker, sells them immediately, and must eventually buy them back to return them. A long position's loss is capped at 100% (the stock can only go to zero); a short position's loss is theoretically unlimited, because there is no ceiling on how high a price can rise.",
+        },
+        {
+          type: 'subheading',
+          text: 'Leverage and margin calls',
+        },
+        {
+          type: 'paragraph',
+          text: "Leverage lets a fund control a larger position than its own capital alone would allow, amplifying both gains and losses. If losses erode the collateral cushion behind a leveraged position, the broker can issue a margin call, forcing the fund to post more capital or close positions, often at the worst possible time.",
+        },
+        {
+          type: 'callout',
+          text: "The 2021 GameStop short squeeze is a well-known real-world illustration of unlimited short-side risk: a heavily shorted stock's price spike forced short sellers to buy back shares to limit their losses, and that buying pushed the price up further still.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's optimizer builds long-only portfolios, so none of this leverage or margin mechanics applies directly to what you build here — which is exactly why professionally leveraged portfolios and a long-only portfolio like the ones you build in Halo can behave so differently under stress.",
+        },
+      ],
+      quiz: [
+        {
+          question: "Why is a short position's potential loss described as unlimited, unlike a long position?",
+          options: [
+            { text: "A long position's loss is unlimited instead", correct: false },
+            { text: 'A stock price can rise indefinitely, while a long position can only lose up to 100% (the stock going to zero)', correct: true },
+            { text: 'Short positions are always more heavily regulated', correct: false },
+          ],
+        },
+        {
+          question: 'What triggers a margin call?',
+          options: [
+            { text: 'A position becoming profitable', correct: false },
+            { text: "Losses eroding the collateral cushion behind a leveraged position", correct: true },
+            { text: 'The end of the trading day', correct: false },
+          ],
+        },
+        {
+          question: 'In a short squeeze, why does short sellers buying back shares to cut losses tend to push the price up further?',
+          options: [
+            { text: 'It has no effect on price', correct: false },
+            { text: "That buying itself adds new demand for the stock, adding more upward pressure on the price", correct: true },
+            { text: 'Because short sellers are required to buy at a fixed government-set price', correct: false },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+const track6: Track = {
+  id: 6,
+  title: 'Quantitative Investing',
+  description: 'Factor investing, systematic strategies, and market regimes.',
+  estimatedTime: '30 min',
+  difficulty: 'Advanced',
+  modules: [
+    {
+      id: 1,
+      title: "What Makes a Strategy 'Quantitative'?",
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Discretionary investing means a person makes each call, informed by judgment. Systematic (quantitative) investing means a fixed, rules-based process makes the decision, so the same inputs always produce the same output.',
+        },
+        {
+          type: 'subheading',
+          text: 'The systematic pipeline',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Signal**: a rules-based measure believed to predict returns, e.g. "cheap relative to earnings"',
+            '**Portfolio construction**: turning signals into actual position weights, often via optimization',
+            '**Execution**: actually placing the trades the model calls for',
+            '**Monitoring and backtesting**: continuously checking whether the process still works',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'Why systematic over discretionary?',
+        },
+        {
+          type: 'paragraph',
+          text: 'A systematic process removes day-to-day emotional bias, scales across thousands of securities a human could never track individually, and can be tested rigorously against history before a dollar is risked.',
+        },
+        {
+          type: 'callout',
+          text: "A systematic strategy is only as good as its signal and its backtest. If a rule was reverse-engineered to fit the past, it will look great in a backtest and fail in real trading — the subject of this track's final module.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: 'The optimizer itself is a systematic process: give it the same tickers, objective, and risk model twice, and it always produces the same weights — exactly the discipline described here.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What distinguishes systematic (quantitative) investing from discretionary investing?',
+          options: [
+            { text: 'Systematic investing only trades bonds', correct: false },
+            { text: 'A fixed, rules-based process makes the decision, so the same inputs always produce the same output', correct: true },
+            { text: 'Discretionary investing is always more profitable', correct: false },
+          ],
+        },
+        {
+          question: 'What is a "signal" in a systematic strategy?',
+          options: [
+            { text: 'The final trade confirmation', correct: false },
+            { text: 'A rules-based measure believed to predict returns', correct: true },
+            { text: 'A regulatory filing requirement', correct: false },
+          ],
+        },
+        {
+          question: 'Why is a systematic strategy "only as good as its signal and its backtest"?',
+          options: [
+            { text: 'Because a rule fit too closely to past data can look great historically but fail going forward', correct: true },
+            { text: 'Because systematic strategies never use historical data', correct: false },
+            { text: 'Because backtests are always accurate predictors of the future', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Factor Investing: Value, Momentum, Size, and Quality',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'A factor is a measurable characteristic of a stock that has historically been associated with different average returns. Factor investing systematically tilts a portfolio toward these characteristics, rather than picking individual names one at a time.',
+        },
+        {
+          type: 'subheading',
+          text: 'The classic factors',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Value**: stocks cheap relative to fundamentals (low price-to-earnings or price-to-book) have historically outperformed expensive ones, formalized by Fama and French',
+            '**Momentum**: stocks that have risen over the past 6–12 months have tended to keep rising in the near term, documented by Jegadeesh and Titman',
+            '**Size**: smaller companies have historically shown a return premium over larger ones, though less consistently in recent decades',
+            '**Quality**: profitable, low-debt, stable-earnings companies have tended to outperform on a risk-adjusted basis',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'A worked example',
+        },
+        {
+          type: 'paragraph',
+          text: 'Say two companies sit in the same sector: Stock A trades at a P/E of 10, Stock B at a P/E of 30. A value tilt, all else equal, would overweight the cheaper Stock A relative to a market-cap-weighted benchmark.',
+        },
+        {
+          type: 'callout',
+          text: "Factors are statistical tendencies observed across large numbers of stocks over long periods, not guarantees for any single stock or year. Any one factor can underperform for years at a time.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's factor risk model estimates covariance using shared statistical factors extracted from asset returns — the same \"characteristics investors get paid to hold\" logic, used here for risk estimation rather than stock-picking.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is a "factor" in factor investing?',
+          options: [
+            { text: 'A single company picked by a portfolio manager', correct: false },
+            { text: 'A measurable stock characteristic historically associated with different average returns', correct: true },
+            { text: 'A government regulation on trading', correct: false },
+          ],
+        },
+        {
+          question: 'Which factor is defined by favoring stocks that are cheap relative to their fundamentals?',
+          options: [
+            { text: 'Momentum', correct: false },
+            { text: 'Value', correct: true },
+            { text: 'Size', correct: false },
+          ],
+        },
+        {
+          question: 'Why can a factor underperform for years at a time?',
+          options: [
+            { text: 'Factors are statistical tendencies over large samples and long periods, not guarantees for any single stretch of time', correct: true },
+            { text: 'Because factor investing is banned during market downturns', correct: false },
+            { text: 'It cannot — factors always outperform every year by definition', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      title: 'Momentum and Mean Reversion: Two Sides of Market Behavior',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Markets show both momentum (trends persisting) over medium horizons and mean reversion (extreme moves reversing) over other horizons. These aren't contradictory — they operate on different time frames and different underlying causes.",
+        },
+        {
+          type: 'subheading',
+          text: 'Momentum',
+        },
+        {
+          type: 'paragraph',
+          text: 'Cross-sectional momentum ranks stocks by recent performance and favors recent winners over recent losers. Time-series momentum looks at a single asset\'s own trend to predict its next move. Both are commonly explained by underreaction: information diffuses into prices gradually rather than instantly.',
+        },
+        {
+          type: 'subheading',
+          text: 'Mean reversion',
+        },
+        {
+          type: 'paragraph',
+          text: 'Short-term reversal shows up at very short horizons (days to weeks). Long-horizon reversal shows up over years: stocks that were the worst performers over the past 3–5 years have tended to outperform the best performers over the following 3–5 years. This is commonly explained by overreaction rather than underreaction.',
+        },
+        {
+          type: 'callout',
+          text: 'The word "trend" means different things at different horizons. A stock can show 12-month momentum and 1-week mean reversion at the very same time — they are not the same phenomenon.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's backtest lets you test how a portfolio would have performed over a historical lookback window you choose — exactly the kind of horizon-dependent analysis this module describes, since the right lookback window depends on which effect you're trying to capture.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is the difference between cross-sectional and time-series momentum?',
+          options: [
+            { text: 'They are two names for the exact same calculation', correct: false },
+            { text: "Cross-sectional ranks stocks against each other; time-series looks at a single asset's own trend", correct: true },
+            { text: 'Time-series momentum only applies to currencies', correct: false },
+          ],
+        },
+        {
+          question: 'Long-horizon reversal describes what pattern?',
+          options: [
+            { text: "The worst performers over 3–5 years tending to outperform the best performers over the following 3–5 years", correct: true },
+            { text: 'Stock prices never changing over long periods', correct: false },
+            { text: 'Winning stocks always continuing to win for decades', correct: false },
+          ],
+        },
+        {
+          question: 'Can a stock show both 12-month momentum and 1-week mean reversion at the same time?',
+          options: [
+            { text: 'No, the two effects are mutually exclusive', correct: false },
+            { text: 'Yes, because they operate on different time horizons and different causes', correct: true },
+            { text: 'Only during a recession', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      title: 'Market Regimes: Why No Strategy Works Forever',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'A regime is a persistent market environment — rising rates, high volatility, risk-on or risk-off sentiment — in which certain strategies work well and others don\'t. Regimes shift, sometimes abruptly, and a strategy calibrated for one can struggle badly in the next.',
+        },
+        {
+          type: 'subheading',
+          text: 'Factor crowding',
+        },
+        {
+          type: 'paragraph',
+          text: 'When too much capital chases the same factor, expected returns compress and the trade becomes fragile. The August 2007 "quant crash" is a well-documented illustration: many quantitative long/short funds with similar factor exposures suffered sharp, correlated losses over just a few days as one fund\'s forced deleveraging triggered others\' losses in a chain reaction, unrelated to any change in the underlying companies\' fundamentals.',
+        },
+        {
+          type: 'subheading',
+          text: 'Volatility regimes',
+        },
+        {
+          type: 'paragraph',
+          text: "A strategy calibrated on a low-volatility period can end up under-sized for risk once volatility rises, or over-sized once it falls. This is part of why an estimation window matters: a model weighting recent data more heavily (like an EWMA risk model) adapts faster to a regime shift than one using a long, equally-weighted history.",
+        },
+        {
+          type: 'callout',
+          text: 'Crowding and volatility regimes are two separate risks that can compound: a crowded factor trade is most dangerous precisely when a volatility regime shift forces many funds to deleverage at the same time.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: 'This is exactly why Halo offers multiple risk models — sample, Ledoit-Wolf shrinkage, EWMA, and factor — instead of just one. Different models respond differently to regime shifts, and no single covariance estimate is right in every environment.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'What caused the August 2007 "quant crash," as commonly described?',
+          options: [
+            { text: 'A sudden change in the fundamentals of the companies held', correct: false },
+            { text: 'Many funds with similar, crowded factor exposures were forced to deleverage together, triggering correlated losses', correct: true },
+            { text: 'A change in government interest rate policy that day', correct: false },
+          ],
+        },
+        {
+          question: 'Why might an EWMA risk model adapt faster to a volatility regime shift than a long equally-weighted sample covariance?',
+          options: [
+            { text: "It weights recent data more heavily, so recent volatility changes affect the estimate faster", correct: true },
+            { text: 'It ignores volatility entirely', correct: false },
+            { text: 'It only uses data from more than 10 years ago', correct: false },
+          ],
+        },
+        {
+          question: 'Why does Halo offer more than one risk model?',
+          options: [
+            { text: 'Because different models respond differently to regime shifts, and no single one is right in every environment', correct: true },
+            { text: 'To make the interface look more advanced', correct: false },
+            { text: 'Because only one risk model is actually accurate and the rest are legacy options', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      title: 'Backtesting Pitfalls: Overfitting and Look-Ahead Bias',
+      content: [
+        {
+          type: 'paragraph',
+          text: "A backtest is a simulation, not a track record on real money, and it's surprisingly easy to make a system look better than it will ever perform live.",
+        },
+        {
+          type: 'subheading',
+          text: 'Overfitting',
+        },
+        {
+          type: 'paragraph',
+          text: "Testing enough variations of a rule against the same historical data will eventually turn up one that \"worked\" by chance alone, not because it captures a real, repeatable pattern. The more parameters tuned to fit the past, the larger this risk grows.",
+        },
+        {
+          type: 'subheading',
+          text: 'Look-ahead and survivorship bias',
+        },
+        {
+          type: 'list',
+          items: [
+            "**Look-ahead bias**: accidentally using information in a backtest that wouldn't actually have been known at the time, like applying today's index membership list to a decade-old simulation",
+            "**Survivorship bias**: testing only on companies that still exist today, silently excluding the ones that went bankrupt or were delisted — which flatters the results",
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'The standard defense against overfitting is out-of-sample testing: build the rule on one period of history, then test it, unmodified, on a later period it never saw during development.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's backtest always runs on a defined historical lookback window you select, and reports the result honestly, including drawdowns, rather than only surfacing the metrics that flatter the strategy — the same discipline this module describes.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'Why does testing many rule variations against the same historical data risk overfitting?',
+          options: [
+            { text: "It doesn't — more variations always means a more reliable rule", correct: false },
+            { text: 'Eventually one variation will look like it "worked" by chance alone, not because it captures a real pattern', correct: true },
+            { text: 'Because backtesting software has a fixed limit on variations tested', correct: false },
+          ],
+        },
+        {
+          question: 'What is survivorship bias in backtesting?',
+          options: [
+            { text: 'Testing only on companies that still exist today, excluding ones that went bankrupt or were delisted, flattering the results', correct: true },
+            { text: 'Only testing strategies that have already been profitable', correct: false },
+            { text: 'A bias toward buying the largest companies in an index', correct: false },
+          ],
+        },
+        {
+          question: 'What is the standard defense against overfitting a backtested rule?',
+          options: [
+            { text: 'Testing the rule, unmodified, on a later period of history it never saw during development', correct: true },
+            { text: 'Adding as many additional parameters as possible', correct: false },
+            { text: 'Only backtesting over a single, recent month', correct: false },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+const track7: Track = {
+  id: 7,
+  title: 'Capital Allocation',
+  description: 'Conviction vs. concentration: portfolio construction at scale.',
+  estimatedTime: '30 min',
+  difficulty: 'Advanced',
+  modules: [
+    {
+      id: 1,
+      title: 'Concentration vs. Diversification: The Core Tension',
+      content: [
+        {
+          type: 'paragraph',
+          text: "Two respected schools of thought pull in opposite directions: concentrate capital in your best few ideas for undiluted upside, or diversify broadly to reduce risk. Both have real theoretical grounding.",
+        },
+        {
+          type: 'subheading',
+          text: 'The case for concentration',
+        },
+        {
+          type: 'paragraph',
+          text: "Concentrated investors argue that an investor's 20th-best idea is, by definition, worse than their 1st-best idea — so heavily diversifying across many mediocre ideas dilutes a genuine edge back down toward the market average.",
+        },
+        {
+          type: 'subheading',
+          text: 'The case for diversification',
+        },
+        {
+          type: 'paragraph',
+          text: "Markowitz's 1952 insight, sometimes called the only \"free lunch\" in investing, is that combining assets that aren't perfectly correlated reduces a portfolio's risk without necessarily giving up expected return.",
+        },
+        {
+          type: 'subheading',
+          text: 'Effective number of bets',
+        },
+        {
+          type: 'paragraph',
+          text: "A 20-stock portfolio isn't automatically diversified if all 20 are highly correlated with each other, like an all-technology book. The \"effective\" number of independent bets can be far lower than the number of holdings suggests.",
+        },
+        {
+          type: 'callout',
+          text: 'Diversification only reduces risk to the extent the holdings are not perfectly correlated. Adding more names that all move together adds very little real diversification, however large the holdings list looks.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "This is precisely the tradeoff Halo's optimizer objectives encode: max_sharpe leans toward concentrating on the best risk-adjusted combination, while min_variance leans toward the diversification side. Picking an objective is picking a side of this debate.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is the core argument for concentrated investing?',
+          options: [
+            { text: 'Diluting capital across many mediocre ideas dilutes a genuine edge back toward the market average', correct: true },
+            { text: 'Concentration always eliminates risk entirely', correct: false },
+            { text: 'Diversification is illegal for institutional investors', correct: false },
+          ],
+        },
+        {
+          question: "Why is Markowitz's diversification insight sometimes called a \"free lunch\"?",
+          options: [
+            { text: 'It reduces risk without necessarily costing expected return, as long as assets are not perfectly correlated', correct: true },
+            { text: 'It guarantees higher returns for every portfolio', correct: false },
+            { text: 'It eliminates all transaction costs', correct: false },
+          ],
+        },
+        {
+          question: 'Why might a 20-stock, all-technology portfolio not actually be well diversified?',
+          options: [
+            { text: 'Twenty holdings is always enough for full diversification regardless of correlation', correct: false },
+            { text: 'If the holdings are highly correlated with each other, the effective number of independent bets is much lower than 20', correct: true },
+            { text: 'Technology stocks cannot be included in a diversified portfolio', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Conviction-Weighted Position Sizing',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Given several ideas of different conviction, how should capital split across all of them — not just one bet considered in isolation? This is the portfolio-level version of the sizing question.',
+        },
+        {
+          type: 'subheading',
+          text: 'Equal-weighting is a hidden decision',
+        },
+        {
+          type: 'paragraph',
+          text: "Splitting capital equally across N ideas feels neutral, but it's actually a conviction statement: that all N ideas are equally good. That's rarely true in practice, so equal-weighting is simple, but it isn't actually a neutral default.",
+        },
+        {
+          type: 'subheading',
+          text: 'Weighting by edge and risk',
+        },
+        {
+          type: 'paragraph',
+          text: "Higher expected edge and lower risk (volatility, and correlation to the rest of the book) argue for a larger allocation. This is the intuition behind mean-variance optimization: it's a formal way of solving this weighting problem instead of doing it by feel.",
+        },
+        {
+          type: 'callout',
+          text: 'A mean-variance optimizer fed noisy, overconfident return estimates can produce extreme, unstable weights — a well-known critique of naive optimization. Shrinkage and robust estimation methods exist specifically to tame this.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's target_return and target_risk objectives let you directly express a conviction — \"I want this level of return\" or \"I can tolerate this much risk\" — and let the optimizer solve the weighting problem, rather than eyeballing percentages yourself.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'Why is equal-weighting across several ideas not actually a "neutral" choice?',
+          options: [
+            { text: "It implicitly states that all the ideas are equally good, which is rarely true", correct: true },
+            { text: 'Equal-weighting is mathematically impossible', correct: false },
+            { text: 'It always produces the lowest possible risk', correct: false },
+          ],
+        },
+        {
+          question: 'What two things argue for giving an idea a larger allocation, according to this module?',
+          options: [
+            { text: 'How recently the idea was proposed and how popular it is', correct: false },
+            { text: 'Higher expected edge and lower risk relative to the rest of the book', correct: true },
+            { text: 'The size of the company alone', correct: false },
+          ],
+        },
+        {
+          question: 'What is a known risk of feeding a mean-variance optimizer noisy, overconfident return estimates?',
+          options: [
+            { text: 'It always fails to run and returns an error', correct: false },
+            { text: 'It can produce extreme, unstable weights', correct: true },
+            { text: 'It automatically corrects the noisy estimates on its own', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 3,
+      title: 'Risk Parity and Equal Risk Contribution',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Traditional allocation splits capital by dollars, like a 60% stocks / 40% bonds split. Risk parity instead splits by risk, since dollar weight and risk contribution are not the same thing.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why dollar-weighting can hide risk concentration',
+        },
+        {
+          type: 'paragraph',
+          text: "In a 60/40 portfolio, stocks are typically far more volatile than bonds. So even though only 60% of dollars sit in stocks, the large majority of the portfolio's actual day-to-day risk usually comes from that 60% slice, not split evenly with the 40% in bonds.",
+        },
+        {
+          type: 'subheading',
+          text: 'Equal risk contribution',
+        },
+        {
+          type: 'paragraph',
+          text: "Risk parity, popularized by approaches like Bridgewater's \"All Weather\" strategy, sizes each asset so it contributes roughly equal risk to the total portfolio. In practice this often means smaller dollar allocations to volatile assets and larger (sometimes leveraged) allocations to stable ones.",
+        },
+        {
+          type: 'callout',
+          text: "Risk parity is a reminder that a portfolio's dollar weights and its actual risk profile can look completely different. Two portfolios with the same dollar allocation can carry very different amounts of real risk.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: 'The min_variance and target_risk objectives, paired with the Ledoit-Wolf or EWMA risk models, are Halo\'s tools for reasoning about a portfolio in terms of risk contribution rather than dollar weights — the same shift in thinking this module describes.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'In a traditional 60/40 stocks/bonds portfolio, where does most of the actual day-to-day risk typically come from?',
+          options: [
+            { text: 'Split evenly between the 60% and the 40%', correct: false },
+            { text: 'Mostly from the 60% stock allocation, since stocks are typically far more volatile than bonds', correct: true },
+            { text: 'Mostly from the 40% bond allocation', correct: false },
+          ],
+        },
+        {
+          question: 'What does risk parity aim to equalize across assets in a portfolio?',
+          options: [
+            { text: 'The dollar amount invested in each asset', correct: false },
+            { text: 'The risk contribution each asset makes to the total portfolio', correct: true },
+            { text: 'The number of shares held of each asset', correct: false },
+          ],
+        },
+        {
+          question: 'Why might a risk-parity approach use smaller dollar allocations to volatile assets?',
+          options: [
+            { text: 'To reduce that asset\'s outsized contribution to total portfolio risk and bring it in line with less volatile assets', correct: true },
+            { text: 'Volatile assets are always illegal to hold in large size', correct: false },
+            { text: 'To maximize the dollar amount invested in the riskiest assets', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 4,
+      title: 'Rebalancing: Discipline vs. Drift',
+      content: [
+        {
+          type: 'paragraph',
+          text: "A portfolio's weights drift away from target as prices move. Rebalancing brings them back — but when and how to do it is a real design decision, not an afterthought.",
+        },
+        {
+          type: 'subheading',
+          text: 'Calendar vs. threshold rebalancing',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Calendar rebalancing**: review and reset on a fixed schedule, such as quarterly — simple and predictable',
+            '**Threshold rebalancing**: only rebalance when a holding drifts beyond a set tolerance band, such as ±5 percentage points from target — trades less often, but reacts to actual market moves',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'The cost side of rebalancing',
+        },
+        {
+          type: 'paragraph',
+          text: 'Every rebalance can trigger transaction costs and, in a taxable account, realized capital gains. Rebalancing too often erodes returns to costs; rebalancing too rarely lets risk drift away from what was originally intended. It is a real tradeoff, not a free action.',
+        },
+        {
+          type: 'callout',
+          text: 'Rebalancing is a disciplined form of "sell high, buy low": trimming what has grown to stay overweight, and adding to what has lagged to stay underweight — which is behaviorally difficult to do purely on instinct.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "This is exactly what Halo's Invest platform rebalancing tools do: compare your current live positions to your target weights and generate the trade plan needed to bring them back in line.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'What is the difference between calendar rebalancing and threshold rebalancing?',
+          options: [
+            { text: 'They are two names for the same approach', correct: false },
+            { text: 'Calendar rebalancing resets on a fixed schedule; threshold rebalancing triggers only once a holding drifts past a set tolerance', correct: true },
+            { text: 'Threshold rebalancing can only be used with bonds', correct: false },
+          ],
+        },
+        {
+          question: 'Why is rebalancing too often a real cost, not a free action?',
+          options: [
+            { text: 'It has no downside — you should rebalance as often as possible', correct: false },
+            { text: 'It can trigger transaction costs and realized capital gains that erode returns', correct: true },
+            { text: 'Rebalancing is only possible once per year by regulation', correct: false },
+          ],
+        },
+        {
+          question: 'Why is rebalancing described as a disciplined form of "sell high, buy low"?',
+          options: [
+            { text: "It trims positions that have grown to stay overweight, and adds to ones that have lagged to stay underweight", correct: true },
+            { text: 'It always sells the entire portfolio and starts over', correct: false },
+            { text: 'It only ever buys, never sells', correct: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 5,
+      title: 'Portfolio Construction at Scale: Constraints and Capacity',
+      content: [
+        {
+          type: 'paragraph',
+          text: "An optimizer's unconstrained \"best\" portfolio often isn't actually investable in the real world. Institutional allocators layer on constraints that reflect real-world limits the math alone doesn't know about.",
+        },
+        {
+          type: 'subheading',
+          text: 'Common real-world constraints',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Position limits**: a cap on any single holding, to bound single-name risk regardless of what the model wants',
+            '**Sector or group caps**: avoiding accidental concentration in one industry, even spread across many individual names',
+            '**Liquidity constraints**: a position sized small enough relative to a stock\'s trading volume that it can actually be exited without moving the price',
+            '**Capacity**: a strategy that works cleanly at $10M can behave completely differently at $10B, once the trades themselves start moving prices',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: "Constraints don't mean giving up on optimization",
+        },
+        {
+          type: 'paragraph',
+          text: 'A constrained optimization still finds the best portfolio possible — just within the boundaries of what is actually implementable. Objectives and constraints work together, not against each other.',
+        },
+        {
+          type: 'callout',
+          text: "An unconstrained \"optimal\" portfolio that can't actually be built or exited at real-world size isn't optimal at all — it's a math result with no path to implementation.",
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: "Halo's Pro-tier sector and position constraints exist for exactly this reason: to keep the optimizer's mathematical rigor while enforcing the real-world limits this module describes, instead of trusting an unconstrained \"best\" portfolio blindly.",
+        },
+      ],
+      quiz: [
+        {
+          question: 'Why might an optimizer\'s unconstrained "best" portfolio not actually be investable?',
+          options: [
+            { text: 'Unconstrained portfolios are always the most investable option', correct: false },
+            { text: "It may ignore real-world limits like liquidity, concentration, or capacity that the math doesn't account for", correct: true },
+            { text: 'Optimizers cannot produce a portfolio without constraints', correct: false },
+          ],
+        },
+        {
+          question: 'What does a "capacity" constraint account for?',
+          options: [
+            { text: 'A strategy that works at small scale potentially behaving differently at much larger scale, once trades start moving prices', correct: true },
+            { text: 'The maximum number of holdings allowed by law', correct: false },
+            { text: 'How many years a strategy has existed', correct: false },
+          ],
+        },
+        {
+          question: 'Do constraints and optimization objectives work against each other?',
+          options: [
+            { text: 'Yes, constraints always cancel out any benefit of optimization', correct: false },
+            { text: 'No — a constrained optimization still finds the best portfolio possible within what is actually implementable', correct: true },
+            { text: 'Constraints and objectives are unrelated to each other', correct: false },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+export const TRACKS: Track[] = [track1, track2, track3, track4, track5, track6, track7]
