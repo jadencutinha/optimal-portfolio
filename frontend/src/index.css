@@ -6248,11 +6248,16 @@ table.weights td {
   overflow: hidden;
   perspective: 1600px;
   outline: none;
+  /* Chromium's 3D hit-testing treats perspective/preserve-3d ancestors as
+     occluding their own translateZ'd descendants; cards re-enable
+     pointer-events themselves so real clicks reach them. */
+  pointer-events: none;
 }
 .fhub__track {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
+  pointer-events: none;
 }
 
 .fhub__card {
@@ -6266,6 +6271,7 @@ table.weights td {
   border: none;
   background: none;
   cursor: pointer;
+  pointer-events: auto;
   transform-origin: center;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.55s ease;
   transform-style: preserve-3d;
@@ -6301,6 +6307,11 @@ table.weights td {
 .fhub__card:hover .fhub__glass {
   background: linear-gradient(158deg, rgba(126, 140, 150, 0.62), rgba(96, 110, 122, 0.68));
   border-color: rgba(255, 255, 255, 0.5);
+}
+/* Cards overlap their neighbors; without this a hovered card's expanded
+   description can render underneath a closer-to-center card. */
+.fhub__card:hover {
+  z-index: 200 !important;
 }
 
 .fhub__card-body {
