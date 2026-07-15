@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { bandedSphere, coronaCloud, makeMaterial, ringDisc } from './celestial/particles'
+import { bandedSphere, coronaCloud, makeCrescentMaterial, makeMaterial, ringDisc } from './celestial/particles'
 
 export type MiniBodyKind = 'rings' | 'globe' | 'moon'
 
@@ -65,7 +65,12 @@ export function MiniBody({ kind }: { kind: MiniBodyKind }) {
       spin = 0.2
     } else {
       body.rotation.z = 0.08
-      const material = makeMaterial(dpr, { ambient: 0.12, front: 1, rim: 0.55 }, 0.95)
+      const material = makeCrescentMaterial(
+        dpr,
+        { ambient: 0.12, front: 1, rim: 0.55 },
+        0.95,
+        new THREE.Vector3(0.92, 0.12, -0.28),
+      )
       const sphere = bandedSphere(4600, 0.92, new THREE.Color(0x5a5c60), new THREE.Color(0xf1ede2), 15)
       body.add(new THREE.Points(sphere, material))
       disposables.push(sphere, material)

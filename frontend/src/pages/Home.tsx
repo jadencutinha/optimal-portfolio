@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
 import { ErrorState } from '../components/ErrorState'
@@ -21,10 +20,7 @@ export function Home() {
   const { session } = useAuth()
   const me = useMe()
   const setPlan = useSetPlan()
-  const { view, setView } = useView()
-  const [managingPlan, setManagingPlan] = useState(false)
-  const [showRiskQ, setShowRiskQ] = useState(false)
-  const [checkout, setCheckout] = useState(false)
+  const { view, overlay, setView, openOverlay, closeOverlay, goHome } = useView()
 
   if (!session) {
     return <Landing />
@@ -40,45 +36,35 @@ export function Home() {
 
   const { plan, plan_selected: planSelected } = me.data
 
-  if (checkout) {
-    return (
-      <CheckoutPage
-        onDone={() => {
-          setCheckout(false)
-          setManagingPlan(false)
-        }}
-        onCancel={() => setCheckout(false)}
-      />
-    )
+  if (overlay === 'checkout') {
+    return <CheckoutPage onDone={goHome} onCancel={closeOverlay} />
   }
 
-  if (!planSelected || managingPlan) {
+  if (!planSelected || overlay === 'manage-plan') {
     return (
       <PlanSelection
         current={planSelected ? plan : undefined}
         pending={setPlan.isPending}
-        onCancel={planSelected ? () => setManagingPlan(false) : undefined}
-        onUpgradeToPro={() => setCheckout(true)}
+        onCancel={planSelected ? closeOverlay : undefined}
+        onUpgradeToPro={() => openOverlay('checkout')}
         onChoose={async (choice) => {
           await setPlan.mutateAsync(choice)
-          setManagingPlan(false)
+          goHome()
         }}
       />
     )
   }
 
-  if (plan === 'free' && showRiskQ) {
+  if (plan === 'free' && overlay === 'risk') {
     return (
       <RiskQuestionnaire
         onComplete={(profile) => {
           localStorage.setItem(RISK_PROFILE_KEY, profile)
-          setShowRiskQ(false)
+          closeOverlay()
         }}
       />
     )
   }
-
-  const goHome = () => setView('home')
 
   return (
     <>
@@ -91,8 +77,8 @@ export function Home() {
           onInvest={() => setView('invest')}
           onLearn={() => setView('learn')}
           onAbout={() => setView('about')}
-          onManagePlan={() => setManagingPlan(true)}
-          onUpgrade={() => setCheckout(true)}
+          onManagePlan={() => openOverlay('manage-plan')}
+          onUpgrade={() => openOverlay('checkout')}
         />
       )}
 
@@ -105,8 +91,8 @@ export function Home() {
           <ProWorkspace onSwitch={goHome} initialMode={view === 'invest' ? 'invest' : 'analyze'} />
         ) : (
           <FreePage
-            onOpenRiskQ={() => setShowRiskQ(true)}
-            onUpgrade={() => setCheckout(true)}
+            onOpenRiskQ={() => openOverlay('risk')}
+            onUpgrade={() => openOverlay('checkout')}
             onSwitch={goHome}
             initialMode={view === 'invest' ? 'invest' : 'analyze'}
           />

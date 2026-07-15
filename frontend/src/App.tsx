@@ -7,7 +7,7 @@ import { VerifyPage } from './pages/VerifyPage'
 
 export default function App() {
   const { session } = useAuth()
-  const { setView } = useView()
+  const { goHome } = useView()
   const path = window.location.pathname
 
   if (path.startsWith('/verify/')) {
@@ -39,7 +39,7 @@ export default function App() {
               <button
                 type="button"
                 className="brand-home"
-                onClick={() => setView('home')}
+                onClick={goHome}
                 aria-label="Go to home"
               >
                 <img src="/logo-wordmark.png" alt="Halo!" className="brand-logo" />

@@ -1421,23 +1421,38 @@ button.primary.modal-submit {
 }
 
 .switch-plan {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 10px;
-  padding: 9px 16px;
-  font-size: 14px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: var(--gold-bright);
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 6px 18px -10px rgba(212, 175, 55, 0.6);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 
   min-width: 9rem;
   box-sizing: border-box;
   text-align: center;
 }
 
+.switch-plan__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .switch-plan:hover {
-  border-color: var(--accent);
-  color: var(--accent-hover);
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold-bright);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -10px rgba(212, 175, 55, 0.75);
 }
 
 .plan-selection {
@@ -5707,6 +5722,29 @@ table.weights td {
   margin: 0;
 }
 
+.invest-reset {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--danger);
+  background: rgba(232, 112, 95, 0.12);
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.invest-reset:hover:not(:disabled) {
+  background: var(--danger);
+  color: #0a1519;
+}
+
+.invest-reset:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .invest-table-wrap {
   overflow-x: auto;
 }
@@ -9304,20 +9342,23 @@ body[data-surface='space'] .primary:hover:not(:disabled) {
 }
 
 .home-dash__manage {
-  padding: 9px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--hairline);
-  background: transparent;
-  color: var(--muted);
+  padding: 11px 20px;
+  border-radius: 11px;
+  border: 1px solid rgba(111, 179, 221, 0.5);
+  background: rgba(111, 179, 221, 0.12);
+  color: var(--accent-hover);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .home-dash__manage:hover {
-  border-color: var(--gold);
-  color: var(--gold-bright);
+  border-color: var(--accent-hover);
+  background: rgba(111, 179, 221, 0.22);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .home-areas {

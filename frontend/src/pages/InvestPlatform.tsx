@@ -396,8 +396,8 @@ export function InvestPlatform() {
         <div className="invest-panel-head">
           <h3>Positions</h3>
           {positionList.length > 0 && (
-            <button type="button" className="signin-trigger" onClick={onReset} disabled={liquidate.isPending}>
-              {liquidate.isPending ? 'Resetting…' : 'Sell everything'}
+            <button type="button" className="invest-reset" onClick={onReset} disabled={liquidate.isPending}>
+              {liquidate.isPending ? 'Resetting…' : 'Reset investments'}
             </button>
           )}
         </div>
