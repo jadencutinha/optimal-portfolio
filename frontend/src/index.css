@@ -6314,8 +6314,6 @@ table.weights td {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  /* Chromium's 3D hit-testing treats this flat wrapper as occluding its own
-     translateZ'd children; each card re-enables pointer-events itself. */
   pointer-events: none;
 }
 

@@ -10,25 +10,21 @@ const FEATURES: HubFeature[] = [
 ]
 
 function frontierCard() {
-  return (
-    screen.queryByRole('button', { name: /bring frontier walk to front/i }) ??
-    screen.getByRole('button', { name: /open frontier walk/i })
-  )
+  return screen.getByRole('button', { name: /open frontier walk/i })
 }
 
 describe('FeatureHub selection', () => {
-  it('brings a non-center card to front on a clean click', async () => {
+  it('opens a non-center card directly on a clean click', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     render(<FeatureHub title="Toolkit" features={FEATURES} onSelect={onSelect} />)
 
     await user.click(frontierCard())
 
-    expect(onSelect).not.toHaveBeenCalled()
-    expect(frontierCard()).toHaveAttribute('aria-selected', 'true')
+    expect(onSelect).toHaveBeenCalledWith('frontier')
   })
 
-  it('brings a card to front on a tap that jitters a few pixels', () => {
+  it('opens a non-center card on a tap that jitters a few pixels', () => {
     const onSelect = vi.fn()
     render(<FeatureHub title="Toolkit" features={FEATURES} onSelect={onSelect} />)
 
@@ -37,8 +33,7 @@ describe('FeatureHub selection', () => {
     fireEvent.pointerMove(card, { pointerId: 1, clientX: 509 })
     fireEvent.pointerUp(card, { pointerId: 1, clientX: 509 })
 
-    expect(onSelect).not.toHaveBeenCalled()
-    expect(frontierCard()).toHaveAttribute('aria-selected', 'true')
+    expect(onSelect).toHaveBeenCalledWith('frontier')
   })
 
   it('opens the centered card when it is tapped', () => {
