@@ -60,13 +60,6 @@ export function HomeDashboard({
       onOpen: onAnalyze,
     },
     {
-      kind: 'globe',
-      title: 'Invest',
-      body: 'Put a saved portfolio to work with paper trading and track how it drifts.',
-      meta: plan === 'pro' ? 'No trading fee on Pro' : '25 bps trading fee on Free',
-      onOpen: onInvest,
-    },
-    {
       kind: 'moon',
       title: 'Learn',
       body: 'From saving basics to the math behind hedge funds. Earn a verifiable certificate.',
@@ -76,6 +69,13 @@ export function HomeDashboard({
           ? 'Three tracks'
           : `${done} of ${tracks.length} tracks complete${started > 0 ? ` · ${started} in progress` : ''}`,
       onOpen: onLearn,
+    },
+    {
+      kind: 'globe',
+      title: 'Invest',
+      body: 'Put a saved portfolio to work with paper trading and track how it drifts.',
+      meta: plan === 'pro' ? 'No trading fee on Pro' : '25 bps trading fee on Free',
+      onOpen: onInvest,
     },
   ]
 

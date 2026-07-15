@@ -74,6 +74,85 @@ export function makeMaterial(pixelRatio: number, shade: Shade, alpha: number) {
   })
 }
 
+const CRESCENT_VERTEX = `
+  attribute float aSize;
+  attribute float aSeed;
+  attribute vec3 aColor;
+  uniform float uTime;
+  uniform float uPixelRatio;
+  uniform float uScale;
+  uniform vec3 uLightDir;
+  varying vec3 vColor;
+  varying float vFacing;
+  varying float vTwinkle;
+  varying float vLit;
+
+  void main() {
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vec3 dir = normalize((modelViewMatrix * vec4(normalize(position), 0.0)).xyz);
+    vFacing = dir.z;
+    vLit = dot(dir, normalize(uLightDir));
+    vColor = aColor;
+    vTwinkle = 0.78 + 0.22 * sin(uTime * 1.6 + aSeed * 6.283);
+    gl_Position = projectionMatrix * mv;
+    gl_PointSize = aSize * uPixelRatio * uScale;
+  }
+`
+
+const CRESCENT_FRAGMENT = `
+  uniform float uAlpha;
+  uniform float uAmbient;
+  uniform float uFront;
+  uniform float uRim;
+  varying vec3 vColor;
+  varying float vFacing;
+  varying float vTwinkle;
+  varying float vLit;
+
+  void main() {
+    vec2 offset = gl_PointCoord - vec2(0.5);
+    float dist = dot(offset, offset);
+    if (dist > 0.25) discard;
+
+    float disc = smoothstep(0.25, 0.03, dist);
+    float front = smoothstep(-0.15, 0.8, vFacing);
+    float rim = pow(1.0 - abs(vFacing), 5.0);
+
+    float shade = uAmbient + front * uFront + rim * uRim;
+    float lit = smoothstep(0.04, 0.55, vLit);
+    float alpha = disc * vTwinkle * shade * uAlpha * lit;
+    if (alpha < 0.01) discard;
+
+    gl_FragColor = vec4(vColor, alpha);
+  }
+`
+
+export function makeCrescentMaterial(
+  pixelRatio: number,
+  shade: Shade,
+  alpha: number,
+  lightDir: THREE.Vector3,
+) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uPixelRatio: { value: pixelRatio },
+      uScale: { value: 1 },
+      uAlpha: { value: alpha },
+      uAmbient: { value: shade.ambient },
+      uFront: { value: shade.front },
+      uRim: { value: shade.rim },
+      uLightDir: { value: lightDir.clone().normalize() },
+    },
+    vertexShader: CRESCENT_VERTEX,
+    fragmentShader: CRESCENT_FRAGMENT,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
+  })
+}
+
 interface Particle {
   position: [number, number, number]
   color: THREE.Color
