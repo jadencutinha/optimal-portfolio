@@ -50,6 +50,13 @@ class Settings(BaseSettings):
     sentry_dsn: str | None = None
     sentry_traces_sample_rate: float = 0.0
 
+    rate_limit_enabled: bool = True
+    rate_limit_storage_uri: str = "memory://"
+    rate_limit_default: str = "200/minute"
+    rate_limit_heavy: str = "30/minute"
+    rate_limit_ai: str = "10/minute"
+    rate_limit_data: str = "60/minute"
+
     risk_free_rate: float = 0.02
     trading_days: int = 252
     default_lookback_days: int = 756

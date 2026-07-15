@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useRef, useState } from 'react'
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 export interface HubFeature {
   id: string
@@ -20,6 +20,7 @@ interface FeatureHubProps {
 
 const ANCHOR_PX = 44
 const STEP_PX = 290
+const DRAG_THRESHOLD = 6
 
 export function FeatureHub({
   title,
@@ -30,9 +31,88 @@ export function FeatureHub({
   lockedLabel = 'Pro only',
 }: FeatureHubProps) {
   const [center, setCenter] = useState(0)
+  const [dragPx, setDragPx] = useState(0)
+  const [dragging, setDragging] = useState(false)
+
+  const startXRef = useRef(0)
+  const activeRef = useRef(false)
+  const movedRef = useRef(false)
+  const dragPxRef = useRef(0)
+  const pressedIndexRef = useRef<number | null>(null)
 
   const clamp = (i: number) => Math.max(0, Math.min(features.length - 1, i))
   const go = (delta: number) => setCenter((c) => clamp(c + delta))
+
+  const activate = (index: number) => {
+    if (index === center) {
+      const feature = features[index]
+      if (feature.locked) onLockedSelect?.(feature.id)
+      else onSelect(feature.id)
+    } else {
+      setCenter(clamp(index))
+    }
+  }
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+    activeRef.current = true
+    movedRef.current = false
+    startXRef.current = event.clientX
+    dragPxRef.current = 0
+    const target = event.target as HTMLElement
+    const card = target.closest?.('[data-fh-index]')
+    pressedIndexRef.current = card ? Number(card.getAttribute('data-fh-index')) : null
+  }
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!activeRef.current) return
+    const dx = event.clientX - startXRef.current
+    if (!movedRef.current && Math.abs(dx) > DRAG_THRESHOLD) {
+      movedRef.current = true
+      setDragging(true)
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+    }
+    if (movedRef.current) {
+      dragPxRef.current = dx
+      setDragPx(dx)
+    }
+  }
+
+  const releaseCapture = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
+    }
+  }
+
+  const onPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!activeRef.current) return
+    activeRef.current = false
+    const steps = movedRef.current ? Math.round(-dragPxRef.current / STEP_PX) : 0
+    if (movedRef.current) {
+      setDragging(false)
+      setDragPx(0)
+      releaseCapture(event)
+    }
+    dragPxRef.current = 0
+    if (steps !== 0) {
+      setCenter((c) => clamp(c + steps))
+      return
+    }
+    if (pressedIndexRef.current != null) activate(pressedIndexRef.current)
+  }
+
+  const onPointerCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!activeRef.current) return
+    activeRef.current = false
+    if (movedRef.current) {
+      setDragging(false)
+      setDragPx(0)
+      releaseCapture(event)
+    }
+    movedRef.current = false
+    dragPxRef.current = 0
+    pressedIndexRef.current = null
+  }
 
   return (
     <div className="fhub">
@@ -47,6 +127,12 @@ export function FeatureHub({
           role="listbox"
           aria-label={title}
           tabIndex={0}
+          style={{ touchAction: 'pan-y', cursor: dragging ? 'grabbing' : 'grab' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onPointerLeave={onPointerCancel}
           onKeyDown={(event) => {
             if (event.key === 'ArrowRight') go(1)
             if (event.key === 'ArrowLeft') go(-1)
@@ -59,10 +145,11 @@ export function FeatureHub({
               const isCenter = offset === 0
               const rotateY = Math.max(Math.min(-offset * 9, 26), -26)
               const style: CSSProperties = {
-                transform: `translateX(${ANCHOR_PX + offset * STEP_PX}px) translateY(-50%) translateZ(${-abs * 30}px) rotateY(${rotateY}deg) scale(${isCenter ? 1 : 0.94})`,
+                transform: `translateX(${ANCHOR_PX + offset * STEP_PX + dragPx}px) translateY(-50%) translateZ(${-abs * 30}px) rotateY(${rotateY}deg) scale(${isCenter ? 1 : 0.94})`,
                 opacity: offset < 0 ? 0.2 : Math.max(0.5, 1 - offset * 0.14),
                 zIndex: 100 - abs,
                 pointerEvents: offset < -1 || offset > 6 ? 'none' : 'auto',
+                transition: dragging ? 'none' : undefined,
               }
               const locked = Boolean(feature.locked)
               const className = [
@@ -86,11 +173,15 @@ export function FeatureHub({
                 <button
                   key={feature.id}
                   type="button"
+                  data-fh-index={i}
                   className={className}
                   style={style}
                   aria-selected={isCenter}
                   aria-label={label}
-                  onClick={open}
+                  onClick={(event) => {
+                    if (event.detail !== 0) return
+                    activate(i)
+                  }}
                 >
                   <span className="fhub__glass" aria-hidden="true" />
                   {locked && (
