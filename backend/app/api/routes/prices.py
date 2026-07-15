@@ -1,17 +1,20 @@
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.api.deps import get_provider, get_settings
 from app.config import Settings
 from app.data.provider import DataProvider
+from app.ratelimit import DATA, limiter
 from app.schemas.prices import PricePoint, PricesResponse, TickerPrices
 
 router = APIRouter(tags=["prices"])
 
 
 @router.get("/prices", response_model=PricesResponse)
+@limiter.limit(DATA)
 async def prices(
+    request: Request,
     tickers: str = Query(..., description="Comma separated list of tickers"),
     start: date | None = None,
     end: date | None = None,

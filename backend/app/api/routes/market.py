@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.api.deps import get_alpaca_client
 from app.invest.client import AlpacaClient, InvestError
+from app.ratelimit import DATA, limiter
 from app.schemas.market import Quote, QuoteBoard
 
 router = APIRouter(tags=["market"])
@@ -45,7 +46,9 @@ def _quote(symbol: str, snapshot: dict) -> Quote | None:
 
 
 @router.get("/market/quotes", response_model=QuoteBoard)
+@limiter.limit(DATA)
 async def quotes(
+    request: Request,
     symbols: str = Query(..., min_length=1),
     client: AlpacaClient = Depends(get_alpaca_client),
 ) -> QuoteBoard:

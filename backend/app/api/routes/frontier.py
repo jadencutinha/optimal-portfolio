@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.api.deps import get_access, get_provider, get_sector_provider, get_settings
 from app.auth.gating import Access, check_optimize
@@ -7,13 +7,16 @@ from app.data.provider import DataProvider
 from app.data.sectors import SectorProvider
 from app.optimizer.risk_models import RISK_MODELS, RiskModel
 from app.optimizer.service import OptimizationServiceError, run_frontier, run_resampled_frontier
+from app.ratelimit import HEAVY, limiter
 from app.schemas.optimize import FrontierResponse, ResampledFrontierRequest, ResampledFrontierResponse
 
 router = APIRouter(tags=["frontier"])
 
 
 @router.get("/frontier", response_model=FrontierResponse)
+@limiter.limit(HEAVY)
 async def frontier(
+    request: Request,
     tickers: str = Query(..., description="Comma separated list of tickers"),
     lookback_days: int | None = Query(default=None, ge=30, le=3650),
     min_weight: float = Query(default=0.0, ge=-1.0, le=1.0),
@@ -60,32 +63,34 @@ async def frontier(
 
 
 @router.post("/frontier/resampled", response_model=ResampledFrontierResponse)
+@limiter.limit(HEAVY)
 async def resampled_frontier(
-    request: ResampledFrontierRequest,
+    request: Request,
+    payload: ResampledFrontierRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     sector_provider: SectorProvider = Depends(get_sector_provider),
     access: Access = Depends(get_access),
 ) -> ResampledFrontierResponse:
     check_optimize(
-        tickers=request.tickers,
+        tickers=payload.tickers,
         objective="min_variance",
-        risk_model=request.risk_model,
+        risk_model=payload.risk_model,
         return_model="historical",
-        lookback_days=request.lookback_days,
+        lookback_days=payload.lookback_days,
         entitlements=access.entitlements,
     )
-    sectors = await sector_provider.resolve(request.tickers)
+    sectors = await sector_provider.resolve(payload.tickers)
     try:
         return await run_resampled_frontier(
-            tickers=request.tickers,
-            lookback_days=request.lookback_days,
-            min_weight=request.min_weight,
-            max_weight=request.max_weight,
-            risk_model=request.risk_model,
-            n_points=request.points,
-            n_resamples=request.resamples,
-            risk_free_rate=request.risk_free_rate,
+            tickers=payload.tickers,
+            lookback_days=payload.lookback_days,
+            min_weight=payload.min_weight,
+            max_weight=payload.max_weight,
+            risk_model=payload.risk_model,
+            n_points=payload.points,
+            n_resamples=payload.resamples,
+            risk_free_rate=payload.risk_free_rate,
             provider=provider,
             settings=settings,
             sectors=sectors,

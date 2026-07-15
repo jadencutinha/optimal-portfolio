@@ -133,7 +133,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'anal
       ) : showHub ? (
         <FeatureHub
           title="Your free toolkit"
-          subtitle="Use the arrows to browse your tools. Hover a card to see what it does, then open it."
+          subtitle="Drag the deck, tap a tool to focus it, or use the arrows. Open the centered tool to launch it."
           features={[...FREE_FEATURES, ...LOCKED_FEATURES]}
           onSelect={(id) => {
             setFeature(id as Feature)

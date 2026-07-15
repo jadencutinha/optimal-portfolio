@@ -16,6 +16,7 @@ def client() -> Iterator[TestClient]:
     os.environ["OPENAI_API_KEY"] = ""
     os.environ["ASSISTANT_PROVIDER"] = "auto"
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{workdir}/test.db"
+    os.environ["RATE_LIMIT_ENABLED"] = "false"
 
     from app.config import get_settings
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.deps import get_access, get_backtest_repository, get_provider, get_settings
 from app.auth.gating import Access, require_pro
@@ -6,14 +6,17 @@ from app.backtest.repository import BacktestRepository
 from app.backtest.service import BacktestServiceError, run_backtest
 from app.config import Settings
 from app.data.provider import DataProvider
+from app.ratelimit import HEAVY, limiter
 from app.schemas.backtest import BacktestRequest, BacktestResponse
 
 router = APIRouter(tags=["backtest"])
 
 
 @router.post("/backtest", response_model=BacktestResponse)
+@limiter.limit(HEAVY)
 async def backtest(
-    request: BacktestRequest,
+    request: Request,
+    payload: BacktestRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     access: Access = Depends(get_access),
@@ -21,14 +24,14 @@ async def backtest(
 ) -> BacktestResponse:
     require_pro(access.entitlements, "Backtesting")
     try:
-        response = await run_backtest(request, provider, settings)
+        response = await run_backtest(payload, provider, settings)
     except BacktestServiceError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
 
     try:
         response.run_id = await repository.save(
-            tickers=request.tickers,
-            config=request.model_dump(mode="json"),
+            tickers=payload.tickers,
+            config=payload.model_dump(mode="json"),
             result=response.model_dump(mode="json"),
         )
     except Exception:
