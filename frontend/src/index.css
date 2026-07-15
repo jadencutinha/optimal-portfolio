@@ -7698,7 +7698,7 @@ body[data-surface='space'] .app-header {
   color: var(--muted);
   flex: 0 0 auto;
 }
-.csearch-input {
+.csearch .csearch-input {
   flex: 1;
   border: none;
   background: none;
