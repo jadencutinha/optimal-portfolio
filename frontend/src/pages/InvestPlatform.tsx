@@ -226,9 +226,9 @@ export function InvestPlatform() {
   }
 
   const onReset = () => {
-    if (!window.confirm('Sell all positions and reset the simulator? This closes every holding.')) return
+    if (!window.confirm('Reset your simulator back to $100,000? This clears every holding and pending order.')) return
     liquidate.mutate(undefined, {
-      onSuccess: (result) => toast(`Closing ${result.closed} position${result.closed === 1 ? '' : 's'}.`, 'success'),
+      onSuccess: () => toast('Simulator reset to $100,000.', 'success'),
       onError: (error) => toast(extractApiError(error, 'Could not reset the simulator.'), 'error'),
     })
   }
@@ -395,7 +395,7 @@ export function InvestPlatform() {
       <div className="panel invest-positions">
         <div className="invest-panel-head">
           <h3>Positions</h3>
-          {positionList.length > 0 && (
+          {(positionList.length > 0 || openOrders.length > 0) && (
             <button type="button" className="invest-reset" onClick={onReset} disabled={liquidate.isPending}>
               {liquidate.isPending ? 'Resetting…' : 'Reset investments'}
             </button>

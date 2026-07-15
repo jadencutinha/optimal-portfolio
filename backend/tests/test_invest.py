@@ -1,10 +1,11 @@
-from typing import Any
+from datetime import timedelta
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_alpaca_client, get_current_user
+from app.api.deps import get_current_user
 from app.auth.repository import ProfileData
+from app.invest.market import utcnow
 
 PORTFOLIO = {
     "name": "Target 40/60",
@@ -16,177 +17,214 @@ PORTFOLIO = {
 }
 
 
-class FakeAlpaca:
-    def __init__(self, positions: list[dict[str, Any]]) -> None:
-        self._positions = positions
-        self.orders: list[tuple[str, float, str]] = []
-        self.closed: list[str] = []
-
-    @property
-    def configured(self) -> bool:
-        return True
-
-    async def get_positions(self) -> list[dict[str, Any]]:
-        return self._positions
-
-    async def submit_notional_order(self, symbol: str, notional: float, side: str = "buy") -> dict[str, Any]:
-        self.orders.append((symbol, notional, side))
-        return {"id": f"order-{symbol}-{side}", "status": "accepted"}
-
-    async def close_position(self, symbol: str, percentage: float | None = None) -> dict[str, Any]:
-        self.closed.append(symbol)
-        return {"id": f"close-{symbol}", "status": "accepted"}
+def as_user(client: TestClient, uid: str, plan: str = "pro") -> None:
+    client.app.dependency_overrides[get_current_user] = lambda: ProfileData(
+        id=uid, email=f"{uid}@example.com", plan=plan, plan_selected=True
+    )
 
 
-def position(symbol: str, market_value: float) -> dict[str, Any]:
-    return {"symbol": symbol, "market_value": market_value}
+@pytest.fixture(autouse=True)
+def _cleanup(client: TestClient):
+    yield
+    client.app.dependency_overrides.pop(get_current_user, None)
 
 
 @pytest.fixture
-def setup(client: TestClient):
-    created: dict[str, Any] = {}
-
-    def go(uid: str, plan: str, positions: list[dict[str, Any]]) -> tuple[FakeAlpaca, int]:
-        client.app.dependency_overrides[get_current_user] = lambda: ProfileData(
-            id=uid, email=f"{uid}@example.com", plan=plan, plan_selected=True
-        )
-        fake = FakeAlpaca(positions)
-        client.app.dependency_overrides[get_alpaca_client] = lambda: fake
-        response = client.post("/api/portfolios", json=PORTFOLIO)
-        assert response.status_code == 200, response.text
-        created["id"] = response.json()["id"]
-        return fake, created["id"]
-
-    yield go
-
-    client.app.dependency_overrides.pop(get_current_user, None)
-    client.app.dependency_overrides.pop(get_alpaca_client, None)
+def market_open(monkeypatch):
+    monkeypatch.setattr("app.invest.simulator.is_market_open", lambda *_: True)
+    return True
 
 
-def test_rebalance_preview_computes_drift(client: TestClient, setup) -> None:
-    _, portfolio_id = setup("reb-1", "pro", [position("AAPL", 6000.0), position("MSFT", 4000.0)])
-
-    plan = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id})
-    assert plan.status_code == 200, plan.text
-    body = plan.json()
-
-    assert body["total_value"] == 10000.0
-    assert body["tradable"] is True
-    rows = {row["symbol"]: row for row in body["rows"]}
-
-    assert rows["AAPL"]["current_weight"] == pytest.approx(0.6)
-    assert rows["AAPL"]["target_weight"] == pytest.approx(0.4)
-    assert rows["AAPL"]["delta"] == pytest.approx(-2000.0)
-    assert rows["AAPL"]["action"] == "sell"
-
-    assert rows["MSFT"]["delta"] == pytest.approx(2000.0)
-    assert rows["MSFT"]["action"] == "buy"
-
-    assert body["max_drift"] == pytest.approx(0.2)
+def test_new_account_starts_at_100k(client: TestClient) -> None:
+    as_user(client, "acct-1")
+    response = client.get("/api/invest/account")
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["cash"] == 100000.0
+    assert body["portfolio_value"] == 100000.0
+    assert body["long_market_value"] == 0.0
+    assert client.get("/api/invest/positions").json() == []
 
 
-def test_rebalance_sells_untargeted_holding_entirely(client: TestClient, setup) -> None:
-    fake, portfolio_id = setup(
-        "reb-2", "pro", [position("AAPL", 4000.0), position("MSFT", 6000.0), position("TSLA", 2000.0)]
+def test_buy_reduces_cash_and_creates_position(client: TestClient, market_open) -> None:
+    as_user(client, "buy-1")
+
+    trade = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 1000})
+    assert trade.status_code == 200, trade.text
+    assert trade.json()["status"] == "filled"
+
+    account = client.get("/api/invest/account").json()
+    assert account["cash"] == pytest.approx(99000.0, abs=0.01)
+    assert account["portfolio_value"] == pytest.approx(100000.0, abs=1.0)
+
+    positions = client.get("/api/invest/positions").json()
+    assert len(positions) == 1
+    assert positions[0]["symbol"] == "AAPL"
+    assert positions[0]["market_value"] == pytest.approx(1000.0, abs=1.0)
+
+
+def test_investments_are_isolated_per_user(client: TestClient, market_open) -> None:
+    as_user(client, "iso-a")
+    client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 5000})
+    a_account = client.get("/api/invest/account").json()
+    assert a_account["cash"] == pytest.approx(95000.0, abs=0.01)
+
+    as_user(client, "iso-b")
+    b_account = client.get("/api/invest/account").json()
+    assert b_account["cash"] == 100000.0
+    assert client.get("/api/invest/positions").json() == []
+
+
+def test_free_plan_pays_a_buy_fee(client: TestClient, market_open) -> None:
+    as_user(client, "fee-1", plan="free")
+    response = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 1000})
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["notional"] < 1000.0
+    assert "Fee" in (body["message"] or "")
+
+
+def test_cannot_spend_more_cash_than_you_have(client: TestClient, market_open) -> None:
+    as_user(client, "broke-1")
+    response = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 250000})
+    assert response.status_code == 400
+    assert "cash" in response.json()["detail"].lower()
+
+
+def test_sell_returns_cash(client: TestClient, market_open) -> None:
+    as_user(client, "sell-1")
+    client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 4000})
+    before = client.get("/api/invest/account").json()["cash"]
+
+    sell = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "sell", "notional": 1000})
+    assert sell.status_code == 200, sell.text
+
+    after = client.get("/api/invest/account").json()["cash"]
+    assert after > before
+
+
+def test_selling_without_a_position_is_rejected(client: TestClient, market_open) -> None:
+    as_user(client, "sell-2")
+    response = client.post("/api/invest/trade", json={"symbol": "TSLA", "side": "sell", "notional": 500})
+    assert response.status_code == 400
+
+
+def test_reset_returns_to_starting_balance(client: TestClient, market_open) -> None:
+    as_user(client, "reset-1")
+    client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 3000})
+    assert client.get("/api/invest/account").json()["cash"] == pytest.approx(97000.0, abs=0.01)
+
+    reset = client.delete("/api/invest/positions")
+    assert reset.status_code == 200, reset.text
+
+    account = client.get("/api/invest/account").json()
+    assert account["cash"] == 100000.0
+    assert client.get("/api/invest/positions").json() == []
+
+
+def test_order_placed_while_market_closed_stays_pending(client: TestClient, monkeypatch) -> None:
+    as_user(client, "closed-1")
+    future = utcnow() + timedelta(days=1)
+    monkeypatch.setattr("app.invest.simulator.is_market_open", lambda *_: False)
+    monkeypatch.setattr("app.invest.simulator.next_market_open", lambda *_: future)
+
+    trade = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 2000})
+    assert trade.status_code == 200, trade.text
+    assert trade.json()["status"] == "new"
+
+    # Cash and holdings are untouched until the order fills at the next open.
+    assert client.get("/api/invest/account").json()["cash"] == 100000.0
+    assert client.get("/api/invest/positions").json() == []
+
+
+def test_pending_order_settles_once_its_fill_time_passes(client: TestClient, monkeypatch) -> None:
+    as_user(client, "closed-2")
+    past = utcnow() - timedelta(hours=1)
+    monkeypatch.setattr("app.invest.simulator.is_market_open", lambda *_: False)
+    monkeypatch.setattr("app.invest.simulator.next_market_open", lambda *_: past)
+
+    trade = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 2000})
+    assert trade.json()["status"] == "new"
+
+    # Its fill time is already in the past, so the next request settles it.
+    positions = client.get("/api/invest/positions").json()
+    assert len(positions) == 1
+    assert positions[0]["symbol"] == "AAPL"
+
+    orders = client.get("/api/invest/orders").json()
+    assert orders[0]["status"] == "filled"
+    assert client.get("/api/invest/account").json()["cash"] == pytest.approx(98000.0, abs=0.01)
+
+
+def test_invest_from_weights_places_orders(client: TestClient, market_open) -> None:
+    as_user(client, "invest-1")
+    response = client.post(
+        "/api/invest/orders",
+        json={"weights": {"AAPL": 0.5, "MSFT": 0.5}, "amount": 10000},
     )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["invested"] == pytest.approx(10000.0, abs=1.0)
+    assert len(body["orders"]) == 2
+    assert all(order["status"] == "filled" for order in body["orders"])
 
-    plan = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id}).json()
-    rows = {row["symbol"]: row for row in plan["rows"]}
-    assert rows["TSLA"]["target_weight"] == 0.0
-    assert rows["TSLA"]["action"] == "sell"
-
-    result = client.post("/api/invest/rebalance", json={"portfolio_id": portfolio_id})
-    assert result.status_code == 200, result.text
-
-    assert "TSLA" in fake.closed
-    assert all(symbol != "TSLA" for symbol, _, _ in fake.orders)
+    account = client.get("/api/invest/account").json()
+    assert account["cash"] == pytest.approx(90000.0, abs=1.0)
 
 
-def test_rebalance_executes_sells_before_buys(client: TestClient, setup) -> None:
-    fake, portfolio_id = setup("reb-3", "pro", [position("AAPL", 6000.0), position("MSFT", 4000.0)])
+def test_rebalance_preview_and_execute(client: TestClient, market_open) -> None:
+    as_user(client, "reb-1")
+    saved = client.post("/api/portfolios", json=PORTFOLIO)
+    assert saved.status_code == 200, saved.text
+    portfolio_id = saved.json()["id"]
+
+    # Start holding only AAPL, so a 40/60 AAPL/MSFT target needs a sell and a buy.
+    client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 8000})
+
+    preview = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id})
+    assert preview.status_code == 200, preview.text
+    assert preview.json()["tradable"] is True
 
     result = client.post("/api/invest/rebalance", json={"portfolio_id": portfolio_id})
     assert result.status_code == 200, result.text
     body = result.json()
-
-    assert [order["symbol"] for order in body["sells"]] == ["AAPL"]
-    assert [order["symbol"] for order in body["buys"]] == ["MSFT"]
-    assert body["fee"] == 0.0
-
-    sides = [side for _, _, side in fake.orders]
-    assert sides.index("sell") < sides.index("buy")
+    symbols = {order["symbol"] for order in body["buys"] + body["sells"]}
+    assert "MSFT" in symbols
 
 
-def test_rebalance_on_free_plan_scales_buys_down_by_fee(client: TestClient, setup) -> None:
-    fake, portfolio_id = setup("reb-4", "free", [position("AAPL", 6000.0), position("MSFT", 4000.0)])
+def test_rebalance_with_no_holdings_is_not_tradable(client: TestClient, market_open) -> None:
+    as_user(client, "reb-2")
+    saved = client.post("/api/portfolios", json=PORTFOLIO)
+    portfolio_id = saved.json()["id"]
 
-    plan = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id}).json()
-    assert plan["fee_bps"] > 0
-    assert plan["fee"] == pytest.approx(2000.0 * plan["fee_bps"] / 10000, abs=0.01)
-
-    result = client.post("/api/invest/rebalance", json={"portfolio_id": portfolio_id})
-    assert result.status_code == 200, result.text
-
-    buys = [(symbol, notional) for symbol, notional, side in fake.orders if side == "buy"]
-    assert len(buys) == 1
-    assert buys[0][1] < 2000.0
-
-
-def test_rebalance_with_no_holdings_is_not_tradable(client: TestClient, setup) -> None:
-    _, portfolio_id = setup("reb-5", "pro", [])
-
-    plan = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id}).json()
-    assert plan["tradable"] is False
-    assert plan["message"]
+    preview = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id}).json()
+    assert preview["tradable"] is False
+    assert preview["message"]
 
     result = client.post("/api/invest/rebalance", json={"portfolio_id": portfolio_id})
     assert result.status_code == 400
 
 
-def test_rebalance_when_already_on_target_is_a_no_op(client: TestClient, setup) -> None:
-    _, portfolio_id = setup("reb-6", "pro", [position("AAPL", 4000.0), position("MSFT", 6000.0)])
-
-    plan = client.get("/api/invest/rebalance", params={"portfolio_id": portfolio_id}).json()
-    assert plan["tradable"] is False
-    assert all(row["action"] == "hold" for row in plan["rows"])
-
-
-def test_manual_trade_applies_fee_on_buy_for_free_plan(client: TestClient, setup) -> None:
-    fake, _ = setup("trade-1", "free", [])
-
-    response = client.post("/api/invest/trade", json={"symbol": "aapl", "side": "buy", "notional": 1000})
-    assert response.status_code == 200, response.text
-    body = response.json()
-
-    assert body["symbol"] == "AAPL"
-    assert body["notional"] < 1000.0
-    assert "Fee" in (body["message"] or "")
-    assert fake.orders == [("AAPL", body["notional"], "buy")]
+def test_history_reports_starting_and_current_equity(client: TestClient, market_open) -> None:
+    as_user(client, "hist-1")
+    body = client.get("/api/invest/history", params={"range": "1M"}).json()
+    assert body["base_value"] == pytest.approx(100000.0, abs=1.0)
+    assert len(body["points"]) >= 2
 
 
-def test_manual_sell_takes_no_fee(client: TestClient, setup) -> None:
-    fake, _ = setup("trade-2", "free", [position("AAPL", 5000.0)])
+def test_cancel_pending_order(client: TestClient, monkeypatch) -> None:
+    as_user(client, "cancel-1")
+    future = utcnow() + timedelta(days=1)
+    monkeypatch.setattr("app.invest.simulator.is_market_open", lambda *_: False)
+    monkeypatch.setattr("app.invest.simulator.next_market_open", lambda *_: future)
 
-    response = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "sell", "notional": 500})
-    assert response.status_code == 200, response.text
-    body = response.json()
+    trade = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 2000})
+    assert trade.json()["status"] == "new"
 
-    assert body["notional"] == 500.0
-    assert body["message"] is None
-    assert fake.orders == [("AAPL", 500.0, "sell")]
+    canceled = client.delete("/api/invest/orders")
+    assert canceled.status_code == 200, canceled.text
+    assert canceled.json()["canceled"] == 1
 
-
-def test_manual_trade_below_minimum_is_rejected(client: TestClient, setup) -> None:
-    setup("trade-3", "pro", [])
-
-    response = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 0.5})
-    assert response.status_code == 400
-
-
-def test_close_position_trims_by_percentage(client: TestClient, setup) -> None:
-    fake, _ = setup("close-1", "pro", [position("AAPL", 5000.0)])
-
-    response = client.delete("/api/invest/positions/aapl", params={"percentage": 50})
-    assert response.status_code == 200, response.text
-    assert response.json()["symbol"] == "AAPL"
-    assert fake.closed == ["AAPL"]
+    orders = client.get("/api/invest/orders").json()
+    assert orders[0]["status"] == "canceled"
+    assert client.get("/api/invest/account").json()["cash"] == 100000.0
