@@ -160,11 +160,14 @@ export function FeatureHub({
                 .filter(Boolean)
                 .join(' ')
 
-              const label = isCenter
-                ? locked
-                  ? `${feature.name} is ${lockedLabel}. Upgrade to unlock.`
-                  : `Open ${feature.name}`
-                : `Bring ${feature.name} to front`
+              const open = () => {
+                if (locked) onLockedSelect?.(feature.id)
+                else onSelect(feature.id)
+              }
+
+              const label = locked
+                ? `${feature.name} is ${lockedLabel}. Upgrade to unlock.`
+                : `Open ${feature.name}`
 
               return (
                 <button
