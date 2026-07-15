@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.deps import (
     get_access,
@@ -9,6 +9,7 @@ from app.api.deps import (
     get_sector_provider,
     get_settings,
 )
+from app.ratelimit import HEAVY, limiter
 from app.auth.gating import Access, check_optimize, enforce_quota
 from app.config import Settings
 from app.data.cache import Cache
@@ -25,8 +26,10 @@ router = APIRouter(tags=["optimize"])
 
 
 @router.post("/optimize", response_model=OptimizeResponse)
+@limiter.limit(HEAVY)
 async def optimize(
-    request: OptimizeRequest,
+    request: Request,
+    payload: OptimizeRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     sector_provider: SectorProvider = Depends(get_sector_provider),
@@ -36,18 +39,18 @@ async def optimize(
     price_repository: PriceRepository = Depends(get_price_repository),
 ) -> OptimizeResponse:
     check_optimize(
-        tickers=request.tickers,
-        objective=request.objective,
-        risk_model=request.risk_model,
-        return_model=request.return_model,
-        lookback_days=request.lookback_days,
+        tickers=payload.tickers,
+        objective=payload.objective,
+        risk_model=payload.risk_model,
+        return_model=payload.return_model,
+        lookback_days=payload.lookback_days,
         entitlements=access.entitlements,
     )
     await enforce_quota(access, cache)
 
-    sectors = await sector_provider.resolve(request.tickers)
+    sectors = await sector_provider.resolve(payload.tickers)
     try:
-        response, frame = await run_optimization(request, provider, settings, sectors)
+        response, frame = await run_optimization(payload, provider, settings, sectors)
     except OptimizationServiceError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
 
@@ -61,7 +64,7 @@ async def optimize(
             objective=response.objective,
             provider=response.provider,
             tickers=[allocation.ticker for allocation in response.weights],
-            request=request.model_dump(mode="json"),
+            request=payload.model_dump(mode="json"),
             weights={allocation.ticker: allocation.weight for allocation in response.weights},
             metrics=response.metrics.model_dump(),
         )
@@ -72,24 +75,26 @@ async def optimize(
 
 
 @router.post("/optimize/explain", response_model=ExplainResponse)
+@limiter.limit(HEAVY)
 async def explain(
-    request: OptimizeRequest,
+    request: Request,
+    payload: OptimizeRequest,
     provider: DataProvider = Depends(get_provider),
     settings: Settings = Depends(get_settings),
     sector_provider: SectorProvider = Depends(get_sector_provider),
     access: Access = Depends(get_access),
 ) -> ExplainResponse:
     check_optimize(
-        tickers=request.tickers,
-        objective=request.objective,
-        risk_model=request.risk_model,
-        return_model=request.return_model,
-        lookback_days=request.lookback_days,
+        tickers=payload.tickers,
+        objective=payload.objective,
+        risk_model=payload.risk_model,
+        return_model=payload.return_model,
+        lookback_days=payload.lookback_days,
         entitlements=access.entitlements,
     )
-    sectors = await sector_provider.resolve(request.tickers)
+    sectors = await sector_provider.resolve(payload.tickers)
     try:
-        return await run_explanation(request, provider, settings, sectors)
+        return await run_explanation(payload, provider, settings, sectors)
     except OptimizationServiceError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
 

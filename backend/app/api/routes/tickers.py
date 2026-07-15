@@ -1,9 +1,10 @@
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from app.api.deps import get_provider
 from app.data.provider import DataProvider
+from app.ratelimit import DATA, limiter
 from app.schemas.tickers import TickerValidation, TickerValidationRequest, TickerValidationResponse
 
 router = APIRouter(tags=["tickers"])
@@ -13,13 +14,15 @@ _LOOKBACK_DAYS = 150
 
 
 @router.post("/tickers/validate", response_model=TickerValidationResponse)
+@limiter.limit(DATA)
 async def validate_tickers(
-    request: TickerValidationRequest,
+    request: Request,
+    payload: TickerValidationRequest,
     provider: DataProvider = Depends(get_provider),
 ) -> TickerValidationResponse:
     seen: set[str] = set()
     symbols: list[str] = []
-    for ticker in request.tickers:
+    for ticker in payload.tickers:
         symbol = ticker.strip().upper()
         if symbol and symbol not in seen:
             seen.add(symbol)
