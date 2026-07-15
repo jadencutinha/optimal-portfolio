@@ -37,6 +37,7 @@ from app.data.cache import build_cache
 from app.data.provider import CachingDataProvider, ProviderError, build_inner_provider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
+from app.invest.simulator import InvestSimulator
 from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
 from app.observability.metrics import MetricsCollector
@@ -66,6 +67,8 @@ async def lifespan(app: FastAPI):
 
     app.state.cache = cache
     app.state.provider = provider
+    app.state.session_factory = session_factory
+    app.state.invest_simulator = InvestSimulator(session_factory, provider)
     app.state.sector_provider = SectorProvider(cache, settings)
     app.state.verifier = SupabaseVerifier(settings)
     app.state.supabase_admin = SupabaseAdmin(settings)

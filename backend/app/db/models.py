@@ -108,3 +108,50 @@ class Certificate(Base):
     course_id: Mapped[str] = mapped_column(String(64), index=True)
     credential_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class InvestAccount(Base):
+    __tablename__ = "invest_accounts"
+
+    user_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    cash: Mapped[float] = mapped_column(Float)
+    starting_balance: Mapped[float] = mapped_column(Float)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class InvestPosition(Base):
+    __tablename__ = "invest_positions"
+    __table_args__ = (UniqueConstraint("user_id", "symbol", name="uq_invest_position"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    symbol: Mapped[str] = mapped_column(String(16), index=True)
+    qty: Mapped[float] = mapped_column(Float)
+    cost_basis: Mapped[float] = mapped_column(Float)
+
+
+class InvestOrder(Base):
+    __tablename__ = "invest_orders"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    symbol: Mapped[str] = mapped_column(String(16), index=True)
+    side: Mapped[str] = mapped_column(String(8))
+    notional: Mapped[float | None] = mapped_column(Float, nullable=True)
+    qty: Mapped[float | None] = mapped_column(Float, nullable=True)
+    fee: Mapped[float] = mapped_column(Float, default=0.0)
+    status: Mapped[str] = mapped_column(String(16), index=True)
+    submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    fill_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    filled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    filled_avg_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    filled_qty: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+
+class InvestEquityPoint(Base):
+    __tablename__ = "invest_equity_points"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    equity: Mapped[float] = mapped_column(Float)
