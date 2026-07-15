@@ -280,8 +280,8 @@ export function CoursePage({
 
   return (
     <div className="course-landing">
-      <PlatformHeader onSwitch={onSwitch} />
       <div className="course-landing-inner">
+      <PlatformHeader onSwitch={onSwitch} />
       <div className="course-landing-head">
         <div>
           <h1 className="course-landing-title">Halo Learn</h1>
