@@ -44,13 +44,9 @@ export function FeatureHub({
   const go = (delta: number) => setCenter((c) => clamp(c + delta))
 
   const activate = (index: number) => {
-    if (index === center) {
-      const feature = features[index]
-      if (feature.locked) onLockedSelect?.(feature.id)
-      else onSelect(feature.id)
-    } else {
-      setCenter(clamp(index))
-    }
+    const feature = features[index]
+    if (feature.locked) onLockedSelect?.(feature.id)
+    else onSelect(feature.id)
   }
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -148,7 +144,6 @@ export function FeatureHub({
                 transform: `translateX(${ANCHOR_PX + offset * STEP_PX + dragPx}px) translateY(-50%) translateZ(${-abs * 30}px) rotateY(${rotateY}deg) scale(${isCenter ? 1 : 0.94})`,
                 opacity: offset < 0 ? 0.2 : Math.max(0.5, 1 - offset * 0.14),
                 zIndex: 100 - abs,
-                pointerEvents: offset < -1 || offset > 6 ? 'none' : 'auto',
                 transition: dragging ? 'none' : undefined,
               }
               const locked = Boolean(feature.locked)
@@ -159,11 +154,6 @@ export function FeatureHub({
               ]
                 .filter(Boolean)
                 .join(' ')
-
-              const open = () => {
-                if (locked) onLockedSelect?.(feature.id)
-                else onSelect(feature.id)
-              }
 
               const label = locked
                 ? `${feature.name} is ${lockedLabel}. Upgrade to unlock.`
