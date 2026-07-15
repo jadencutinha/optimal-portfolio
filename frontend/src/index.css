@@ -6210,13 +6210,15 @@ table.weights td {
   overflow: hidden;
   perspective: 1600px;
   outline: none;
+  /* Chromium's 3D hit-testing treats perspective/preserve-3d ancestors as
+     occluding their own translateZ'd descendants; cards re-enable
+     pointer-events themselves so real clicks reach them. */
+  pointer-events: none;
 }
 .fhub__track {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  /* Chromium's 3D hit-testing treats this flat wrapper as occluding its own
-     translateZ'd children; each card re-enables pointer-events itself. */
   pointer-events: none;
 }
 
@@ -6231,6 +6233,7 @@ table.weights td {
   border: none;
   background: none;
   cursor: pointer;
+  pointer-events: auto;
   transform-origin: center;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.55s ease;
   transform-style: preserve-3d;
