@@ -85,12 +85,16 @@ export function ModuleLayout({
   const readingMinutes = estimateReadingMinutes(mod.content)
 
   const prevModule = moduleIndex > 0 ? track.modules[moduleIndex - 1] : undefined
-  const nextModule =
-    moduleIndex < track.modules.length - 1 ? track.modules[moduleIndex + 1] : undefined
+  const nextModule = moduleIndex < track.modules.length - 1 ? track.modules[moduleIndex + 1] : undefined
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
 
   return (
-    <div className="module-shell">
-      <aside className="module-sidebar">
+    <div className={`module-shell ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <aside className={`module-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <button type="button" className="sidebar-back" onClick={onBackToTracks}>
           ← Back to map
         </button>
@@ -155,6 +159,9 @@ export function ModuleLayout({
 
         <div className="module-meta">
           <span className="module-reading-time">{readingMinutes} min read</span>
+          <button className="sidebar-toggle" onClick={toggleSidebar}>
+            {isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+          </button>
         </div>
 
         <h1 className="module-title">{mod.title}</h1>
