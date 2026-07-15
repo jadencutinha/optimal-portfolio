@@ -34,6 +34,9 @@ const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn' | 'neptun
   2: 'moon',
   3: 'saturn',
   4: 'neptune',
+  5: 'saturn',
+  6: 'moon',
+  7: 'earth',
 }
 
 const SECTOR_BY_TRACK: Record<number, string> = {
@@ -51,6 +54,9 @@ const ARCHETYPE_BY_TRACK: Record<number, string> = {
   2: 'Mindset',
   3: 'Engineering',
   4: 'Analysis',
+  5: 'Institutional',
+  6: 'Quantitative',
+  7: 'Allocation',
 }
 
 const BECOMES_BY_TRACK: Record<number, string> = {
@@ -58,6 +64,9 @@ const BECOMES_BY_TRACK: Record<number, string> = {
   2: 'Emotionally Disciplined',
   3: 'Portfolio Builder',
   4: 'Portfolio Analyst',
+  5: 'Institutional Thinker',
+  6: 'Quantitative Investor',
+  7: 'Capital Allocator',
 }
 
 const START_HERE_BY_TRACK: Record<number, string> = {
@@ -74,29 +83,7 @@ interface StubSector {
   becomes: string
 }
 
-const STUB_SECTORS: StubSector[] = [
-  {
-    id: 5,
-    archetype: 'Institutional',
-    title: 'Institutional Investing',
-    description: 'How hedge funds generate ideas, size positions, and manage risk.',
-    becomes: 'Institutional Thinker',
-  },
-  {
-    id: 6,
-    archetype: 'Quantitative',
-    title: 'Quantitative Investing',
-    description: 'Factor investing, systematic strategies, and market regimes.',
-    becomes: 'Quantitative Investor',
-  },
-  {
-    id: 7,
-    archetype: 'Allocation',
-    title: 'Capital Allocation',
-    description: 'Conviction vs. concentration: portfolio construction at scale.',
-    becomes: 'Capital Allocator',
-  },
-]
+const STUB_SECTORS: StubSector[] = []
 
 type SpineNode =
   | { kind: 'real'; id: number; track: Track }
