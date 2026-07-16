@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../auth/useAuth'
 import { Certificate } from '../components/Certificate'
 import { CourseSearch } from '../components/CourseSearch'
-import { CheckIcon, LockIcon } from '../components/icons'
+import { Flashcards } from '../components/Flashcards'
+import { CardsIcon, CheckIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { TRACKS, type Track } from '../data/courseData'
@@ -135,6 +136,7 @@ export function CoursePage({
 }) {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [viewingModule, setViewingModule] = useState(false)
+  const [viewingFlashcards, setViewingFlashcards] = useState(false)
   const [moduleIndex, setModuleIndex] = useState(0)
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
   const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
@@ -221,6 +223,10 @@ export function CoursePage({
     }
     setZoomingTrackId(track.id)
     window.setTimeout(() => openTrack(track), 480)
+  }
+
+  if (viewingFlashcards) {
+    return <Flashcards onClose={() => setViewingFlashcards(false)} />
   }
 
   if (selectedTrack && viewingModule) {
@@ -315,6 +321,14 @@ export function CoursePage({
             Master the hidden curriculum of investing through interactive lessons and real
             portfolio building.
           </p>
+          <button
+            type="button"
+            className="course-flashcards-cta"
+            onClick={() => setViewingFlashcards(true)}
+          >
+            <CardsIcon />
+            Study Flashcards
+          </button>
         </motion.div>
       </div>
 
