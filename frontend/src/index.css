@@ -1903,8 +1903,8 @@ button.primary.modal-submit {
 }
 
 .course-module {
-  max-width: 760px;
-  margin: 0 auto;
+  max-width: 1300px;
+  margin: 56px 0 0;
 }
 
 .course-module-head {
@@ -8078,15 +8078,23 @@ body[data-surface='space'] .app-header {
   }
 }
 
-/* ---------- Constellation learning path: a scrollable vertical galaxy ---------- */
+/* ---------- Constellation learning path: a scrollable horizontal galaxy ----------
+   No card edge on purpose — the star field should read as part of the page,
+   not a boxed widget sitting on top of it. The path runs left to right and
+   fills the full text column, so the chain of nodes uses the width instead
+   of leaving it empty; a vignette mask lets scrolled content dissolve at
+   the edges rather than being clipped by a hard rectangle. */
 .constellation {
   position: relative;
-  height: min(620px, 72vh);
-  border-radius: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border: 1px solid var(--border);
+  height: 300px;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin-bottom: 24px;
+  /* A porthole vignette, not a hard rectangle: fades on all four sides of
+     the visible viewport (independent of scroll, since the mask sizes to
+     the container's own box) so the star field dissolves into the page. */
+  mask-image: radial-gradient(ellipse 70% 64% at 50% 50%, #000 62%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 64% at 50% 50%, #000 62%, transparent 100%);
   /* Fixed backdrop (doesn't scroll with content) — nebula + dust + a static
      star field. The foreground stars drifting past this while you scroll is
      what reads as depth/parallax. */
@@ -8100,11 +8108,11 @@ body[data-surface='space'] .app-header {
     radial-gradient(1px 1px at 10% 75%, rgba(255, 255, 255, 0.3), transparent 60%),
     radial-gradient(60% 40% at 20% 30%, rgba(111, 62, 200, 0.14), transparent 70%),
     radial-gradient(55% 45% at 80% 70%, rgba(57, 135, 229, 0.12), transparent 70%),
-    radial-gradient(120% 60% at 50% 100%, #101f2a 0%, #060b10 68%, #04070a 100%);
+    radial-gradient(90% 140% at 50% 50%, rgba(16, 31, 42, 0.6) 0%, rgba(6, 11, 16, 0.35) 68%, transparent 100%);
 }
 .constellation__content {
   position: relative;
-  width: 100%;
+  height: 100%;
   transition: transform 0.42s cubic-bezier(0.6, 0, 0.9, 0.4), filter 0.42s ease, opacity 0.42s ease;
 }
 .constellation.is-warping .constellation__content {
@@ -8322,7 +8330,7 @@ body[data-surface='space'] .app-header {
 }
 
 @media (max-width: 620px) {
-  .constellation { height: 68vh; }
+  .constellation { height: 260px; }
   .constellation__hotspot-label { width: 120px; font-size: 11.5px; }
 }
 

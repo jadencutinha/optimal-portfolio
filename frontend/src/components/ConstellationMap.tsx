@@ -9,20 +9,21 @@ interface Props {
   onSelectModule: (index: number) => void
 }
 
-const ROW_WORLD = 1.6
+const STEP_WORLD = 2
 const WORLD_PAD = 1.1
 const PX_PER_UNIT = 90
 const CAMERA_Z = 8
 const DUST_COUNT = 46
+const WOBBLE_WORLD = 0.9
 
-// Deterministic per-track layout — module 0 (first) sits at the bottom, the
-// last module at the top, with a gentle left-right drift so it reads as a
-// climbing star chain rather than a straight ladder.
-function layout(count: number, seed: number): [number, number, number][] {
+// Deterministic per-track layout — module 0 (first) sits on the left, the
+// last module on the right, with a gentle up-down drift so it reads as a
+// climbing star chain rather than a straight line.
+function layout(count: number, seed: number, stepWorld: number): [number, number, number][] {
   const points: [number, number, number][] = []
   for (let i = 0; i < count; i += 1) {
-    const wobble = Math.sin(seed + i * 2.1) * 0.9
-    points.push([wobble, i * ROW_WORLD, 0])
+    const wobble = Math.sin(seed + i * 2.1) * WOBBLE_WORLD
+    points.push([i * stepWorld, wobble, 0])
   }
   return points
 }
@@ -39,7 +40,8 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
   const scrollRef = useRef<HTMLDivElement>(null)
   const mountRef = useRef<HTMLDivElement>(null)
   const hoverActiveRef = useRef(false)
-  const [contentWidth, setContentWidth] = useState(600)
+  const [viewHeight, setViewHeight] = useState(300)
+  const [viewWidth, setViewWidth] = useState<number | null>(null)
   const [hovered, setHovered] = useState<number | null>(null)
   const [traveling, setTraveling] = useState<number | null>(null)
   const [entering, setEntering] = useState(true)
@@ -48,7 +50,21 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
   const prevTrackIdRef = useRef<number | null>(null)
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  const points = useMemo(() => layout(track.modules.length, track.id * 1.7), [track])
+  // Node spacing stretches to fill the available box width — it only ever
+  // grows past STEP_WORLD (when there's room to spread modules out), never
+  // shrinks below it, so labels never crowd. Falls back to the fixed step
+  // (and horizontal scroll) when the box is too narrow for the module count.
+  const stepWorld = useMemo(() => {
+    const count = track.modules.length
+    if (viewWidth == null || count <= 1) return STEP_WORLD
+    const availableWorld = viewWidth / PX_PER_UNIT - WORLD_PAD * 2
+    return Math.max(STEP_WORLD, availableWorld / (count - 1))
+  }, [track, viewWidth])
+
+  const points = useMemo(
+    () => layout(track.modules.length, track.id * 1.7, stepWorld),
+    [track, stepWorld],
+  )
 
   const currentIndex = track.modules.findIndex((m) => !isModuleComplete(m.id))
 
@@ -71,16 +87,29 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
     }
   }, [track, isModuleComplete, reduceMotion])
 
-  const topY = (track.modules.length - 1) * ROW_WORLD + WORLD_PAD
-  const bottomY = -WORLD_PAD
-  const totalWorldHeight = topY - bottomY
-  const contentHeight = Math.round(totalWorldHeight * PX_PER_UNIT)
+  const rightX = (track.modules.length - 1) * stepWorld + WORLD_PAD
+  const leftX = -WORLD_PAD
+  const totalWorldWidth = rightX - leftX
+  const contentWidth = Math.round(totalWorldWidth * PX_PER_UNIT)
 
   useEffect(() => {
     setEntering(true)
     const t = window.setTimeout(() => setEntering(false), reduceMotion ? 0 : 1500)
     return () => window.clearTimeout(t)
   }, [track, reduceMotion])
+
+  // Measured independently of the WebGL setup effect below so resizing the
+  // box (e.g. viewport width change) doesn't tear down/rebuild the scene —
+  // it just feeds `stepWorld` above, which reflows points/contentWidth.
+  useEffect(() => {
+    const scrollEl = scrollRef.current
+    if (!scrollEl) return
+    const measure = () => setViewWidth(scrollEl.clientWidth)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(scrollEl)
+    return () => observer.disconnect()
+  }, [])
 
   function travelTo(index: number) {
     if (traveling !== null) return
@@ -112,8 +141,8 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
     camera.position.set(0, 0, CAMERA_Z)
-    camera.top = topY
-    camera.bottom = bottomY
+    camera.left = leftX
+    camera.right = rightX
 
     const doneColor = new THREE.Color(0xffd66b)
     const currentColor = new THREE.Color(0x6fb3dd)
@@ -135,11 +164,11 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
     scene.add(stars)
     disposables.push(starGeometry, starMaterial)
 
-    // Ambient dust scattered across the whole column — pure atmosphere, no interaction.
+    // Ambient dust scattered across the whole row — pure atmosphere, no interaction.
     const rand = seededRandom(track.id * 97 + 13)
     const dustPoints: [number, number, number][] = Array.from({ length: DUST_COUNT }, () => [
+      leftX + rand() * totalWorldWidth,
       (rand() - 0.5) * 3.4,
-      bottomY + rand() * totalWorldHeight,
       -1 - rand(),
     ])
     const dustGeometry = constellationStars(dustPoints, new THREE.Color(0x6fb3dd), 2.5)
@@ -149,16 +178,16 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
     disposables.push(dustGeometry, dustMaterial)
 
     const layoutCamera = () => {
-      const clientWidth = scrollEl.clientWidth
-      if (clientWidth === 0) return
-      renderer.setSize(clientWidth, contentHeight, false)
-      const worldWidth = clientWidth / PX_PER_UNIT
-      camera.left = -worldWidth / 2
-      camera.right = worldWidth / 2
+      const clientHeight = scrollEl.clientHeight
+      if (clientHeight === 0) return
+      renderer.setSize(contentWidth, clientHeight, false)
+      const worldHeight = clientHeight / PX_PER_UNIT
+      camera.top = worldHeight / 2
+      camera.bottom = -worldHeight / 2
       camera.updateProjectionMatrix()
       starMaterial.uniforms.uScale.value = PX_PER_UNIT * 0.0095
       dustMaterial.uniforms.uScale.value = PX_PER_UNIT * 0.0095
-      setContentWidth(clientWidth)
+      setViewHeight(clientHeight)
     }
     layoutCamera()
 
@@ -191,22 +220,22 @@ export function ConstellationMap({ track, isModuleComplete, onSelectModule }: Pr
       renderer.dispose()
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
     }
-  }, [track, isModuleComplete, points, contentHeight, topY, bottomY, currentIndex, totalWorldHeight])
+  }, [track, isModuleComplete, points, contentWidth, leftX, rightX, currentIndex, totalWorldWidth])
 
   function pxFor(index: number) {
     const point = points[index]
     return {
-      x: contentWidth / 2 + point[0] * PX_PER_UNIT,
-      y: (topY - point[1]) * PX_PER_UNIT,
+      x: (point[0] - leftX) * PX_PER_UNIT,
+      y: viewHeight / 2 - point[1] * PX_PER_UNIT,
     }
   }
 
   return (
     <div className={`constellation ${traveling !== null ? 'is-warping' : ''}`} ref={scrollRef}>
-      <div className="constellation__content" style={{ height: contentHeight }}>
+      <div className="constellation__content" style={{ width: contentWidth }}>
         <div className="constellation__sky" ref={mountRef} aria-hidden="true" />
 
-        <svg className="constellation__lines" width={contentWidth} height={contentHeight} aria-hidden="true">
+        <svg className="constellation__lines" width={contentWidth} height={viewHeight} aria-hidden="true">
           {track.modules.slice(0, -1).map((mod, i) => {
             const a = pxFor(i)
             const b = pxFor(i + 1)
