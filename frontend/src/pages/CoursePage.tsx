@@ -1,10 +1,14 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { useAuth } from '../auth/useAuth'
 import { Certificate } from '../components/Certificate'
 import { CourseSearch } from '../components/CourseSearch'
-import { CheckIcon, FlameIcon, LockIcon } from '../components/icons'
+import { CheckIcon, LockIcon } from '../components/icons'
 import { ModuleLayout } from '../components/ModuleLayout'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { TRACKS, type Track } from '../data/courseData'
+import { displayName } from '../lib/displayName'
+import { useSurface } from '../lib/useSurface'
 import {
   awardXP,
   ensureTrackCompletion,
@@ -142,6 +146,10 @@ export function CoursePage({
   const spineRef = useRef<HTMLDivElement>(null)
   const planetRefs = useRef<Map<number, HTMLElement>>(new Map())
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const { session } = useAuth()
+  const learnerLabel = session ? displayName(session.user).toUpperCase() : 'LEARNER'
+
+  useSurface('platform')
 
   const setPlanetRef = (id: number) => (el: HTMLElement | null) => {
     if (el) planetRefs.current.set(id, el)
@@ -281,24 +289,33 @@ export function CoursePage({
   return (
     <div className="course-landing">
       <div className="course-landing-inner">
-      <PlatformHeader onSwitch={onSwitch} />
-      <div className="course-landing-head">
-        <div>
-          <h1 className="course-landing-title">Halo Learn</h1>
+      <PlatformHeader onSwitch={onSwitch} showGreeting={false} />
+      <div className="course-hero">
+        <motion.div
+          className="course-hero-planet shared-planet"
+          layoutId="course-planet"
+          transition={{ type: 'tween', duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
+          aria-hidden="true"
+        />
+        <motion.div
+          className="course-hero-content"
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: reduceMotion ? 0 : 0.45, ease: [0.65, 0, 0.35, 1] }}
+        >
+          <p className="course-hero-tag">
+            {learnerLabel}
+            <span className="course-hero-tag-sep"> &middot; </span>
+            {streak.current > 0
+              ? `${streak.current} DAY${streak.current === 1 ? '' : 'S'} STREAK`
+              : 'WELCOME BACK'}
+          </p>
+          <h1 className="course-hero-title">Your Route Through the Galaxy</h1>
           <p className="course-landing-desc">
             Master the hidden curriculum of investing through interactive lessons and real
             portfolio building.
           </p>
-        </div>
-        <div className="sidebar-stats course-landing-stats">
-          <span className="xp-badge">{xp} XP</span>
-          {streak.current > 0 && (
-            <span className="streak-badge">
-              <FlameIcon />
-              {streak.current} day{streak.current === 1 ? '' : 's'}
-            </span>
-          )}
-        </div>
+        </motion.div>
       </div>
 
       <div className="course-progress-summary">
