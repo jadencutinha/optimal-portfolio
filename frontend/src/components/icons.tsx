@@ -34,6 +34,15 @@ export function StarIcon({ filled = true }: { filled?: boolean }) {
   )
 }
 
+export function CardsIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none">
+      <rect x="1.5" y="4.5" width="10" height="8" rx="1.5" transform="rotate(-8 1.5 4.5)" stroke="currentColor" strokeWidth="1.3" />
+      <rect x="4" y="3.5" width="10" height="8" rx="1.5" fill="var(--panel, #10201d)" stroke="currentColor" strokeWidth="1.3" />
+    </svg>
+  )
+}
+
 export function FlameIcon() {
   return (
     <svg viewBox="0 0 16 16" fill="none">
