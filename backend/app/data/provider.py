@@ -1,11 +1,15 @@
 import json
 from abc import ABC, abstractmethod
 from datetime import date
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from app.config import Settings
 from app.data.cache import Cache
+
+if TYPE_CHECKING:
+    from app.data.repository import PriceRepository
 
 
 class ProviderError(Exception):
@@ -61,6 +65,53 @@ def _series_from_json(payload: str) -> pd.Series:
     data = json.loads(payload)
     index = pd.to_datetime(list(data.keys()))
     return pd.Series(list(data.values()), index=index, dtype=float).sort_index()
+
+
+class PersistentPriceProvider(DataProvider):
+    """A durable read-through cache backed by the price_bars table.
+
+    On a cache miss upstream, this serves prices from the database when they are
+    recent enough, so a cold in-memory/Redis cache (e.g. after a restart) does not
+    re-hit the market-data API for data we already have.
+    """
+
+    FRESHNESS_DAYS = 4
+    COVERAGE_DAYS = 7
+
+    def __init__(self, inner: DataProvider, repository: "PriceRepository") -> None:
+        self._inner = inner
+        self._repository = repository
+        self.name = inner.name
+
+    def _is_fresh(self, series: pd.Series, start: date, end: date) -> bool:
+        if series.empty:
+            return False
+        latest = series.index.max().date()
+        earliest = series.index.min().date()
+        recent_enough = (end - latest).days <= self.FRESHNESS_DAYS
+        covers_start = (earliest - start).days <= self.COVERAGE_DAYS
+        return recent_enough and covers_start
+
+    async def get_prices(self, tickers: list[str], start: date, end: date) -> dict[str, pd.Series]:
+        stored = await self._repository.load_prices(self.name, tickers, start, end)
+        resolved: dict[str, pd.Series] = {}
+        missing: list[str] = []
+        for ticker in tickers:
+            series = stored.get(ticker)
+            if series is not None and self._is_fresh(series, start, end):
+                resolved[ticker] = series
+            else:
+                missing.append(ticker)
+        if missing:
+            fetched = await self._inner.get_prices(missing, start, end)
+            if fetched:
+                await self._repository.store_prices(self.name, pd.DataFrame(fetched))
+            for ticker, series in fetched.items():
+                resolved[ticker] = series
+        return {ticker: resolved[ticker] for ticker in tickers if ticker in resolved}
+
+    async def close(self) -> None:
+        await self._inner.close()
 
 
 class CachingDataProvider(DataProvider):
