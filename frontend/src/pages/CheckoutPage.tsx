@@ -1,5 +1,11 @@
-import { Suspense, lazy, useState } from 'react'
-import { useSetPlan } from '../api/queries'
+import { Suspense, lazy, useCallback, useMemo, useRef } from 'react'
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
+import { useQueryClient } from '@tanstack/react-query'
+import { apiClient } from '../api/client'
+import { useBillingConfig, useSetPlan } from '../api/queries'
+import type { CheckoutSession } from '../api/types'
+import { StripeDemoCheckout } from '../components/StripeDemoCheckout'
+import { getStripe } from '../lib/stripe'
 import { useSurface } from '../lib/useSurface'
 
 const SunScene = lazy(() => import('../components/SunScene').then((module) => ({ default: module.SunScene })))
@@ -25,14 +31,36 @@ function LockIcon() {
 }
 
 export function CheckoutPage({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
+  const config = useBillingConfig()
   const setPlan = useSetPlan()
-  const [card, setCard] = useState('')
-  const [expiry, setExpiry] = useState('')
-  const [cvc, setCvc] = useState('')
+  const queryClient = useQueryClient()
 
   useSurface('space')
 
-  const upgrade = async () => {
+  const publishableKey = config.data?.publishable_key ?? ''
+  const stripeEnabled = Boolean(config.data?.enabled && publishableKey)
+  const stripePromise = useMemo(
+    () => (stripeEnabled ? getStripe(publishableKey) : null),
+    [stripeEnabled, publishableKey],
+  )
+
+  const onDoneRef = useRef(onDone)
+  onDoneRef.current = onDone
+
+  const fetchClientSecret = useCallback(async () => {
+    const { data } = await apiClient.post<CheckoutSession>('/api/billing/checkout-session')
+    return data.client_secret
+  }, [])
+
+  const onComplete = useCallback(async () => {
+    await apiClient.post('/api/billing/confirm')
+    await queryClient.invalidateQueries({ queryKey: ['me'] })
+    onDoneRef.current()
+  }, [queryClient])
+
+  const checkoutOptions = useMemo(() => ({ fetchClientSecret, onComplete }), [fetchClientSecret, onComplete])
+
+  const bypass = async () => {
     await setPlan.mutateAsync('pro')
     onDone()
   }
@@ -70,53 +98,27 @@ export function CheckoutPage({ onDone, onCancel }: { onDone: () => void; onCance
           </div>
           <p className="checkout__cancel-note">Cancel anytime. No lock-in.</p>
 
-          <div className="checkout__fields">
-            <label className="checkout__field">
-              <span>Card number</span>
-              <input
-                value={card}
-                placeholder="4242 4242 4242 4242"
-                inputMode="numeric"
-                autoComplete="cc-number"
-                onChange={(event) => setCard(event.target.value)}
-              />
-            </label>
-            <div className="checkout__row">
-              <label className="checkout__field">
-                <span>Expiry</span>
-                <input
-                  value={expiry}
-                  placeholder="MM/YY"
-                  autoComplete="cc-exp"
-                  onChange={(event) => setExpiry(event.target.value)}
-                />
-              </label>
-              <label className="checkout__field">
-                <span>CVC</span>
-                <input
-                  value={cvc}
-                  placeholder="123"
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  onChange={(event) => setCvc(event.target.value)}
-                />
-              </label>
+          {config.isLoading ? (
+            <p className="checkout__note">Loading secure checkout…</p>
+          ) : stripeEnabled && stripePromise ? (
+            <div className="checkout__stripe" key={publishableKey}>
+              <EmbeddedCheckoutProvider stripe={stripePromise} options={checkoutOptions}>
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
             </div>
-          </div>
-
-          <button type="button" className="primary checkout__pay" disabled={setPlan.isPending} onClick={upgrade}>
-            {setPlan.isPending ? 'Processing…' : 'Pay $29 / month'}
-          </button>
+          ) : (
+            <StripeDemoCheckout amountLabel="$29.00" onPay={bypass} paying={setPlan.isPending} />
+          )}
 
           {DEMO_BYPASS && (
-            <button type="button" className="checkout__bypass" disabled={setPlan.isPending} onClick={upgrade}>
-              Skip payment and unlock Pro now
+            <button type="button" className="checkout__bypass" disabled={setPlan.isPending} onClick={bypass}>
+              {setPlan.isPending ? 'Unlocking…' : 'Skip payment and unlock Pro now'}
             </button>
           )}
 
           <p className="checkout__secure">
             <LockIcon />
-            Demo checkout. No card is charged.
+            Secured by Stripe. Test mode, so no real card is charged.
           </p>
 
           <button type="button" className="checkout__back" onClick={onCancel}>

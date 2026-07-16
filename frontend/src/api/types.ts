@@ -655,3 +655,16 @@ export interface PricesResponse {
   end: string
   series: TickerPrices[]
 }
+
+export interface BillingConfig {
+  enabled: boolean
+  publishable_key: string
+  price_amount_cents: number
+  currency: string
+  product_name: string
+}
+
+export interface CheckoutSession {
+  client_secret: string
+  session_id: string
+}

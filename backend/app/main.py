@@ -13,6 +13,7 @@ from app.api.routes import (
     assistant,
     backtest,
     behavioral,
+    billing,
     courses,
     frontier,
     health,
@@ -32,6 +33,8 @@ from app.api.routes import (
 from app.auth.repository import ProfileRepository
 from app.auth.supabase import SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
+from app.billing.repository import BillingRepository
+from app.billing.service import StripeBilling
 from app.config import get_settings
 from app.data.cache import build_cache
 from app.data.provider import CachingDataProvider, ProviderError, build_inner_provider
@@ -73,6 +76,7 @@ async def lifespan(app: FastAPI):
     app.state.verifier = SupabaseVerifier(settings)
     app.state.supabase_admin = SupabaseAdmin(settings)
     app.state.profile_repository = ProfileRepository(session_factory)
+    app.state.billing = StripeBilling(settings, BillingRepository(session_factory), app.state.profile_repository)
     app.state.optimization_repository = OptimizationRepository(session_factory)
     app.state.price_repository = PriceRepository(session_factory)
     app.state.backtest_repository = BacktestRepository(session_factory)
@@ -142,6 +146,7 @@ def create_app() -> FastAPI:
     app.include_router(stress.router, prefix=settings.api_prefix)
     app.include_router(reports.router, prefix=settings.api_prefix)
     app.include_router(invest.router, prefix=settings.api_prefix)
+    app.include_router(billing.router, prefix=settings.api_prefix)
     app.include_router(market.router, prefix=settings.api_prefix)
     app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)
