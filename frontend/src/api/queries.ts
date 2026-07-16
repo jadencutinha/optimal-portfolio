@@ -9,6 +9,7 @@ import type {
   BacktestResponse,
   BehaviorGapRequest,
   BehaviorGapResponse,
+  BillingConfig,
   CourseDetail,
   CourseSummary,
   ExplainResponse,
@@ -100,6 +101,14 @@ export function useSetPlan() {
   return useMutation({
     mutationFn: async (plan: Plan) => (await apiClient.put<MeResponse>('/api/me/plan', { plan })).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
+  })
+}
+
+export function useBillingConfig() {
+  return useQuery({
+    queryKey: ['billing', 'config'],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => (await apiClient.get<BillingConfig>('/api/billing/config')).data,
   })
 }
 

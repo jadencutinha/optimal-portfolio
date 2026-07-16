@@ -47,6 +47,13 @@ class Settings(BaseSettings):
     alpaca_data_url: str = "https://data.alpaca.markets"
     alpaca_timeout_seconds: float = 30.0
 
+    stripe_secret_key: str | None = None
+    stripe_publishable_key: str | None = None
+    stripe_webhook_secret: str | None = None
+    stripe_price_amount_cents: int = 2900
+    stripe_currency: str = "usd"
+    stripe_product_name: str = "Optimal Portfolio Pro"
+
     sentry_dsn: str | None = None
     sentry_traces_sample_rate: float = 0.0
 
@@ -80,6 +87,10 @@ class Settings(BaseSettings):
         if text.startswith("["):
             return json.loads(text)
         return [origin.strip() for origin in text.split(",") if origin.strip()]
+
+    @property
+    def stripe_enabled(self) -> bool:
+        return bool(self.stripe_secret_key and self.stripe_publishable_key)
 
 
 @lru_cache
