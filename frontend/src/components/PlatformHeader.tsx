@@ -1,9 +1,15 @@
 import { Greeting } from './Greeting'
 
-export function PlatformHeader({ onSwitch }: { onSwitch: () => void }) {
+export function PlatformHeader({
+  onSwitch,
+  showGreeting = true,
+}: {
+  onSwitch: () => void
+  showGreeting?: boolean
+}) {
   return (
     <div className="platform-bar">
-      <Greeting />
+      {showGreeting && <Greeting />}
       <button type="button" className="switch-plan" onClick={onSwitch}>
         <svg className="switch-plan__icon" viewBox="0 0 24 24" aria-hidden="true">
           <path
