@@ -3360,10 +3360,47 @@ table.weights td {
   padding: 40px 0;
 }
 
-.course-landing-title {
-  margin: 0 0 8px;
-  font-size: 32px;
+.course-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 0 auto 30px;
+  padding-top: 4px;
+}
+
+.course-hero-planet {
+  width: clamp(150px, 22vw, 210px);
+  height: clamp(150px, 22vw, 210px);
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 34px rgba(224, 194, 138, 0.22));
+}
+
+.course-hero-content {
+  max-width: 640px;
+}
+
+.course-hero-tag {
+  margin: 0 0 12px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.course-hero-tag-sep {
+  color: var(--muted);
+}
+
+.course-hero-title {
+  margin: 0 0 10px;
+  font-size: clamp(34px, 5vw, 54px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 .course-landing-desc {
@@ -5536,18 +5573,6 @@ table.weights td {
 }
 
 /* ---- Course gamification: XP, streaks, mastery stars ---- */
-
-.course-landing-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.course-landing-stats {
-  flex-shrink: 0;
-}
 
 .sidebar-stats {
   display: flex;
@@ -8408,6 +8433,7 @@ body[data-surface='space'] .app-header {
   transform: translateY(var(--star-offset, 0px));
   background-repeat: repeat;
   opacity: 0.5;
+  transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1), opacity 1100ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 .starfield__layer--far {
   background-image:
@@ -8416,7 +8442,7 @@ body[data-surface='space'] .app-header {
     radial-gradient(1.4px 1.4px at 82% 30%, #234952 40%, transparent 60%),
     radial-gradient(1.4px 1.4px at 30% 82%, #234952 40%, transparent 60%);
   background-size: 340px 340px;
-  transform: translateY(calc(var(--star-offset, 0px) * 0.4));
+  transform: translateY(calc(var(--star-offset, 0px) * 0.4)) scale(calc(1 + var(--warp, 0) * 0.7));
 }
 .starfield__layer--near {
   background-image:
@@ -8426,10 +8452,11 @@ body[data-surface='space'] .app-header {
     radial-gradient(1.6px 1.6px at 88% 88%, #ffd66b 45%, transparent 65%),
     radial-gradient(1.6px 1.6px at 8% 60%, #ffffff 45%, transparent 65%);
   background-size: 420px 420px;
+  transform: translateY(var(--star-offset, 0px)) scale(calc(1 + var(--warp, 0) * 1.6));
 }
 
-.starfield__layer--far { opacity: 0.5; }
-.starfield__layer--near { opacity: 0.7; }
+.starfield__layer--far { opacity: calc(0.5 + var(--warp, 0) * 0.35); }
+.starfield__layer--near { opacity: calc(0.7 + var(--warp, 0) * 0.3); }
 
 /* ---------- Track planets: each track is its own celestial body ---------- */
 .track-planet {
@@ -9671,6 +9698,68 @@ body[data-surface='platform'] .hud-bar__value--plan {
   border-radius: 50%;
   background: radial-gradient(circle at 32% 30%, var(--gold-pale), var(--gold) 45%, var(--gold-deep) 100%);
   opacity: 0.85;
+}
+
+/* The Home-to-Course camera flight shares this element (via Framer Motion's
+   layoutId) between the small dashboard icon and the large hero planet. It
+   deliberately skips the WebGL MiniBody: instantiating a fresh Three.js
+   scene mid-flight stalls the animation.
+   The WebGL planets never fill their square viewport edge-to-edge — the
+   orthographic camera frames a smaller sphere with room around it, and a
+   soft corona halo bleeds past its rim. A CSS circle painted flush to the
+   box reads as noticeably bigger and flatter next to that, so the actual
+   sphere lives on ::after, inset from the box, while ::before is a wider,
+   blurred halo behind it standing in for the corona glow.
+   Modeled on the WebGL moon body: a dark, grainy crescent lit from one
+   side with a warm rim glow along the terminator, rather than the flat
+   evenly-lit banded look. The WebGL planets "spin" by rotating the sphere
+   geometry while their shader keeps rim/front lighting fixed in view
+   space; we fake the same read in 2D on ::after: the lit-side gradients
+   stay put (the fixed light) while the two grain layers scroll underneath
+   (the rotating surface). Distances are multiples of each layer's own
+   tile size (4px / 3px) so the loop is seamless. */
+.shared-planet {
+  display: block;
+  position: relative;
+}
+
+.shared-planet::before {
+  content: '';
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 74% 28%, rgba(224, 194, 138, 0.3), rgba(90, 94, 102, 0.12) 55%, transparent 76%);
+  filter: blur(3px);
+}
+
+.shared-planet::after {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 74% 28%, rgba(255, 255, 255, 0.5), transparent 18%),
+    radial-gradient(circle at 88% 46%, transparent 58%, rgba(224, 194, 138, 0.55) 82%, transparent 95%),
+    radial-gradient(circle at -15% 50%, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.88) 42%, transparent 68%),
+    repeating-radial-gradient(circle at 3px 3px, rgba(0, 0, 0, 0.4) 0px, rgba(0, 0, 0, 0.4) 1px, transparent 1px, transparent 4px),
+    repeating-radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.15) 0px, rgba(255, 255, 255, 0.15) 1px, transparent 1px, transparent 3px),
+    radial-gradient(circle at 70% 38%, #9a9ea6, #55585f 46%, #1a1b1e 100%);
+  background-position: center, center, center, 0 0, 0 0, center;
+  box-shadow:
+    inset 9px -11px 22px rgba(0, 0, 0, 0.55),
+    inset -5px 6px 14px rgba(255, 255, 255, 0.16);
+  animation: shared-planet-spin 16s linear infinite;
+}
+
+@keyframes shared-planet-spin {
+  from { background-position: center, center, center, 0 0, 0 0, center; }
+  to { background-position: center, center, center, -48px 0, -24px 0, center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shared-planet::after {
+    animation: none;
+  }
 }
 
 .home-mission {

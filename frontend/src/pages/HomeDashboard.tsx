@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react'
+import { motion } from 'framer-motion'
 import { useCourses, useSavedPortfolios } from '../api/queries'
 import type { Plan } from '../api/types'
 import { useAuth } from '../auth/useAuth'
@@ -112,11 +113,20 @@ export function HomeDashboard({
       <div className="home-areas">
         {areas.map((area) => (
           <button key={area.title} type="button" className="home-area" onClick={area.onOpen}>
-            <span className="home-area__body-slot">
-              <Suspense fallback={<span className="mini-body is-fallback" aria-hidden="true" />}>
-                <MiniBody kind={area.kind} />
-              </Suspense>
-            </span>
+            {area.title === 'Learn' ? (
+              <motion.span
+                className="home-area__body-slot shared-planet"
+                layoutId="course-planet"
+                transition={{ type: 'tween', duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
+                aria-hidden="true"
+              />
+            ) : (
+              <span className="home-area__body-slot">
+                <Suspense fallback={<span className="mini-body is-fallback" aria-hidden="true" />}>
+                  <MiniBody kind={area.kind} />
+                </Suspense>
+              </span>
+            )}
             <span className="home-area__title">{area.title}</span>
             <span className="home-area__body">{area.body}</span>
             <span className="home-area__meta">{area.meta}</span>

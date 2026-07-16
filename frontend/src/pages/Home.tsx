@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { useMe, useSetPlan } from '../api/queries'
 import { useAuth } from '../auth/useAuth'
 import { ErrorState } from '../components/ErrorState'
@@ -15,6 +16,8 @@ import { Landing } from './Landing'
 import { ProWorkspace } from './ProWorkspace'
 
 const RISK_PROFILE_KEY = 'risk_profile'
+const WARP_MS = 1100
+const WARP_EASE = [0.65, 0, 0.35, 1] as const
 
 export function Home() {
   const { session } = useAuth()
@@ -66,25 +69,78 @@ export function Home() {
     )
   }
 
+  const warp = () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) return
+    document.documentElement.style.setProperty('--warp', '1')
+    window.setTimeout(() => {
+      document.documentElement.style.setProperty('--warp', '0')
+    }, WARP_MS + 150)
+  }
+
+  const enterCourse = () => {
+    warp()
+    setView('learn')
+  }
+
+  const leaveCourse = () => {
+    warp()
+    goHome()
+  }
+
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <MissionControlHUD plan={plan} />
 
-      {view === 'home' && (
-        <HomeDashboard
-          plan={plan}
-          onAnalyze={() => setView('analyze')}
-          onInvest={() => setView('invest')}
-          onLearn={() => setView('learn')}
-          onAbout={() => setView('about')}
-          onManagePlan={() => openOverlay('manage-plan')}
-          onUpgrade={() => openOverlay('checkout')}
-        />
-      )}
+      <div style={{ position: 'relative' }}>
+        <AnimatePresence mode="popLayout" initial={false}>
+          {view === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 0.4, delay: 0.5, ease: WARP_EASE } }}
+              exit={{
+                opacity: 0,
+                scale: 0.88,
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                transition: { duration: 0.5, ease: WARP_EASE },
+              }}
+            >
+              <HomeDashboard
+                plan={plan}
+                onAnalyze={() => setView('analyze')}
+                onInvest={() => setView('invest')}
+                onLearn={enterCourse}
+                onAbout={() => setView('about')}
+                onManagePlan={() => openOverlay('manage-plan')}
+                onUpgrade={() => openOverlay('checkout')}
+              />
+            </motion.div>
+          )}
+
+          {view === 'learn' && (
+            <motion.div
+              key="learn"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 0.5, delay: 0.55, ease: WARP_EASE } }}
+              exit={{
+                opacity: 0,
+                scale: 0.92,
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                transition: { duration: 0.4, ease: WARP_EASE },
+              }}
+            >
+              <CoursePage onSwitch={leaveCourse} learnerName={me.data.email} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {view === 'about' && <AboutPage onBack={goHome} />}
-
-      {view === 'learn' && <CoursePage onSwitch={goHome} learnerName={me.data.email} />}
 
       {(view === 'analyze' || view === 'invest') &&
         (plan === 'pro' ? (
@@ -97,6 +153,6 @@ export function Home() {
             initialMode={view === 'invest' ? 'invest' : 'analyze'}
           />
         ))}
-    </>
+    </MotionConfig>
   )
 }
