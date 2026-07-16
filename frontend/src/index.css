@@ -7958,8 +7958,8 @@ body[data-surface='space'] .app-header {
   margin-bottom: 16px;
   padding: 12px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(140, 170, 230, 0.16);
-  background: linear-gradient(168deg, rgba(20, 29, 62, 0.6), rgba(9, 14, 34, 0.7));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: linear-gradient(168deg, rgba(247, 231, 180, 0.16), rgba(212, 175, 55, 0.09));
   backdrop-filter: blur(10px);
 }
 .mstrip__head {
@@ -8001,21 +8001,50 @@ body[data-surface='space'] .app-header {
   color: var(--muted);
 }
 .mstrip__rail {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
+  overflow: hidden;
+  position: relative;
   padding-bottom: 2px;
-  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.mstrip__track {
+  display: flex;
+  width: max-content;
+  animation: mstrip-scroll 45s linear infinite;
+  will-change: transform;
+}
+.mstrip__track.is-static {
+  animation: none;
+}
+.mstrip__rail:hover .mstrip__track {
+  animation-play-state: paused;
+}
+@keyframes mstrip-scroll {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mstrip__track {
+    animation: none;
+  }
+  .mstrip__rail {
+    overflow-x: auto;
+  }
 }
 .mquote {
   display: flex;
   align-items: baseline;
   gap: 8px;
   flex: none;
+  margin-right: 10px;
   padding: 8px 12px;
   border-radius: 11px;
-  border: 1px solid rgba(140, 170, 230, 0.14);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(255, 245, 220, 0.05);
   white-space: nowrap;
 }
 .mquote.is-loading {
@@ -8972,8 +9001,8 @@ body[data-surface='platform'] .mode-btn:hover {
 }
 
 body[data-surface='platform'] .mstrip {
-  border-color: var(--hairline);
-  background: linear-gradient(168deg, rgba(30, 27, 21, 0.72), rgba(8, 8, 10, 0.82));
+  border-color: rgba(212, 175, 55, 0.32);
+  background: linear-gradient(168deg, rgba(247, 231, 180, 0.17), rgba(212, 175, 55, 0.1));
 }
 body[data-surface='platform'] .mstrip__live {
   color: var(--gold-bright);

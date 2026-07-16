@@ -123,6 +123,7 @@ export function usePrices(tickers: string[], enabled: boolean) {
   return useQuery({
     queryKey: ['prices', [...tickers].sort().join(',')],
     enabled: enabled && tickers.length > 0,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () =>
       (await apiClient.get<PricesResponse>('/api/prices', { params: { tickers: tickers.join(',') } })).data,
   })

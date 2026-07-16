@@ -37,7 +37,7 @@ from app.billing.repository import BillingRepository
 from app.billing.service import StripeBilling
 from app.config import get_settings
 from app.data.cache import build_cache
-from app.data.provider import CachingDataProvider, ProviderError, build_inner_provider
+from app.data.provider import CachingDataProvider, PersistentPriceProvider, ProviderError, build_inner_provider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
 from app.invest.simulator import InvestSimulator
@@ -66,7 +66,11 @@ async def lifespan(app: FastAPI):
         pass
 
     cache = await build_cache(settings.redis_url)
-    provider = CachingDataProvider(build_inner_provider(settings), cache, settings.cache_ttl_seconds)
+    price_repository = PriceRepository(session_factory)
+    inner_provider = build_inner_provider(settings)
+    if settings.fmp_api_key:
+        inner_provider = PersistentPriceProvider(inner_provider, price_repository)
+    provider = CachingDataProvider(inner_provider, cache, settings.cache_ttl_seconds)
 
     app.state.cache = cache
     app.state.provider = provider
@@ -78,7 +82,7 @@ async def lifespan(app: FastAPI):
     app.state.profile_repository = ProfileRepository(session_factory)
     app.state.billing = StripeBilling(settings, BillingRepository(session_factory), app.state.profile_repository)
     app.state.optimization_repository = OptimizationRepository(session_factory)
-    app.state.price_repository = PriceRepository(session_factory)
+    app.state.price_repository = price_repository
     app.state.backtest_repository = BacktestRepository(session_factory)
     app.state.course_repository = CourseRepository(session_factory)
     app.state.portfolio_repository = PortfolioRepository(session_factory)
