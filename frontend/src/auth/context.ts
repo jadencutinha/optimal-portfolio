@@ -17,6 +17,12 @@ export interface AuthState {
     full_name?: string
     username?: string
     birthdate?: string
+    country?: string
+    region?: string
+    income_level?: string
+    investment_experience?: string
+    investment_goal?: string
+    onboarded?: boolean
   }) => Promise<{ error?: string }>
 }
 
