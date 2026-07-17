@@ -20,6 +20,7 @@ interface Props {
   onAbout: () => void
   onManagePlan: () => void
   onUpgrade: () => void
+  onCompete: () => void
 }
 
 export function HomeDashboard({
@@ -30,6 +31,7 @@ export function HomeDashboard({
   onAbout,
   onManagePlan,
   onUpgrade,
+  onCompete,
 }: Props) {
   const { session } = useAuth()
   const portfolios = useSavedPortfolios()
@@ -134,6 +136,15 @@ export function HomeDashboard({
           </button>
         ))}
       </div>
+
+      <button type="button" className="home-compete" onClick={onCompete}>
+        <span className="home-compete__icon" aria-hidden="true">🏆</span>
+        <span className="home-compete__text">
+          <strong>Click to compete with friends</strong>
+          <span>Draft stocks with 2 to 4 players, simulate years of the market, and crown a champion.</span>
+        </span>
+        <span className="home-compete__cta">Play →</span>
+      </button>
 
       <section className="home-mission">
         <span className="home-mission__eyebrow">Our mission</span>

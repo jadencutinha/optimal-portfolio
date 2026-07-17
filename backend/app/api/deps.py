@@ -31,6 +31,10 @@ def get_invest_simulator(request: Request) -> InvestSimulator:
     return request.app.state.invest_simulator
 
 
+def get_room_store(request: Request):
+    return request.app.state.room_store
+
+
 def get_billing(request: Request) -> StripeBilling:
     return request.app.state.billing
 

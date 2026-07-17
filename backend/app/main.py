@@ -16,6 +16,7 @@ from app.api.routes import (
     billing,
     courses,
     frontier,
+    game,
     health,
     invest,
     market,
@@ -40,6 +41,7 @@ from app.data.cache import build_cache
 from app.data.provider import CachingDataProvider, PersistentPriceProvider, ProviderError, build_inner_provider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
+from app.game.rooms import RoomStore
 from app.invest.simulator import InvestSimulator
 from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
@@ -76,6 +78,7 @@ async def lifespan(app: FastAPI):
     app.state.provider = provider
     app.state.session_factory = session_factory
     app.state.invest_simulator = InvestSimulator(session_factory, provider)
+    app.state.room_store = RoomStore()
     app.state.sector_provider = SectorProvider(cache, settings)
     app.state.verifier = SupabaseVerifier(settings)
     app.state.supabase_admin = SupabaseAdmin(settings)
@@ -151,6 +154,7 @@ def create_app() -> FastAPI:
     app.include_router(reports.router, prefix=settings.api_prefix)
     app.include_router(invest.router, prefix=settings.api_prefix)
     app.include_router(billing.router, prefix=settings.api_prefix)
+    app.include_router(game.router, prefix=settings.api_prefix)
     app.include_router(market.router, prefix=settings.api_prefix)
     app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)

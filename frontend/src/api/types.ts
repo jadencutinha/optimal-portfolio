@@ -445,10 +445,11 @@ export interface AssistantConfig {
 
 export interface AssistantResponse {
   model: string
+  reply: string
   rationale: string
   explanation: string
-  config: AssistantConfig
-  result: OptimizeResponse
+  config: AssistantConfig | null
+  result: OptimizeResponse | null
 }
 
 export interface StressCurvePoint {
@@ -667,4 +668,86 @@ export interface BillingConfig {
 export interface CheckoutSession {
   client_secret: string
   session_id: string
+}
+
+export interface GamePathPoint {
+  month: number
+  value: number
+}
+
+export interface GamePlayerResult {
+  name: string
+  tickers: string[]
+  resolved_tickers: string[]
+  start_value: number
+  final_value: number
+  return_pct: number
+  cagr: number
+  best_ticker: string | null
+  win_probability: number
+  median_final: number
+  p10_final: number
+  p90_final: number
+  volatility: number
+  resilience: number
+  path: GamePathPoint[]
+}
+
+export interface GameAward {
+  category: string
+  label: string
+  player_index: number
+  detail: string
+}
+
+export interface GameMeta {
+  simulations: number
+  data_source: string
+  history_years: number
+  source: string
+  method: string
+  credibility: string
+}
+
+export interface GameResponse {
+  years: number
+  months: number
+  start_value: number
+  winner_index: number
+  players: GamePlayerResult[]
+  awards: GameAward[]
+  meta: GameMeta | null
+}
+
+export interface GameRequest {
+  players: { name: string; tickers: string[] }[]
+  years: number
+  seed?: number
+}
+
+export interface RoomPlayerState {
+  id: string
+  name: string
+  is_host: boolean
+  pick_count: number
+  ready: boolean
+}
+
+export interface RoomState {
+  code: string
+  status: string
+  years: number
+  players: RoomPlayerState[]
+  result: GameResponse | null
+}
+
+export interface CreateRoomResponse {
+  code: string
+  player_id: string
+  room: RoomState
+}
+
+export interface JoinRoomResponse {
+  player_id: string
+  room: RoomState
 }

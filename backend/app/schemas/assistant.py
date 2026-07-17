@@ -23,7 +23,8 @@ class AssistantConfig(BaseModel):
 
 class AssistantResponse(BaseModel):
     model: str
-    rationale: str
-    explanation: str
-    config: AssistantConfig
-    result: OptimizeResponse
+    reply: str = ""
+    rationale: str = ""
+    explanation: str = ""
+    config: AssistantConfig | None = None
+    result: OptimizeResponse | None = None

@@ -26,16 +26,22 @@ export function AuthBar() {
     }
     return (
       <div className="authbar">
-        <div className="auth-menu" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-          <button type="button" className="signin-trigger" onClick={() => setOpen((value) => !value)}>
-            <span className="authbar-avatar" aria-hidden="true">
-              {avatar ? <img src={avatar} alt="" /> : <span>{name.charAt(0).toUpperCase()}</span>}
-            </span>
-            {name}
-            <span className="caret" aria-hidden>
-              ▾
-            </span>
+        <div className="authbar-user">
+          <button
+            type="button"
+            className="authbar-avatar"
+            onClick={() => setOpen((value) => !value)}
+            aria-label="Account menu"
+          >
+            {avatar ? <img src={avatar} alt="" /> : <span>{name.charAt(0).toUpperCase()}</span>}
           </button>
+          <div className="auth-menu" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+            <button type="button" className="signin-trigger" onClick={() => setOpen((value) => !value)}>
+              {name}
+              <span className="caret" aria-hidden>
+                ▾
+              </span>
+            </button>
           {open && (
             <div className="auth-menu-dropdown">
               <div className="auth-menu-card">
@@ -60,6 +66,7 @@ export function AuthBar() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     )
