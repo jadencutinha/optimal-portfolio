@@ -121,7 +121,10 @@ export function ModuleLayout({
                 key={m.id}
                 type="button"
                 className={`sidebar-module-item ${statusClass} ${isCurrent ? 'current' : ''}`}
-                onClick={() => onSelectModule(i)}
+                onClick={() => {
+                  onSelectModule(i)
+                  setSidebarOpen(false)
+                }}
               >
                 <span className="sidebar-module-icon">
                   {done ? <CheckIcon /> : <span className="sidebar-module-dot" />}
@@ -277,7 +280,10 @@ export function ModuleLayout({
           <button
             type="button"
             className="module-nav-btn"
-            onClick={() => prevModule && onSelectModule(moduleIndex - 1)}
+            onClick={() => {
+              prevModule && onSelectModule(moduleIndex - 1)
+              setSidebarOpen(false)
+            }}
             disabled={!prevModule}
           >
             ← Previous
@@ -285,7 +291,10 @@ export function ModuleLayout({
           <button
             type="button"
             className="module-nav-btn primary-nav"
-            onClick={() => nextModule && onSelectModule(moduleIndex + 1)}
+            onClick={() => {
+              nextModule && onSelectModule(moduleIndex + 1)
+              setSidebarOpen(false)
+            }}
             disabled={!nextModule}
           >
             {nextModule ? 'Next module →' : 'Track complete'}
