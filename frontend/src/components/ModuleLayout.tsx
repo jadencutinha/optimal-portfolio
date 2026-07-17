@@ -281,7 +281,9 @@ export function ModuleLayout({
             type="button"
             className="module-nav-btn"
             onClick={() => {
-              prevModule && onSelectModule(moduleIndex - 1)
+              if (prevModule) {
+                onSelectModule(moduleIndex - 1)
+              }
               setSidebarOpen(false)
             }}
             disabled={!prevModule}
@@ -292,7 +294,9 @@ export function ModuleLayout({
             type="button"
             className="module-nav-btn primary-nav"
             onClick={() => {
-              nextModule && onSelectModule(moduleIndex + 1)
+              if (nextModule) {
+                onSelectModule(moduleIndex + 1)
+              }
               setSidebarOpen(false)
             }}
             disabled={!nextModule}
