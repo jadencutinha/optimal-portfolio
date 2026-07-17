@@ -4030,7 +4030,7 @@ table.weights td {
   width: clamp(150px, 22vw, 210px);
   height: clamp(150px, 22vw, 210px);
   margin-bottom: 18px;
-  filter: drop-shadow(0 0 34px rgba(224, 194, 138, 0.22));
+  filter: drop-shadow(0 0 30px rgba(214, 218, 226, 0.16));
 }
 
 .course-hero-content {
@@ -4137,8 +4137,7 @@ table.weights td {
    their target sector's row regardless of which side that sector renders on. */
 .sector-annotation {
   position: absolute;
-  left: -150px;
-  width: 128px;
+  width: 132px;
   transform: translateY(-50%);
   margin: 0;
   font-size: 11.5px;
@@ -4157,6 +4156,13 @@ table.weights td {
   height: 1px;
   background: #6fb3dd;
   opacity: 0.6;
+}
+.sector-annotation--right {
+  text-align: left;
+}
+.sector-annotation--right::after {
+  right: auto;
+  left: -14px;
 }
 @media (max-width: 1000px) {
   .sector-annotation {
@@ -10453,6 +10459,9 @@ body[data-surface='platform'] .hud-bar__value--plan {
   border-radius: 50%;
   background: radial-gradient(circle at 32% 30%, var(--gold-pale), var(--gold) 45%, var(--gold-deep) 100%);
   opacity: 0.85;
+}
+.mini-body.is-fallback--moon {
+  background: radial-gradient(circle at 34% 30%, #f1ede2, #b9bcc4 46%, #55585f 100%);
 }
 
 /* The Home-to-Course camera flight shares this element (via Framer Motion's

@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../auth/useAuth'
 import { Certificate } from '../components/Certificate'
@@ -32,6 +33,9 @@ const ConstellationMap = lazy(() =>
 )
 const TrackPlanet = lazy(() =>
   import('../components/TrackPlanet').then((module) => ({ default: module.TrackPlanet })),
+)
+const MiniBody = lazy(() =>
+  import('../components/MiniBody').then((module) => ({ default: module.MiniBody })),
 )
 
 const PLANET_KIND_BY_TRACK: Record<number, 'earth' | 'moon' | 'saturn' | 'neptune'> = {
@@ -153,6 +157,31 @@ export function CoursePage({
 
   useSurface('platform')
 
+  // The top-level view router tracks browser history, but drilling into a track
+  // or module is local state. Without this, the browser back button jumps
+  // straight out of the course to the home page. We push a history entry on each
+  // drill-in and unwind one level per back press so back returns to the galaxy.
+  const navRef = useRef({ viewingModule, selectedTrack, viewingFlashcards, certificateTrack })
+  navRef.current = { viewingModule, selectedTrack, viewingFlashcards, certificateTrack }
+
+  useEffect(() => {
+    const onPop = () => {
+      const s = navRef.current
+      if (s.viewingModule) setViewingModule(false)
+      else if (s.selectedTrack) {
+        setSelectedTrack(null)
+        setZoomingTrackId(null)
+      } else if (s.viewingFlashcards) setViewingFlashcards(false)
+      else if (s.certificateTrack) setCertificateTrack(null)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const pushCourseEntry = () => {
+    window.history.pushState({ ...(window.history.state ?? {}) }, '')
+  }
+
   const setPlanetRef = (id: number) => (el: HTMLElement | null) => {
     if (el) planetRefs.current.set(id, el)
     else planetRefs.current.delete(id)
@@ -217,6 +246,7 @@ export function CoursePage({
 
   function flyToTrack(track: Track) {
     if (zoomingTrackId !== null) return
+    pushCourseEntry()
     if (reduceMotion) {
       openTrack(track)
       return
@@ -226,7 +256,7 @@ export function CoursePage({
   }
 
   if (viewingFlashcards) {
-    return <Flashcards onClose={() => setViewingFlashcards(false)} />
+    return <Flashcards onClose={() => window.history.back()} />
   }
 
   if (selectedTrack && viewingModule) {
@@ -235,7 +265,7 @@ export function CoursePage({
         track={selectedTrack}
         moduleIndex={moduleIndex}
         onSelectModule={setModuleIndex}
-        onBackToTracks={() => setViewingModule(false)}
+        onBackToTracks={() => window.history.back()}
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
         onModuleComplete={(moduleId, retakes) => markComplete(selectedTrack.id, moduleId, retakes)}
         getModuleStars={(moduleId) => mastery[moduleKey(selectedTrack.id, moduleId)] ?? 0}
@@ -251,10 +281,7 @@ export function CoursePage({
         <button
           type="button"
           className="sidebar-back constellation-back"
-          onClick={() => {
-            setSelectedTrack(null)
-            setZoomingTrackId(null)
-          }}
+          onClick={() => window.history.back()}
         >
           ← Back to Tracks
         </button>
@@ -265,6 +292,7 @@ export function CoursePage({
             track={selectedTrack}
             isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
             onSelectModule={(index) => {
+              pushCourseEntry()
               setModuleIndex(index)
               setViewingModule(true)
             }}
@@ -280,7 +308,7 @@ export function CoursePage({
         track={certificateTrack}
         completion={ensureTrackCompletion(certificateTrack.id)}
         learner={learnerName?.trim() || 'Halo Learner'}
-        onClose={() => setCertificateTrack(null)}
+        onClose={() => window.history.back()}
       />
     )
   }
@@ -297,12 +325,11 @@ export function CoursePage({
       <div className="course-landing-inner">
       <PlatformHeader onSwitch={onSwitch} showGreeting={false} />
       <div className="course-hero">
-        <motion.div
-          className="course-hero-planet shared-planet"
-          layoutId="course-planet"
-          transition={{ type: 'tween', duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
-          aria-hidden="true"
-        />
+        <div className="course-hero-planet" aria-hidden="true">
+          <Suspense fallback={<div className="mini-body is-fallback is-fallback--moon" />}>
+            <MiniBody kind="moon" />
+          </Suspense>
+        </div>
         <motion.div
           className="course-hero-content"
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}
@@ -324,7 +351,10 @@ export function CoursePage({
           <button
             type="button"
             className="course-flashcards-cta"
-            onClick={() => setViewingFlashcards(true)}
+            onClick={() => {
+              pushCourseEntry()
+              setViewingFlashcards(true)
+            }}
           >
             <CardsIcon />
             Study Flashcards
@@ -349,6 +379,8 @@ export function CoursePage({
         onOpen={(trackId, mi) => {
           const track = TRACKS.find((t) => t.id === trackId)
           if (track) {
+            pushCourseEntry()
+            pushCourseEntry()
             setSelectedTrack(track)
             setModuleIndex(mi)
             setViewingModule(true)
@@ -380,10 +412,23 @@ export function CoursePage({
         </svg>
         {Object.entries(START_HERE_BY_TRACK).map(([idStr, text]) => {
           const id = Number(idStr)
-          const point = linePoints[SECTOR_IDS_IN_ORDER.indexOf(id)]
+          const idx = SECTOR_IDS_IN_ORDER.indexOf(id)
+          const point = linePoints[idx]
           if (!point) return null
+          // Odd 0-based index renders on the right (nth-of-type even → flex-end),
+          // so the note sits beside its own planet, not across the spine.
+          const onRight = idx % 2 === 1
+          const kind = PLANET_KIND_BY_TRACK[id] ?? 'moon'
+          const gap = (kind === 'saturn' ? 170 : kind === 'neptune' ? 150 : 115) + 16
+          const style: CSSProperties = onRight
+            ? { top: point.y, left: point.x + gap }
+            : { top: point.y, right: `calc(100% - ${point.x - gap}px)` }
           return (
-            <p key={id} className="sector-annotation" style={{ top: point.y }}>
+            <p
+              key={id}
+              className={`sector-annotation ${onRight ? 'sector-annotation--right' : ''}`}
+              style={style}
+            >
               {text}
             </p>
           )
@@ -492,7 +537,10 @@ export function CoursePage({
                   <button
                     type="button"
                     className="certificate-download-btn"
-                    onClick={() => setCertificateTrack(track)}
+                    onClick={() => {
+                      pushCourseEntry()
+                      setCertificateTrack(track)
+                    }}
                   >
                     View Certificate
                   </button>
