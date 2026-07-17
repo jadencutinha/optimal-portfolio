@@ -1,4 +1,5 @@
 import { AuthBar } from './components/AuthBar'
+import { GalaxyBackdrop } from './components/GalaxyBackdrop'
 import { Starfield } from './components/Starfield'
 import { useAuth } from './auth/useAuth'
 import { useView } from './nav/useView'
@@ -8,7 +9,7 @@ import { VerifyPage } from './pages/VerifyPage'
 
 export default function App() {
   const { session } = useAuth()
-  const { goHome } = useView()
+  const { goHome, view } = useView()
   const path = window.location.pathname
 
   if (path.startsWith('/play/')) {
@@ -52,6 +53,7 @@ export default function App() {
   return (
     <div className="app">
       <Starfield />
+      {session && view === 'learn' && <GalaxyBackdrop />}
       {session && (
         <header className="app-header">
           <div className="brand">

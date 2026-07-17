@@ -1946,6 +1946,10 @@ button.primary.modal-submit {
   margin: 56px 0 0;
 }
 
+.sector-comet__head {
+  filter: drop-shadow(0 0 5px rgba(255, 224, 150, 0.9)) drop-shadow(0 0 12px rgba(255, 210, 120, 0.55));
+}
+
 .course-module-head {
   display: flex;
   align-items: center;
@@ -4015,6 +4019,54 @@ table.weights td {
 .course-landing-inner {
   max-width: 1100px;
   margin: 0 auto;
+}
+
+/* ---------- Full-page galaxy backdrop (course landing + track pages) ---------- */
+.galaxy-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 44% at 20% 26%, rgba(111, 62, 200, 0.16), transparent 70%),
+    radial-gradient(54% 50% at 82% 66%, rgba(57, 135, 229, 0.13), transparent 72%),
+    radial-gradient(46% 38% at 66% 14%, rgba(212, 175, 55, 0.09), transparent 70%),
+    radial-gradient(130% 100% at 50% -6%, #0c0b13 0%, #08070c 54%, #050507 100%);
+  animation: galaxy-fade-in 0.85s ease both;
+}
+@keyframes galaxy-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.galaxy-backdrop--track {
+  background:
+    radial-gradient(60% 48% at 24% 24%, rgba(57, 135, 229, 0.16), transparent 72%),
+    radial-gradient(52% 46% at 80% 70%, rgba(111, 62, 200, 0.14), transparent 72%),
+    radial-gradient(44% 36% at 62% 12%, rgba(111, 179, 221, 0.1), transparent 70%),
+    radial-gradient(130% 100% at 50% -6%, #0a0c14 0%, #07080d 54%, #040506 100%);
+}
+.galaxy-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(38% 30% at 30% 40%, rgba(120, 84, 214, 0.1), transparent 70%),
+    radial-gradient(34% 28% at 72% 60%, rgba(64, 150, 226, 0.09), transparent 72%);
+  animation: galaxy-drift 46s ease-in-out infinite alternate;
+}
+.galaxy-backdrop__stars {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+@keyframes galaxy-drift {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1.02); }
+  to { transform: translate3d(2%, 1.5%, 0) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-backdrop,
+  .galaxy-backdrop::before { animation: none; }
 }
 
 .certificate-page {
