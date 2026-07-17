@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, RefObject } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../auth/useAuth'
 import { Certificate } from '../components/Certificate'
@@ -130,6 +130,110 @@ function trimLine(p: LinePoint, q: LinePoint, amount: number) {
   }
 }
 
+
+// A comet that traces your route down the sector spine as you scroll. Its
+// position is the point that far along the planet-to-planet polyline, driven
+// by how far the spine has travelled through the viewport.
+function SpineComet({
+  points,
+  containerRef,
+}: {
+  points: LinePoint[]
+  containerRef: RefObject<HTMLDivElement | null>
+}) {
+  const [comet, setComet] = useState<{ x: number; y: number; tailX: number; tailY: number } | null>(
+    null,
+  )
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (points.length < 2) return
+
+    const segments = points.slice(0, -1).map((a, i) => {
+      const b = points[i + 1]
+      return { a, b, len: Math.hypot(b.x - a.x, b.y - a.y) }
+    })
+    const total = segments.reduce((sum, s) => sum + s.len, 0)
+    if (total === 0) return
+
+    let ticking = false
+    const update = () => {
+      const el = containerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const progress = (window.innerHeight * 0.55 - rect.top) / rect.height
+      const target = Math.max(0, Math.min(1, progress)) * total
+
+      let acc = 0
+      let seg = segments[0]
+      let localT = 0
+      for (let i = 0; i < segments.length; i += 1) {
+        const s = segments[i]
+        if (target <= acc + s.len || i === segments.length - 1) {
+          seg = s
+          localT = s.len === 0 ? 0 : (target - acc) / s.len
+          break
+        }
+        acc += s.len
+      }
+      localT = Math.max(0, Math.min(1, localT))
+
+      const x = seg.a.x + (seg.b.x - seg.a.x) * localT
+      const y = seg.a.y + (seg.b.y - seg.a.y) * localT
+      const dx = seg.b.x - seg.a.x
+      const dy = seg.b.y - seg.a.y
+      const dl = Math.hypot(dx, dy) || 1
+      const tail = 52
+      setComet({ x, y, tailX: x - (dx / dl) * tail, tailY: y - (dy / dl) * tail })
+    }
+
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        update()
+        ticking = false
+      })
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [points, containerRef])
+
+  if (!comet) return null
+  return (
+    <g className="sector-comet">
+      <defs>
+        <linearGradient
+          id="sector-comet-tail"
+          gradientUnits="userSpaceOnUse"
+          x1={comet.tailX}
+          y1={comet.tailY}
+          x2={comet.x}
+          y2={comet.y}
+        >
+          <stop offset="0" stopColor="#ffd66b" stopOpacity="0" />
+          <stop offset="1" stopColor="#ffe9b0" stopOpacity="0.85" />
+        </linearGradient>
+      </defs>
+      <line
+        x1={comet.tailX}
+        y1={comet.tailY}
+        x2={comet.x}
+        y2={comet.y}
+        stroke="url(#sector-comet-tail)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+      <circle className="sector-comet__head" cx={comet.x} cy={comet.y} r="3.6" fill="#fff7e6" />
+    </g>
+  )
+}
 
 export function CoursePage({
   onSwitch,
@@ -409,6 +513,7 @@ export function CoursePage({
             const { x1, y1, x2, y2 } = trimLine(p, q, 190)
             return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} className={`sector-line ${state}`} />
           })}
+          <SpineComet points={linePoints} containerRef={spineRef} />
         </svg>
         {Object.entries(START_HERE_BY_TRACK).map(([idStr, text]) => {
           const id = Number(idStr)
