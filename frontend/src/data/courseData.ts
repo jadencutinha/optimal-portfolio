@@ -412,6 +412,119 @@ const track1: Track = {
         },
       ],
     },
+    {
+      id: 5,
+      title: 'Know Your Building Blocks: S&P 500, Nasdaq 100 Direct, and Bond Ladders',
+      content: [
+        {
+          type: 'paragraph',
+          text: 'Before you start picking stocks, it helps to know a few terms you\'ll run into constantly: the benchmarks everyone compares returns to, and the fixed-income tools some investors use alongside a stock portfolio.',
+        },
+        {
+          type: 'subheading',
+          text: 'What Is the S&P 500?',
+        },
+        {
+          type: 'paragraph',
+          text: 'The **S&P 500** is a stock market index that tracks 500 of the largest publicly traded U.S. companies, weighted by market value (bigger companies move the index more). It\'s the most widely used benchmark for "how is the stock market doing."',
+        },
+        {
+          type: 'list',
+          items: [
+            'Spans nearly every sector: tech, healthcare, financials, energy, and more',
+            '**Market-cap weighted**, so a company like Apple or Microsoft moves the index far more than a smaller company does',
+            'Historically returned roughly 9-10% per year on average before inflation, though any single year can swing wildly in either direction',
+            'Often used as the "bar to beat": if a portfolio underperforms the S&P 500 for years, a low-cost fund that just tracks it may be the simpler choice',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'What Is Nasdaq 100 Direct?',
+        },
+        {
+          type: 'paragraph',
+          text: 'The **Nasdaq 100** is an index of the 100 largest non-financial companies listed on the Nasdaq exchange, tilted heavily toward technology. "Direct" refers to **direct indexing**: instead of buying a single fund or ETF (like QQQ) that owns all 100 stocks for you, you buy the individual stocks yourself in roughly the same weights the index uses.',
+        },
+        {
+          type: 'list',
+          items: [
+            'You get full control over which stocks you hold, so you can exclude a company you don\'t want or tilt weights differently',
+            'You can sell individual losing positions to offset gains for tax purposes, something you can\'t do inside a shared fund',
+            'It takes more effort and usually more money than buying one ETF, so it\'s typically only worth it once you have a meaningful amount invested',
+          ],
+        },
+        {
+          type: 'callout',
+          text: 'Halo is direct indexing at your own scale: you choose the stocks that matter to you, and the optimizer decides how much of each to hold.',
+        },
+        {
+          type: 'subheading',
+          text: 'What Is a Treasury Bond Ladder?',
+        },
+        {
+          type: 'paragraph',
+          text: 'A **bond ladder** splits your money across several U.S. Treasury bonds that mature at different times, for example one maturing in 1 year, another in 2 years, another in 3, and so on, instead of putting it all into a single bond with one maturity date.',
+        },
+        {
+          type: 'list',
+          items: [
+            '**Steady cash flow**: a chunk of your money matures and becomes available every year, so you\'re not locked up for a decade at a time',
+            '**Lower interest rate risk**: when a rung matures, you reinvest it at whatever the current rate is, so you\'re never stuck holding only old, lower-paying bonds',
+            'Treasury bonds are backed by the U.S. government, making them one of the safest fixed-income options available',
+          ],
+        },
+        {
+          type: 'subheading',
+          text: 'So What Is Halo For?',
+        },
+        {
+          type: 'paragraph',
+          text: 'Halo is a **stock portfolio-building tool**. You pick the stocks you\'re interested in, and Halo runs real portfolio optimization math (the same models professional investors use) to figure out how much of your money should go into each one, balancing expected return against risk. It doesn\'t pick stocks for you, it\'s not an index fund, and it\'s not a bond ladder. It\'s a way to build and fine-tune your own stock portfolio with real math instead of guessing.',
+        },
+        {
+          type: 'subheading',
+          text: 'Why this matters for Halo',
+        },
+        {
+          type: 'callout',
+          text: 'Everything above is background you\'ll hear referenced constantly. Halo itself is the tool where you do the actual work: pick your stocks, and let the optimizer find the ideal weights between them.',
+        },
+      ],
+      quiz: [
+        {
+          question: 'The S&P 500 tracks:',
+          options: [
+            { text: '500 of the largest U.S. companies, weighted by market value', correct: true },
+            { text: '500 random small-cap stocks', correct: false },
+            { text: 'Only technology companies', correct: false },
+          ],
+        },
+        {
+          question: 'What does "direct indexing," like Nasdaq 100 Direct, mean?',
+          options: [
+            { text: 'Buying one ETF that owns all the index stocks for you', correct: false },
+            { text: 'Buying the individual stocks in an index yourself, instead of a fund', correct: true },
+            { text: 'Investing directly in Treasury bonds', correct: false },
+          ],
+        },
+        {
+          question: 'What is the main benefit of a Treasury bond ladder?',
+          options: [
+            { text: 'Guaranteed high returns', correct: false },
+            { text: 'Staggered maturities that provide steady cash flow and lower interest rate risk', correct: true },
+            { text: 'It replaces the need for stocks entirely', correct: false },
+          ],
+        },
+        {
+          question: 'What does Halo actually do with the stocks you choose?',
+          options: [
+            { text: 'Picks the stocks for you automatically', correct: false },
+            { text: 'Calculates the optimal allocation, or weights, between the stocks you chose', correct: true },
+            { text: 'Replaces the need for saving money', correct: false },
+          ],
+        },
+      ],
+    },
   ],
 }
 

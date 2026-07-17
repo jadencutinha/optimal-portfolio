@@ -1,4 +1,5 @@
-import { loadStreak, loadXP } from '../lib/courseProgress'
+import { useEffect, useState } from 'react'
+import { loadStreak, loadXP, onXPChange, touchStreak, type StreakState } from '../lib/courseProgress'
 import { useAnimatedNumber } from '../lib/useAnimatedNumber'
 
 import type { Plan } from '../api/types'
@@ -9,8 +10,13 @@ const PLAN_LABEL: Record<Plan, string> = {
 }
 
 export function MissionControlHUD({ plan }: { plan: Plan }) {
-  const xp = useAnimatedNumber(loadXP())
-  const streak = loadStreak()
+  const [xpValue, setXpValue] = useState<number>(loadXP)
+  useEffect(() => onXPChange(setXpValue), [])
+  const xp = useAnimatedNumber(xpValue)
+  const [streak, setStreak] = useState<StreakState>(loadStreak)
+  useEffect(() => {
+    setStreak(touchStreak())
+  }, [])
   const streakDays = useAnimatedNumber(streak.current)
 
   return (
