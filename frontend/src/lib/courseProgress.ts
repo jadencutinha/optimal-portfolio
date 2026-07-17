@@ -70,10 +70,21 @@ export function loadXP(): number {
   }
 }
 
+const XP_EVENT = 'course-xp'
+
 export function awardXP(amount: number): number {
   const next = loadXP() + amount
   localStorage.setItem(XP_KEY, String(next))
+  window.dispatchEvent(new CustomEvent<number>(XP_EVENT, { detail: next }))
   return next
+}
+
+// Lets components outside the one that called awardXP (e.g. the dashboard HUD) stay in sync,
+// since a localStorage write alone doesn't trigger a re-render anywhere else.
+export function onXPChange(handler: (xp: number) => void): () => void {
+  const listener = (event: Event) => handler((event as CustomEvent<number>).detail)
+  window.addEventListener(XP_EVENT, listener)
+  return () => window.removeEventListener(XP_EVENT, listener)
 }
 
 // 3 stars for a first-try perfect run, fewer for each retake it took.
@@ -135,8 +146,8 @@ export function loadStreak(): StreakState {
   }
 }
 
-// Call once per learning action (module completed). Same-day calls are idempotent;
-// a gap of more than one day resets the streak instead of extending it.
+// Call on any site visit (dashboard load) or learning action (module completed).
+// Same-day calls are idempotent; a gap of more than one day resets the streak instead of extending it.
 export function touchStreak(): StreakState {
   const state = loadStreak()
   const now = today()
