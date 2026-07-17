@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import date, timedelta
 from typing import TYPE_CHECKING
 
 import pandas as pd
@@ -70,44 +70,50 @@ def _series_from_json(payload: str) -> pd.Series:
 class PersistentPriceProvider(DataProvider):
     """A durable read-through cache backed by the price_bars table.
 
-    On a cache miss upstream, this serves prices from the database when they are
-    recent enough, so a cold in-memory/Redis cache (e.g. after a restart) does not
-    re-hit the market-data API for data we already have.
+    On any miss it fetches one deep (canonical) window from the upstream API and stores
+    it, then serves every consumer's window by slicing that stored history. This means
+    the market-data API is hit at most about once per ticker every few days, no matter
+    how many different date ranges the app asks for (validate, optimize, backtest, game,
+    invest all reuse the same stored bars) or how often a cold cache is restarted.
     """
 
     FRESHNESS_DAYS = 4
-    COVERAGE_DAYS = 7
+    CANONICAL_DAYS = 365 * 8
+    MIN_OBSERVATIONS = 5
 
     def __init__(self, inner: DataProvider, repository: "PriceRepository") -> None:
         self._inner = inner
         self._repository = repository
         self.name = inner.name
 
-    def _is_fresh(self, series: pd.Series, start: date, end: date) -> bool:
-        if series.empty:
+    def _is_fresh(self, series: pd.Series | None, end: date) -> bool:
+        if series is None or series.empty or len(series) < self.MIN_OBSERVATIONS:
             return False
         latest = series.index.max().date()
-        earliest = series.index.min().date()
-        recent_enough = (end - latest).days <= self.FRESHNESS_DAYS
-        covers_start = (earliest - start).days <= self.COVERAGE_DAYS
-        return recent_enough and covers_start
+        return (end - latest).days <= self.FRESHNESS_DAYS
+
+    @staticmethod
+    def _slice(series: pd.Series, start: date, end: date) -> pd.Series:
+        window = series[(series.index >= pd.Timestamp(start)) & (series.index <= pd.Timestamp(end))]
+        return window if not window.empty else series
 
     async def get_prices(self, tickers: list[str], start: date, end: date) -> dict[str, pd.Series]:
-        stored = await self._repository.load_prices(self.name, tickers, start, end)
+        canonical_start = min(start, end - timedelta(days=self.CANONICAL_DAYS))
+        stored = await self._repository.load_prices(self.name, tickers, canonical_start, end)
         resolved: dict[str, pd.Series] = {}
         missing: list[str] = []
         for ticker in tickers:
             series = stored.get(ticker)
-            if series is not None and self._is_fresh(series, start, end):
-                resolved[ticker] = series
+            if self._is_fresh(series, end):
+                resolved[ticker] = self._slice(series, start, end)
             else:
                 missing.append(ticker)
         if missing:
-            fetched = await self._inner.get_prices(missing, start, end)
+            fetched = await self._inner.get_prices(missing, canonical_start, end)
             if fetched:
                 await self._repository.store_prices(self.name, pd.DataFrame(fetched))
             for ticker, series in fetched.items():
-                resolved[ticker] = series
+                resolved[ticker] = self._slice(series, start, end)
         return {ticker: resolved[ticker] for ticker in tickers if ticker in resolved}
 
     async def close(self) -> None:

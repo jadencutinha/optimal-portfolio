@@ -1,10 +1,13 @@
 import asyncio
+import logging
 from datetime import date
 
 import httpx
 import pandas as pd
 
 from app.data.provider import DataProvider, ProviderError, ProviderRateLimited, ProviderUnavailable
+
+logger = logging.getLogger("optimal_portfolio.fmp")
 
 _LEGACY_SUFFIX = "/api/v3"
 _STABLE_BASE = "https://financialmodelingprep.com/stable"
@@ -44,6 +47,7 @@ class FMPProvider(DataProvider):
         return prices
 
     async def _fetch_one(self, ticker: str, start: date, end: date) -> pd.Series | None:
+        logger.info("FMP fetch %s %s..%s", ticker, start.isoformat(), end.isoformat())
         url = f"{self._base_url}/historical-price-eod/full"
         params = {
             "symbol": ticker,

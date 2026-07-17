@@ -62,3 +62,23 @@ def test_stale_window_triggers_a_refetch(tmp_path) -> None:
         await engine.dispose()
 
     asyncio.run(run())
+
+
+def test_a_different_window_reuses_the_single_canonical_fetch(tmp_path) -> None:
+    async def run() -> None:
+        engine, inner, provider = _provider(tmp_path)
+        await init_models(engine)
+        end = date(2024, 3, 1)
+
+        # A narrow recent window triggers exactly one deep fetch.
+        await provider.get_prices(["AAPL"], date(2024, 1, 1), end)
+        assert inner.calls == 1
+
+        # A much wider window ending on the same day is served entirely from the DB.
+        wide = await provider.get_prices(["AAPL"], date(2019, 1, 1), end)
+        assert inner.calls == 1
+        assert not wide["AAPL"].empty
+
+        await engine.dispose()
+
+    asyncio.run(run())
