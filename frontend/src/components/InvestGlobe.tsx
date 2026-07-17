@@ -209,9 +209,9 @@ export function InvestGlobe({ gain = 0, className }: Props) {
       uPixelRatio: { value: renderer.getPixelRatio() },
       uScale: { value: 1 },
       uAlpha: { value: 1 },
-      uColor: { value: new THREE.Color(0x2f6ac4) },
-      uLandColor: { value: new THREE.Color(0x6fb4ff) },
-      uRimColor: { value: new THREE.Color(0xd6ecff) },
+      uColor: { value: new THREE.Color(0xdfe3ea) },
+      uLandColor: { value: new THREE.Color(0xdfe3ea) },
+      uRimColor: { value: new THREE.Color(0xf0f2f6) },
     }
 
     const material = new THREE.ShaderMaterial({
@@ -262,8 +262,8 @@ export function InvestGlobe({ gain = 0, className }: Props) {
       uPixelRatio: { value: renderer.getPixelRatio() },
       uScale: { value: 1 },
       uAlpha: { value: 2.4 },
-      uColor: { value: new THREE.Color(0xbcdcff) },
-      uLandColor: { value: new THREE.Color(0xe8f4ff) },
+      uColor: { value: new THREE.Color(0xeef1f5) },
+      uLandColor: { value: new THREE.Color(0xffffff) },
       uRimColor: { value: new THREE.Color(0xffffff) },
     }
     const nodeMaterial = new THREE.ShaderMaterial({
@@ -303,7 +303,7 @@ export function InvestGlobe({ gain = 0, className }: Props) {
     const clock = new THREE.Clock()
     let frame = 0
 
-    const baseLand = new THREE.Color(0x6fb4ff)
+    const baseLand = new THREE.Color(0xdfe3ea)
     const up = new THREE.Color(0x4ce3b4)
     const down = new THREE.Color(0xff7b7b)
 
