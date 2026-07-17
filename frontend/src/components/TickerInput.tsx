@@ -13,6 +13,7 @@ interface Props {
 
 export function TickerInput({ tickers, suggestions, onChange }: Props) {
   const [draft, setDraft] = useState('')
+  const [focused, setFocused] = useState(false)
   const [browsing, setBrowsing] = useState(false)
   const [inspecting, setInspecting] = useState<string | null>(null)
   const [invalid, setInvalid] = useState<Set<string>>(new Set())
@@ -86,6 +87,22 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
 
   const heaviest = mix[0]
   const concentrated = tickers.length >= 3 && heaviest && heaviest[1] / tickers.length > 0.6
+
+  const matches = useMemo(() => {
+    const query = draft.trim().toLowerCase()
+    if (!query) return []
+    return suggestions
+      .filter((asset) => !tickers.includes(asset.ticker))
+      .filter(
+        (asset) => asset.ticker.toLowerCase().startsWith(query) || asset.name.toLowerCase().includes(query),
+      )
+      .sort((a, b) => {
+        const aStarts = a.ticker.toLowerCase().startsWith(query) ? 0 : 1
+        const bStarts = b.ticker.toLowerCase().startsWith(query) ? 0 : 1
+        return aStarts - bStarts || a.name.localeCompare(b.name)
+      })
+      .slice(0, 8)
+  }, [draft, suggestions, tickers])
 
   return (
     <div className="field">
@@ -166,18 +183,39 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
       )}
 
       <div className="ticker-entry">
-        <input
-          value={draft}
-          placeholder="Add a ticker, e.g. AAPL"
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              add(draft)
-            }
-          }}
-        />
-        <button type="button" onClick={() => add(draft)}>
+        <div className="ticker-search">
+          <input
+            value={draft}
+            placeholder="Search a company or ticker, e.g. Apple or AAPL"
+            onFocus={() => setFocused(true)}
+            onBlur={() => window.setTimeout(() => setFocused(false), 150)}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                add(matches.length > 0 ? matches[0].ticker : draft)
+              }
+            }}
+          />
+          {focused && matches.length > 0 && (
+            <ul className="ticker-suggest">
+              {matches.map((asset) => (
+                <li key={asset.ticker}>
+                  <button
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => add(asset.ticker)}
+                  >
+                    <span className="ticker-suggest__ticker">{asset.ticker}</span>
+                    <span className="ticker-suggest__name">{asset.name}</span>
+                    <span className="ticker-suggest__sector">{asset.sector}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <button type="button" onClick={() => add(matches[0]?.ticker ?? draft)}>
           Add
         </button>
       </div>
