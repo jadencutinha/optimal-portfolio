@@ -115,7 +115,14 @@ export function HomeDashboard({
         {areas.map((area) => (
           <button key={area.title} type="button" className="home-area" onClick={area.onOpen}>
             <span className="home-area__body-slot">
-              <Suspense fallback={<span className="mini-body is-fallback" aria-hidden="true" />}>
+              <Suspense
+                fallback={
+                  <span
+                    className={`mini-body is-fallback${area.kind === 'moon' ? ' is-fallback--moon' : ''}`}
+                    aria-hidden="true"
+                  />
+                }
+              >
                 <MiniBody kind={area.kind} />
               </Suspense>
             </span>
