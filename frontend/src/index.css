@@ -162,6 +162,13 @@ textarea {
   z-index: 50;
 }
 
+@media (max-width: 768px) {
+  .auth-menu-dropdown {
+      left: 0;
+      right: auto;
+  }
+}
+
 .auth-menu-card {
   display: flex;
   flex-direction: column;
@@ -4505,6 +4512,7 @@ table.weights td {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-back {
@@ -4519,6 +4527,55 @@ table.weights td {
 
 .sidebar-back:hover {
   color: var(--accent-hover);
+}
+
+
+.sidebar-toggle {
+  display: none;
+}
+
+/* Mobile styles for sidebar */
+@media (max-width: 768px) {
+  
+  .module-shell {
+    flex-direction: column;
+  }
+
+  .module-sidebar {
+    position: fixed;
+    top: 10rem;
+    left: 0;
+    max-height: 80vh;
+    height: auto;
+    transform: translateX(-100%); /* Hidden by default */
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .module-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle { /* Sidebar toggle button */
+    display: inline-flex; 
+    align-items: center;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+.module-meta { /* puts the sidebar button opposite of module meta for now */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .sidebar-track-title {
