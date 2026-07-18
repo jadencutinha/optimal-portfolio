@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-export type View = 'home' | 'analyze' | 'invest' | 'learn' | 'about'
+export type View = 'home' | 'analyze' | 'invest' | 'learn' | 'about' | 'profile' | 'game'
 
 export type Overlay = 'manage-plan' | 'checkout' | 'risk' | null
 

@@ -13,8 +13,10 @@ from app.api.routes import (
     assistant,
     backtest,
     behavioral,
+    billing,
     courses,
     frontier,
+    game,
     health,
     invest,
     market,
@@ -32,11 +34,14 @@ from app.api.routes import (
 from app.auth.repository import ProfileRepository
 from app.auth.supabase import SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
+from app.billing.repository import BillingRepository
+from app.billing.service import StripeBilling
 from app.config import get_settings
 from app.data.cache import build_cache
-from app.data.provider import CachingDataProvider, ProviderError, build_inner_provider
+from app.data.provider import CachingDataProvider, PersistentPriceProvider, ProviderError, build_inner_provider
 from app.data.repository import PriceRepository
 from app.data.sectors import SectorProvider
+from app.game.rooms import RoomStore
 from app.invest.simulator import InvestSimulator
 from app.db.session import create_engine, create_session_factory, init_models
 from app.education.repository import CourseRepository
@@ -63,18 +68,24 @@ async def lifespan(app: FastAPI):
         pass
 
     cache = await build_cache(settings.redis_url)
-    provider = CachingDataProvider(build_inner_provider(settings), cache, settings.cache_ttl_seconds)
+    price_repository = PriceRepository(session_factory)
+    inner_provider = build_inner_provider(settings)
+    if settings.fmp_api_key:
+        inner_provider = PersistentPriceProvider(inner_provider, price_repository)
+    provider = CachingDataProvider(inner_provider, cache, settings.cache_ttl_seconds)
 
     app.state.cache = cache
     app.state.provider = provider
     app.state.session_factory = session_factory
     app.state.invest_simulator = InvestSimulator(session_factory, provider)
+    app.state.room_store = RoomStore()
     app.state.sector_provider = SectorProvider(cache, settings)
     app.state.verifier = SupabaseVerifier(settings)
     app.state.supabase_admin = SupabaseAdmin(settings)
     app.state.profile_repository = ProfileRepository(session_factory)
+    app.state.billing = StripeBilling(settings, BillingRepository(session_factory), app.state.profile_repository)
     app.state.optimization_repository = OptimizationRepository(session_factory)
-    app.state.price_repository = PriceRepository(session_factory)
+    app.state.price_repository = price_repository
     app.state.backtest_repository = BacktestRepository(session_factory)
     app.state.course_repository = CourseRepository(session_factory)
     app.state.portfolio_repository = PortfolioRepository(session_factory)
@@ -142,6 +153,8 @@ def create_app() -> FastAPI:
     app.include_router(stress.router, prefix=settings.api_prefix)
     app.include_router(reports.router, prefix=settings.api_prefix)
     app.include_router(invest.router, prefix=settings.api_prefix)
+    app.include_router(billing.router, prefix=settings.api_prefix)
+    app.include_router(game.router, prefix=settings.api_prefix)
     app.include_router(market.router, prefix=settings.api_prefix)
     app.include_router(tickers.router, prefix=settings.api_prefix)
     app.include_router(metrics_route.router, prefix=settings.api_prefix)

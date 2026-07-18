@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useAuth } from '../auth/useAuth'
+import { useView } from '../nav/useView'
 import { displayName } from '../lib/displayName'
 import { AuthModal } from './AuthModal'
-import { ProfileModal } from './ProfileModal'
 
-type Modal = null | 'login' | 'signup' | 'profile'
+type Modal = null | 'login' | 'signup'
 
 export function AuthBar() {
   const { session, loading, signInWithGoogle, signOut } = useAuth()
+  const { setView } = useView()
   const [modal, setModal] = useState<Modal>(null)
   const [open, setOpen] = useState(false)
 
@@ -16,15 +17,31 @@ export function AuthBar() {
   }
 
   if (session) {
+    const name = displayName(session.user)
+    let avatar = ''
+    try {
+      avatar = localStorage.getItem(`profile_avatar:${session.user.id}`) ?? ''
+    } catch {
+      avatar = ''
+    }
     return (
       <div className="authbar">
-        <div className="auth-menu" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-          <button type="button" className="signin-trigger" onClick={() => setOpen((value) => !value)}>
-            {displayName(session.user)}
-            <span className="caret" aria-hidden>
-              ▾
-            </span>
+        <div className="authbar-user">
+          <button
+            type="button"
+            className="authbar-avatar"
+            onClick={() => setOpen((value) => !value)}
+            aria-label="Account menu"
+          >
+            {avatar ? <img src={avatar} alt="" /> : <span>{name.charAt(0).toUpperCase()}</span>}
           </button>
+          <div className="auth-menu" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+            <button type="button" className="signin-trigger" onClick={() => setOpen((value) => !value)}>
+              {name}
+              <span className="caret" aria-hidden>
+                ▾
+              </span>
+            </button>
           {open && (
             <div className="auth-menu-dropdown">
               <div className="auth-menu-card">
@@ -32,7 +49,7 @@ export function AuthBar() {
                   type="button"
                   onClick={() => {
                     setOpen(false)
-                    setModal('profile')
+                    setView('profile')
                   }}
                 >
                   Edit profile
@@ -49,8 +66,8 @@ export function AuthBar() {
               </div>
             </div>
           )}
+          </div>
         </div>
-        {modal === 'profile' && <ProfileModal onClose={() => setModal(null)} />}
       </div>
     )
   }

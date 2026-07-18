@@ -10,6 +10,8 @@ import { useView } from '../nav/useView'
 import { AboutPage } from './AboutPage'
 import { CheckoutPage } from './CheckoutPage'
 import { CoursePage } from './CoursePage'
+import { EditProfilePage } from './EditProfilePage'
+import { GamePage } from './GamePage'
 import { FreePage } from './FreePage'
 import { HomeDashboard } from './HomeDashboard'
 import { Landing } from './Landing'
@@ -41,6 +43,11 @@ export function Home() {
 
   if (overlay === 'checkout') {
     return <CheckoutPage onDone={goHome} onCancel={closeOverlay} />
+  }
+
+  const onboarded = Boolean((session.user.user_metadata ?? {}).onboarded)
+  if (!onboarded && !planSelected) {
+    return <EditProfilePage mode="onboarding" onDone={() => setView('home')} />
   }
 
   if (!planSelected || overlay === 'manage-plan') {
@@ -116,6 +123,7 @@ export function Home() {
                 onAbout={() => setView('about')}
                 onManagePlan={() => openOverlay('manage-plan')}
                 onUpgrade={() => openOverlay('checkout')}
+                onCompete={() => setView('game')}
               />
             </motion.div>
           )}
@@ -141,6 +149,10 @@ export function Home() {
       </div>
 
       {view === 'about' && <AboutPage onBack={goHome} />}
+
+      {view === 'profile' && <EditProfilePage mode="edit" onDone={goHome} onCancel={goHome} />}
+
+      {view === 'game' && <GamePage onExit={goHome} />}
 
       {(view === 'analyze' || view === 'invest') &&
         (plan === 'pro' ? (

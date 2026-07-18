@@ -42,13 +42,17 @@ export function AssistantPage() {
   const [risk, setRisk] = useState(20)
 
   const compose = () => {
+    const chosen = GOALS.find((g) => g.id === goal)
     const parts: string[] = []
     if (message.trim()) parts.push(message.trim())
-    const chosen = GOALS.find((g) => g.id === goal)
-    if (chosen) parts.push(chosen.phrase)
-    parts.push(
-      `My time horizon is about ${horizon} years and I can tolerate a drop of at most around ${risk}% in a bad year.`,
-    )
+    // Only attach the portfolio context (goal, horizon, risk) when a quick-control goal is
+    // chosen, so a plain message like "hello" stays a plain message the agent can just answer.
+    if (chosen) {
+      parts.push(chosen.phrase)
+      parts.push(
+        `My time horizon is about ${horizon} years and I can tolerate a drop of at most around ${risk}% in a bad year.`,
+      )
+    }
     return parts.join(' ')
   }
 
@@ -64,8 +68,8 @@ export function AssistantPage() {
       <div className="assistant-intro">
         <h2>Portfolio assistant</h2>
         <p className="muted">
-          Describe your goal in plain English, or use the quick controls. The assistant picks an objective and
-          constraints, runs the optimizer, and explains the result.
+          Ask anything about investing, or ask it to build you a portfolio. When you ask for one, it picks an
+          objective and constraints, runs the optimizer, and explains the result.
         </p>
       </div>
 
@@ -86,9 +90,19 @@ export function AssistantPage() {
       />
 
       {assistant.isError && <p className="error">{extractError(assistant.error)}</p>}
-      {assistant.isPending && <Loader fullscreen={false} label="Choosing a strategy and building your portfolio…" />}
+      {assistant.isPending && <Loader fullscreen={false} label="Thinking…" />}
 
-      {result && (
+      {result && !result.result && result.reply && (
+        <div className="assistant-reply">
+          <span className="assistant-badge">Assistant</span>
+          {result.reply.split('\n').filter(Boolean).map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+          <p className="provenance">Answered with {result.model}</p>
+        </div>
+      )}
+
+      {result && result.result && result.config && (
         <div className="assistant-result">
           {result.rationale && (
             <div className="assistant-rationale">

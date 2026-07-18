@@ -42,22 +42,30 @@ export function MarketStrip({ symbols = WATCHLIST }: { symbols?: string[] }) {
       </div>
 
       <div className="mstrip__rail">
-        {board.isLoading
-          ? symbols.slice(0, 6).map((symbol) => (
+        {board.isLoading ? (
+          <div className="mstrip__track is-static">
+            {symbols.slice(0, 6).map((symbol) => (
               <div key={symbol} className="mquote is-loading">
                 <span className="mquote__symbol">{symbol}</span>
                 <span className="mquote__price">—</span>
               </div>
-            ))
-          : (board.data?.quotes ?? []).map((quote) => (
-              <div key={quote.symbol} className="mquote">
-                <span className="mquote__symbol">{quote.symbol}</span>
-                <span className="mquote__price">{usd(quote.price)}</span>
-                <span className={quote.change >= 0 ? 'mquote__move gain' : 'mquote__move loss'}>
-                  {quote.change >= 0 ? '▲' : '▼'} {pct(quote.change_pct)}
-                </span>
-              </div>
             ))}
+          </div>
+        ) : (
+          <div className="mstrip__track">
+            {[0, 1].map((copy) =>
+              (board.data?.quotes ?? []).map((quote) => (
+                <div key={`${copy}-${quote.symbol}`} className="mquote" aria-hidden={copy === 1 ? true : undefined}>
+                  <span className="mquote__symbol">{quote.symbol}</span>
+                  <span className="mquote__price">{usd(quote.price)}</span>
+                  <span className={quote.change >= 0 ? 'mquote__move gain' : 'mquote__move loss'}>
+                    {quote.change >= 0 ? '▲' : '▼'} {pct(quote.change_pct)}
+                  </span>
+                </div>
+              )),
+            )}
+          </div>
+        )}
       </div>
     </section>
   )

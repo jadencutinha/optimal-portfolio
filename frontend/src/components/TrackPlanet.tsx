@@ -32,6 +32,9 @@ export function TrackPlanet({ kind, progress }: Props) {
     mount.appendChild(renderer.domElement)
 
     const dpr = renderer.getPixelRatio()
+    // Ringed planets span far wider than a bare sphere, so they need a taller
+    // world box or their rings fall outside the camera and get clipped.
+    const worldHeight = kind === 'saturn' ? 4.6 : kind === 'neptune' ? 4.0 : WORLD_HEIGHT
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
     camera.position.set(0, 0, CAMERA_Z)
@@ -198,13 +201,13 @@ export function TrackPlanet({ kind, progress }: Props) {
       if (clientWidth === 0 || clientHeight === 0) return
       renderer.setSize(clientWidth, clientHeight, false)
       const aspect = clientWidth / clientHeight
-      const worldWidth = WORLD_HEIGHT * aspect
+      const worldWidth = worldHeight * aspect
       camera.left = -worldWidth / 2
       camera.right = worldWidth / 2
-      camera.top = WORLD_HEIGHT / 2
-      camera.bottom = -WORLD_HEIGHT / 2
+      camera.top = worldHeight / 2
+      camera.bottom = -worldHeight / 2
       camera.updateProjectionMatrix()
-      const scale = (clientHeight / WORLD_HEIGHT) * 0.0095
+      const scale = (clientHeight / worldHeight) * 0.0095
       allMaterials.forEach((m) => { m.uniforms.uScale.value = scale })
     }
     layoutCamera()

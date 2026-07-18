@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { Wave } from './ui/wave'
 
 interface LoaderProps {
   label?: string
@@ -13,11 +13,7 @@ export function Loader({ label = 'Loading…', fullscreen = true }: LoaderProps)
       aria-live="polite"
     >
       <div className="pl">
-        <div className="pl__dots" aria-hidden="true">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <span key={i} className="pl__dot" style={{ '--i': i } as CSSProperties} />
-          ))}
-        </div>
+        <Wave className="pl__wave" aria-hidden="true" />
         <div className="pl__text">{label}</div>
       </div>
     </div>

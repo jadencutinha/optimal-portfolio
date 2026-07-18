@@ -56,6 +56,13 @@ async def call_text(settings: Settings, *, system: str, user: str) -> str:
     return await _anthropic_text(settings, system, user)
 
 
+async def call_agent(settings: Settings, *, system: str, user: str, tool: dict) -> tuple[dict | None, str]:
+    """One turn where the model may either call the tool or answer with plain text."""
+    if _require_provider(settings) == "openai":
+        return await _openai_agent(settings, system, user, tool)
+    return await _anthropic_agent(settings, system, user, tool)
+
+
 async def _post(url: str, headers: dict, payload: dict, timeout: float) -> dict:
     try:
         async with httpx.AsyncClient(timeout=timeout) as http:
@@ -106,6 +113,17 @@ async def _anthropic_tool(settings: Settings, system: str, user: str, tool: dict
 async def _anthropic_text(settings: Settings, system: str, user: str) -> str:
     data = await _anthropic_call(settings, system, [{"role": "user", "content": user}])
     return extract_text(data)
+
+
+async def _anthropic_agent(settings: Settings, system: str, user: str, tool: dict) -> tuple[dict | None, str]:
+    data = await _anthropic_call(
+        settings,
+        system,
+        [{"role": "user", "content": user}],
+        tools=[tool],
+        tool_choice={"type": "auto"},
+    )
+    return extract_tool_use(data, tool["name"]), extract_text(data)
 
 
 def extract_tool_use(data: dict, name: str) -> dict | None:
@@ -166,3 +184,37 @@ async def _openai_text(settings: Settings, system: str, user: str) -> str:
         return (data["choices"][0]["message"]["content"] or "").strip()
     except (KeyError, IndexError, TypeError):
         return ""
+
+
+async def _openai_agent(settings: Settings, system: str, user: str, tool: dict) -> tuple[dict | None, str]:
+    function_tool = {
+        "type": "function",
+        "function": {
+            "name": tool["name"],
+            "description": tool.get("description", ""),
+            "parameters": tool["input_schema"],
+        },
+    }
+    data = await _openai_call(
+        settings,
+        [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        tools=[function_tool],
+        tool_choice="auto",
+    )
+    try:
+        message = data["choices"][0]["message"]
+    except (KeyError, IndexError, TypeError):
+        return None, ""
+    text = (message.get("content") or "").strip()
+    tool_calls = message.get("tool_calls") or []
+    tool_input: dict | None = None
+    if tool_calls:
+        arguments = tool_calls[0].get("function", {}).get("arguments")
+        if isinstance(arguments, dict):
+            tool_input = arguments
+        elif isinstance(arguments, str):
+            try:
+                tool_input = json.loads(arguments)
+            except (TypeError, json.JSONDecodeError):
+                tool_input = None
+    return tool_input, text

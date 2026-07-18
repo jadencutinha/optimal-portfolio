@@ -5,6 +5,7 @@ from app.auth.plans import entitlements_for
 from app.auth.repository import ProfileData, ProfileRepository
 from app.auth.supabase import AuthError, SupabaseAdmin, SupabaseVerifier
 from app.backtest.repository import BacktestRepository
+from app.billing.service import StripeBilling
 from app.config import Settings
 from app.data.cache import Cache
 from app.data.provider import DataProvider
@@ -28,6 +29,14 @@ def get_alpaca_client(request: Request) -> AlpacaClient:
 
 def get_invest_simulator(request: Request) -> InvestSimulator:
     return request.app.state.invest_simulator
+
+
+def get_room_store(request: Request):
+    return request.app.state.room_store
+
+
+def get_billing(request: Request) -> StripeBilling:
+    return request.app.state.billing
 
 
 def get_provider(request: Request) -> DataProvider:
