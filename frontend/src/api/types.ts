@@ -469,6 +469,17 @@ export interface AssistantResponse {
   result: OptimizeResponse | null
 }
 
+export interface CourseAssistantRequest {
+  message: string
+  track_title?: string | null
+  module_title?: string | null
+}
+
+export interface CourseAssistantResponse {
+  model: string
+  reply: string
+}
+
 export interface StressCurvePoint {
   date: string
   equity: number

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
 import { starsForRetakes, xpForStars } from '../lib/courseProgress'
+import { CourseAssistant } from './CourseAssistant'
 import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
 interface Props {
@@ -85,12 +86,16 @@ export function ModuleLayout({
   const readingMinutes = estimateReadingMinutes(mod.content)
 
   const prevModule = moduleIndex > 0 ? track.modules[moduleIndex - 1] : undefined
-  const nextModule =
-    moduleIndex < track.modules.length - 1 ? track.modules[moduleIndex + 1] : undefined
+  const nextModule = moduleIndex < track.modules.length - 1 ? track.modules[moduleIndex + 1] : undefined
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
 
   return (
-    <div className="module-shell">
-      <aside className="module-sidebar">
+    <div className={`module-shell ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <aside className={`module-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <button type="button" className="sidebar-back" onClick={onBackToTracks}>
           ← Back to map
         </button>
@@ -117,7 +122,10 @@ export function ModuleLayout({
                 key={m.id}
                 type="button"
                 className={`sidebar-module-item ${statusClass} ${isCurrent ? 'current' : ''}`}
-                onClick={() => onSelectModule(i)}
+                onClick={() => {
+                  onSelectModule(i)
+                  setSidebarOpen(false)
+                }}
               >
                 <span className="sidebar-module-icon">
                   {done ? <CheckIcon /> : <span className="sidebar-module-dot" />}
@@ -155,6 +163,9 @@ export function ModuleLayout({
 
         <div className="module-meta">
           <span className="module-reading-time">{readingMinutes} min read</span>
+          <button className="sidebar-toggle" onClick={toggleSidebar}>
+            {isSidebarOpen ? 'Close Sidebar' : 'Open Sidebar'}
+          </button>
         </div>
 
         <h1 className="module-title">{mod.title}</h1>
@@ -192,9 +203,23 @@ export function ModuleLayout({
                 </div>
               )
             }
+            if (block.type === 'sources') {
+              return (
+                <div key={i} className="lesson-sources">
+                  <span className="lesson-sources-label">Sources</span>
+                  <ul className="lesson-sources-list">
+                    {(block.items ?? []).map((item, j) => (
+                      <li key={j}>{renderText(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }
             return null
           })}
         </div>
+
+        <CourseAssistant trackTitle={track.title} moduleTitle={mod.title} />
 
         <div className="quiz">
           <h2 className="quiz-heading">Check your knowledge</h2>
@@ -270,7 +295,12 @@ export function ModuleLayout({
           <button
             type="button"
             className="module-nav-btn"
-            onClick={() => prevModule && onSelectModule(moduleIndex - 1)}
+            onClick={() => {
+              if (prevModule) {
+                onSelectModule(moduleIndex - 1)
+              }
+              setSidebarOpen(false)
+            }}
             disabled={!prevModule}
           >
             ← Previous
@@ -278,7 +308,12 @@ export function ModuleLayout({
           <button
             type="button"
             className="module-nav-btn primary-nav"
-            onClick={() => nextModule && onSelectModule(moduleIndex + 1)}
+            onClick={() => {
+              if (nextModule) {
+                onSelectModule(moduleIndex + 1)
+              }
+              setSidebarOpen(false)
+            }}
             disabled={!nextModule}
           >
             {nextModule ? 'Next module →' : 'Track complete'}
