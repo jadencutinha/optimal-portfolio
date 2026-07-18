@@ -24,7 +24,7 @@ export function SavedPortfolios() {
   if (list.length === 0) {
     return (
       <EmptyState
-        icon="💾"
+        icon={null}
         title="No saved portfolios yet"
         description="Run the optimizer and click “Save portfolio” to keep it here."
       />

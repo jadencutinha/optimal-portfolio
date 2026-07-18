@@ -3605,9 +3605,17 @@ table.weights td {
   flex-wrap: wrap;
 }
 
-.constraint-row select {
-  flex: 1;
-  min-width: 120px;
+.constraints .constraint-row select {
+  flex: 1 1 100%;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  text-overflow: ellipsis;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239c968b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-size: 12px 8px;
 }
 
 .constraint-row input[type='number'] {
@@ -5144,7 +5152,9 @@ table.weights td {
 /* ---- Goal-based planner (#56) ---- */
 .planner-intro,
 .assistant-intro {
-  margin-bottom: 18px;
+  max-width: 620px;
+  margin: 0 auto 18px;
+  text-align: center;
 }
 
 .planner-intro h2,
@@ -5251,6 +5261,130 @@ table.weights td {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px 8px 4px;
+}
+
+/* ---- Goal planner: reverse solver, odds-over-time, sensitivity levers ---- */
+.planner-solver {
+  border: 1px solid var(--hairline, var(--border));
+  border-radius: 12px;
+  padding: 16px;
+  background: linear-gradient(160deg, rgba(212, 175, 55, 0.07), rgba(212, 175, 55, 0.02));
+}
+.planner-solver-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.planner-solver-lead {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--text);
+}
+.planner-solver-options {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.planner-solver-opt {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.planner-solver-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--mono);
+}
+.planner-solver-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+.planner-solver-divider {
+  align-self: center;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.planner-odds {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 8px 4px;
+}
+.planner-odds-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 8px 6px;
+}
+.planner-odds-head h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.planner-odds-head .muted {
+  font-size: 12px;
+}
+
+.planner-levers {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--bg);
+}
+.planner-levers-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.planner-levers-sub {
+  margin: 4px 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.planner-levers-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.planner-lever {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-1, rgba(255, 255, 255, 0.03));
+}
+.planner-lever-label {
+  font-size: 13px;
+  color: var(--text);
+}
+.planner-lever-delta {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.planner-lever-delta.up {
+  color: #57c99a;
+}
+.planner-lever-delta.down {
+  color: var(--danger);
 }
 
 .fan-tooltip {
@@ -5717,7 +5851,9 @@ table.weights td {
 
 /* ---- Historical stress test (#4) ---- */
 .stress-intro {
-  margin-bottom: 18px;
+  max-width: 620px;
+  margin: 0 auto 18px;
+  text-align: center;
 }
 
 .stress-intro h2 {
@@ -6300,6 +6436,15 @@ table.weights td {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px;
+}
+
+.tool-title {
+  margin: 2px 0 18px;
+  text-align: center;
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
 }
 
 /* ---- Course gamification: XP, streaks, mastery stars ---- */

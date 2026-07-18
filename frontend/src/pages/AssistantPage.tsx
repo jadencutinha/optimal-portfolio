@@ -66,7 +66,6 @@ export function AssistantPage() {
   return (
     <div className="assistant">
       <div className="assistant-intro">
-        <h2>Portfolio assistant</h2>
         <p className="muted">
           Ask anything about investing, or ask it to build you a portfolio. When you ask for one, it picks an
           objective and constraints, runs the optimizer, and explains the result.

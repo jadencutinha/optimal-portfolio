@@ -47,7 +47,6 @@ export function StressPage() {
   return (
     <div className="stress">
       <div className="stress-intro">
-        <h2>Historical stress test</h2>
         <p className="muted">
           Build a portfolio, then replay it through history's worst shocks to see the drawdown it
           would have taken, and how long it took to recover.

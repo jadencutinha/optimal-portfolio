@@ -136,6 +136,7 @@ export function ProWorkspace({
               ← All features
             </button>
           </div>
+          <h1 className="tool-title">{PRO_FEATURES.find((f) => f.id === feature)?.name}</h1>
           {feature === 'optimizer' && <OptimizerPage />}
           {feature === 'frontier' && <OptimizerPage autoStart />}
           {feature === 'assistant' && <AssistantPage />}
