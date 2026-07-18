@@ -4841,6 +4841,112 @@ table.weights td {
   color: var(--text);
 }
 
+.lesson-sources {
+  margin: 8px 0 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.lesson-sources-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.lesson-sources-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lesson-sources-list li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ─── Course assistant ("Ask Halo") ──────────────────────────────── */
+
+.course-assistant {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+
+.course-assistant-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel);
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 18px;
+  cursor: pointer;
+}
+
+.course-assistant-toggle:hover {
+  color: var(--accent-hover);
+}
+
+.course-assistant-caret {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.course-assistant-body {
+  padding: 16px 18px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.course-assistant-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.course-assistant-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.course-assistant-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.course-assistant-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.course-assistant-reply {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  background: rgba(224, 151, 67, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
 /* ─── Quiz ────────────────────────────────────────────────────── */
 
 .quiz {

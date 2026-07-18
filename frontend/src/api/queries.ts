@@ -10,6 +10,8 @@ import type {
   BehaviorGapRequest,
   BehaviorGapResponse,
   BillingConfig,
+  CourseAssistantRequest,
+  CourseAssistantResponse,
   CourseDetail,
   CourseSummary,
   ExplainResponse,
@@ -254,6 +256,13 @@ export function useAssistant() {
   return useMutation({
     mutationFn: async (request: AssistantRequest) =>
       (await apiClient.post<AssistantResponse>('/api/assistant', request)).data,
+  })
+}
+
+export function useCourseAssistant() {
+  return useMutation({
+    mutationFn: async (request: CourseAssistantRequest) =>
+      (await apiClient.post<CourseAssistantResponse>('/api/course-assistant', request)).data,
   })
 }
 

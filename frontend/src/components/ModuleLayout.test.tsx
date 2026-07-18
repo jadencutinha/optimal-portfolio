@@ -2,7 +2,18 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { Track } from '../data/courseData'
-import { ModuleLayout } from './ModuleLayout'
+
+vi.mock('../api/queries', () => ({
+  useCourseAssistant: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+    isError: false,
+    error: null,
+    data: undefined,
+  }),
+}))
+
+const { ModuleLayout } = await import('./ModuleLayout')
 
 const track: Track = {
   id: 99,

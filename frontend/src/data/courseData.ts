@@ -1,5 +1,5 @@
 export interface ContentBlock {
-  type: 'paragraph' | 'subheading' | 'list' | 'callout'
+  type: 'paragraph' | 'subheading' | 'list' | 'callout' | 'sources'
   text?: string
   items?: string[]
 }
@@ -73,6 +73,13 @@ const track1: Track = {
         {
           type: 'callout',
           text: 'Halo is an investing tool, not a savings tool. It assumes you already have an emergency fund and are ready to put money to work for the long term. If you\'re still building your emergency fund, do that first.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Consumer Financial Protection Bureau, "How much should I save for an emergency fund?" (consumerfinance.gov)',
+            'FINRA Investor Education Foundation, "Saving and Investing" investor guide (finra.org)',
+          ],
         },
       ],
       quiz: [
@@ -149,6 +156,12 @@ const track1: Track = {
           type: 'paragraph',
           text: 'Someone who invests $5,000 per year from age 22 to 32 (10 years, then stops) ends up with more money at retirement than someone who invests $5,000 per year from age 32 to 62 (30 years). **Time in the market beats time spent waiting.**',
         },
+        {
+          type: 'sources',
+          items: [
+            'U.S. Securities and Exchange Commission, Investor.gov, "Compound Interest Calculator" and "The Power of Compounding" (investor.gov)',
+          ],
+        },
       ],
       quiz: [
         {
@@ -223,6 +236,13 @@ const track1: Track = {
         {
           type: 'paragraph',
           text: 'When you set your **risk tolerance** in Halo, you\'re deciding where on this spectrum you want to sit. Higher risk tolerance → optimizer targets higher return portfolios. Lower risk tolerance → optimizer targets more stable portfolios.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Aswath Damodaran (NYU Stern), "Historical Returns on Stocks, Bonds and Bills" data series (pages.stern.nyu.edu/~adamodar)',
+            'U.S. Securities and Exchange Commission, Investor.gov, "Assessing and Managing Risk" (investor.gov)',
+          ],
         },
       ],
       quiz: [
@@ -299,6 +319,13 @@ const track1: Track = {
         {
           type: 'paragraph',
           text: 'The optimizer doesn\'t just look at each stock individually. It looks at the **covariance matrix**: how every stock in your portfolio moves relative to every other stock. It then finds the combination of weights that gives you the most return for the least risk, taking all those relationships into account.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Markowitz, H. (1952). "Portfolio Selection." The Journal of Finance, 7(1) — the original mathematical case for diversification.',
+            'U.S. Securities and Exchange Commission, Investor.gov, "Diversification" (investor.gov)',
+          ],
         },
       ],
       quiz: [
@@ -384,6 +411,13 @@ const track1: Track = {
           type: 'paragraph',
           text: 'How many different industries your portfolio spans. More sectors = more diversified.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Sharpe, W.F. (1994). "The Sharpe Ratio." The Journal of Portfolio Management, 21(1).',
+            'Hirschman, A.O. (1964). "The Paternity of an Index." The American Economic Review, 54(5) — origin of the Herfindahl-Hirschman concentration index.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -413,7 +447,7 @@ const track1: Track = {
       ],
     },
     {
-      id: 5,
+      id: 6,
       title: 'Know Your Building Blocks: S&P 500, Nasdaq 100 Direct, and Bond Ladders',
       content: [
         {
@@ -488,6 +522,14 @@ const track1: Track = {
         {
           type: 'callout',
           text: 'Everything above is background you\'ll hear referenced constantly. Halo itself is the tool where you do the actual work: pick your stocks, and let the optimizer find the ideal weights between them.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'S&P Dow Jones Indices, "S&P 500 Index Methodology" (spglobal.com/spdji)',
+            'Nasdaq, Inc., "Nasdaq-100 Index Methodology" (nasdaq.com)',
+            'U.S. Department of the Treasury, TreasuryDirect, "Treasury Bonds" and building a bond ladder (treasurydirect.gov)',
+          ],
         },
       ],
       quiz: [
@@ -579,6 +621,13 @@ const track2: Track = {
           type: 'callout',
           text: 'Halo\'s Risk Assessment questionnaire, which you can take from the home screen, specifically checks whether your reaction to a hypothetical drop or your comfort with volatility shows signs of loss aversion, and flags it in your results if it does.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Kahneman, D. & Tversky, A. (1979). "Prospect Theory: An Analysis of Decision under Risk." Econometrica, 47(2) — origin of loss aversion.',
+            'Shefrin, H. & Statman, M. (1985). "The Disposition to Sell Winners Too Early and Ride Losers Too Long." The Journal of Finance, 40(3).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -655,6 +704,13 @@ const track2: Track = {
           type: 'callout',
           text: 'Halo\'s Risk Assessment questionnaire also checks for overconfidence directly: describing yourself as an experienced investor while also picking the highest-risk answer on every question flags overconfidence as a bias to watch for in your results.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Barber, B.M. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth: The Common Stock Investment Performance of Individual Investors." The Journal of Finance, 55(2).',
+            'French, K.R. & Poterba, J.M. (1991). "Investor Diversification and International Equity Markets." The American Economic Review, 81(2) — foundational home bias study.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -726,6 +782,13 @@ const track2: Track = {
         {
           type: 'paragraph',
           text: 'Halo builds your portfolio from a covariance matrix and optimization objective, not from whatever asset happens to be trending. Because the optimizer weighs every asset\'s expected return against its risk and its correlation with everything else you hold, a single hot performer will not automatically dominate your portfolio unless it genuinely improves your overall risk-adjusted return.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Sirri, E.R. & Tufano, P. (1998). "Costly Search and Mutual Fund Flows." The Journal of Finance, 53(5) — fund flows chasing past returns.',
+            'Bikhchandani, S., Hirshleifer, D., & Welch, I. (1992). "A Theory of Fads, Fashion, Custom, and Cultural Change as Informational Cascades." Journal of Political Economy, 100(5).',
+          ],
         },
       ],
       quiz: [
@@ -803,6 +866,14 @@ const track2: Track = {
           type: 'callout',
           text: "Halo's Risk Assessment questionnaire checks for anchoring too: a long time horizon paired with answers focused on capital preservation flags anchoring to overly conservative expectations as a bias worth watching.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Tversky, A. & Kahneman, D. (1974). "Judgment under Uncertainty: Heuristics and Biases." Science, 185(4157) — origin of the anchoring heuristic.',
+            'Thaler, R.H. (1999). "Mental Accounting Matters." Journal of Behavioral Decision Making, 12(3).',
+            'Thaler, R.H. & Johnson, E.J. (1990). "Gambling with the House Money and Trying to Break Even." Management Science, 36(6) — origin of the "house money" effect.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -874,6 +945,13 @@ const track2: Track = {
         {
           type: 'paragraph',
           text: "This is the entire philosophy behind Halo. You set your risk tolerance and optimization objective once, in advance. The optimizer computes the target allocation from data, not headlines. The drift tracker tells you exactly when a rebalance is actually warranted, using a band you set ahead of time. Every bias in this track (loss aversion, overconfidence, herding, anchoring) loses most of its power once the decision has already been made by a rules-based system instead of by you in the heat of the moment.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'DALBAR, Inc., "Quantitative Analysis of Investor Behavior" (QAIB), annual study (dalbar.com)',
+            'Morningstar, "Mind the Gap" annual investor returns study (morningstar.com)',
+          ],
         },
       ],
       quiz: [
@@ -964,6 +1042,12 @@ const track3: Track = {
           type: 'callout',
           text: "Halo's optimizer solves for exactly this: the mix of weights that gives you the best return-for-risk trade-off, using this same return/variance math scaled up to however many assets you hold. The next module covers how it decides which mix is actually \"best.\"",
         },
+        {
+          type: 'sources',
+          items: [
+            'Markowitz, H. (1952). "Portfolio Selection." The Journal of Finance, 7(1) — origin of mean-variance portfolio theory.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1042,6 +1126,13 @@ const track3: Track = {
           type: 'callout',
           text: 'Halo\'s "Max Sharpe" objective solves exactly this optimization automatically across as many assets as you hold, and its Efficient Frontier chart plots this exact curve for your actual portfolio.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Sharpe, W.F. (1964). "Capital Asset Prices: A Theory of Market Equilibrium under Conditions of Risk." The Journal of Finance, 19(3) — tangency portfolio and the capital market line.',
+            'Sharpe, W.F. (1994). "The Sharpe Ratio." The Journal of Portfolio Management, 21(1).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1115,6 +1206,13 @@ const track3: Track = {
         {
           type: 'callout',
           text: 'Halo computes your full covariance matrix automatically and reports concentration (HHI) and effective holdings, so you can see whether you\'re actually diversified or just holding a lot of similar things.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Statman, M. (1987). "How Many Stocks Make a Diversified Portfolio?" Journal of Financial and Quantitative Analysis, 22(3).',
+            'Markowitz, H. (1952). "Portfolio Selection." The Journal of Finance, 7(1).',
+          ],
         },
       ],
       quiz: [
@@ -1193,6 +1291,13 @@ const track3: Track = {
           type: 'callout',
           text: 'This is exactly why Halo lets you choose the risk model (Sample, Ledoit-Wolf shrinkage, EWMA, or PCA factor) instead of hardcoding raw sample covariance.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Ledoit, O. & Wolf, M. (2004). "Honey, I Shrunk the Sample Covariance Matrix." The Journal of Portfolio Management, 30(4).',
+            'Ledoit, O. & Wolf, M. (2003). "Improved Estimation of the Covariance Matrix of Stock Returns with an Application to Portfolio Selection." Journal of Empirical Finance, 10(5).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1268,6 +1373,12 @@ const track3: Track = {
         {
           type: 'callout',
           text: 'Halo offers Black-Litterman return estimates as an alternative to plugging in raw historical averages, specifically to avoid the instability shown above.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Black, F. & Litterman, R. (1992). "Global Portfolio Optimization." Financial Analysts Journal, 48(5).',
+          ],
         },
       ],
       quiz: [
@@ -1349,6 +1460,13 @@ const track3: Track = {
           type: 'callout',
           text: "Every objective above (Min Variance, Max Sharpe, Target Return/Risk, Risk Parity, Max Diversification, CVaR, Net-of-Cost) is selectable directly in Halo's optimizer. You've just learned what each one is actually doing under the hood.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Rockafellar, R.T. & Uryasev, S. (2000). "Optimization of Conditional Value-at-Risk." Journal of Risk, 2(3) — origin of CVaR optimization.',
+            'Qian, E. (2005). "Risk Parity Portfolios: Efficient Portfolios Through True Diversification." PanAgora Asset Management research paper.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1427,6 +1545,13 @@ const track4: Track = {
           type: 'callout',
           text: 'Every optimized portfolio shows its Sharpe ratio on the results screen, the Efficient Frontier chart marks the exact "Max Sharpe" point among every mix that was possible, and Max Sharpe is one of the optimizer\'s built-in objectives.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Sharpe, W.F. (1966). "Mutual Fund Performance." The Journal of Business, 39(1) — introduces the reward-to-variability ratio.',
+            'Sharpe, W.F. (1994). "The Sharpe Ratio." The Journal of Portfolio Management, 21(1).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1504,6 +1629,13 @@ const track4: Track = {
           type: 'callout',
           text: "Backtesting your portfolio against a benchmark reports both alpha and beta side by side, so you can see how much of your performance came from market exposure versus how much was genuinely additive.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Sharpe, W.F. (1964). "Capital Asset Prices: A Theory of Market Equilibrium under Conditions of Risk." The Journal of Finance, 19(3) — origin of beta in the CAPM.',
+            'Jensen, M.C. (1968). "The Performance of Mutual Funds in the Period 1945-1964." The Journal of Finance, 23(2) — origin of "Jensen\'s alpha."',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1567,6 +1699,13 @@ const track4: Track = {
         {
           type: 'callout',
           text: 'Every portfolio result reports annualized volatility directly, and it\'s the risk axis on the Efficient Frontier chart: every point on that curve is a real (volatility, return) pair.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Bodie, Z., Kane, A., & Marcus, A.J. Investments (McGraw-Hill) — standard treatment of return/volatility annualization.',
+            'CFA Institute, CFA Program Curriculum, "Quantitative Methods" — square-root-of-time volatility scaling.',
+          ],
         },
       ],
       quiz: [
@@ -1640,6 +1779,12 @@ const track4: Track = {
           type: 'callout',
           text: "Backtesting a portfolio charts its drawdown curve directly alongside its growth curve, and the metrics table reports Calmar ratio next to Sharpe so you can compare how each portfolio handled its worst stretch.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Young, T.W. (1991). "Calmar Ratio: A Smoother Tool." Futures Magazine — origin of the Calmar ratio.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1711,6 +1856,13 @@ const track4: Track = {
         {
           type: 'callout',
           text: 'Every portfolio breakdown reports Concentration (HHI) and Effective Holdings directly, right alongside volatility and Sharpe ratio, so you can see whether your allocation is actually spread out or just looks that way on the weight table.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Rhoades, S.A. (1993). "The Herfindahl-Hirschman Index." Federal Reserve Bulletin, 79.',
+            'Hirschman, A.O. (1964). "The Paternity of an Index." The American Economic Review, 54(5).',
+          ],
         },
       ],
       quiz: [
@@ -1793,6 +1945,13 @@ const track4: Track = {
           type: 'callout',
           text: 'A full backtest report puts CAGR, Volatility, Sharpe, Sortino, Max Drawdown, Calmar, Alpha, Beta, and Information Ratio side by side in one table, every metric from this entire track, on your own portfolio.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Sortino, F.A. & van der Meer, R. (1991). "Downside Risk." The Journal of Portfolio Management, 17(4) — origin of the Sortino ratio.',
+            'Goodwin, T.H. (1998). "The Information Ratio." Financial Analysts Journal, 54(4).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1872,6 +2031,13 @@ const track5: Track = {
           type: 'callout',
           text: "The optimizer takes a list of tickers as a given input. Everything upstream of that — why THESE tickers and not others — is the idea-generation process this module describes. Halo picks up exactly where that process ends.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Greenwald, B., Kahn, J., Sonkin, P.D., & van Biema, M. Value Investing: From Graham to Buffett and Beyond (Wiley) — fundamental research process.',
+            'Kolanovic, M. & Krishnamachari, R.T. (2017). "Big Data and AI Strategies." J.P. Morgan Research — widely cited overview of alternative data in investing.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -1939,6 +2105,13 @@ const track5: Track = {
         {
           type: 'callout',
           text: "The optimizer's output weights are position sizes. Choosing max_sharpe or target_risk as an objective is a systematic way of answering the sizing question this module describes, instead of guessing at percentages.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'Kelly, J.L. (1956). "A New Interpretation of Information Rate." Bell System Technical Journal, 35(4) — origin of the Kelly criterion.',
+            'Thorp, E.O. (2006). "The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market." Handbook of Asset and Liability Management.',
+          ],
         },
       ],
       quiz: [
@@ -2009,6 +2182,12 @@ const track5: Track = {
           type: 'callout',
           text: "Halo's optimizer currently builds long-only portfolios — every weight is a non-negative allocation, so net exposure is always 100%. Understanding net and gross exposure here is exactly what changes if a platform ever adds short positions.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Stulz, R.M. (2007). "Hedge Funds: Past, Present, and Future." Journal of Economic Perspectives, 21(2).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2078,6 +2257,13 @@ const track5: Track = {
           type: 'callout',
           text: "Halo's stress-test feature runs your portfolio against specific historical windows — the 2008 financial crisis, the 2020 COVID crash, the 2022 rate shock — for exactly this reason: a statistical risk number alone doesn't tell you what actually happens to your portfolio in a real crisis.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Jorion, P. Value at Risk: The New Benchmark for Managing Financial Risk (McGraw-Hill).',
+            'J.P. Morgan/Reuters (1996). "RiskMetrics — Technical Document," 4th edition — early standardization of VaR methodology.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2141,6 +2327,12 @@ const track5: Track = {
         {
           type: 'callout',
           text: "Halo's optimizer builds long-only portfolios, so none of this leverage or margin mechanics applies directly to what you build here — which is exactly why professionally leveraged portfolios and a long-only portfolio like the ones you build in Halo can behave so differently under stress.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'U.S. Securities and Exchange Commission, "Staff Report on Equity and Options Market Structure Conditions in Early 2021" (October 2021, sec.gov) — official account of the GameStop short squeeze.',
+          ],
         },
       ],
       quiz: [
@@ -2221,6 +2413,12 @@ const track6: Track = {
           type: 'callout',
           text: 'The optimizer itself is a systematic process: give it the same tickers, objective, and risk model twice, and it always produces the same weights — exactly the discipline described here.',
         },
+        {
+          type: 'sources',
+          items: [
+            'Grinold, R.C. & Kahn, R.N. Active Portfolio Management (McGraw-Hill) — standard reference on systematic investment processes.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2290,6 +2488,13 @@ const track6: Track = {
           type: 'callout',
           text: "Halo's factor risk model estimates covariance using shared statistical factors extracted from asset returns — the same \"characteristics investors get paid to hold\" logic, used here for risk estimation rather than stock-picking.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Fama, E.F. & French, K.R. (1992). "The Cross-Section of Expected Stock Returns." The Journal of Finance, 47(2) — value and size factors.',
+            'Jegadeesh, N. & Titman, S. (1993). "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency." The Journal of Finance, 48(1) — momentum.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2354,6 +2559,13 @@ const track6: Track = {
           type: 'callout',
           text: "Halo's backtest lets you test how a portfolio would have performed over a historical lookback window you choose — exactly the kind of horizon-dependent analysis this module describes, since the right lookback window depends on which effect you're trying to capture.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Jegadeesh, N. & Titman, S. (1993). "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency." The Journal of Finance, 48(1).',
+            'De Bondt, W.F.M. & Thaler, R. (1985). "Does the Stock Market Overreact?" The Journal of Finance, 40(3) — long-horizon reversal.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2417,6 +2629,12 @@ const track6: Track = {
         {
           type: 'callout',
           text: 'This is exactly why Halo offers multiple risk models — sample, Ledoit-Wolf shrinkage, EWMA, and factor — instead of just one. Different models respond differently to regime shifts, and no single covariance estimate is right in every environment.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Khandani, A.E. & Lo, A.W. (2007). "What Happened to the Quants in August 2007?" Journal of Investment Management, 5(4).',
+          ],
         },
       ],
       quiz: [
@@ -2484,6 +2702,12 @@ const track6: Track = {
         {
           type: 'callout',
           text: "Halo's backtest always runs on a defined historical lookback window you select, and reports the result honestly, including drawdowns, rather than only surfacing the metrics that flatter the strategy — the same discipline this module describes.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'Bailey, D.H., Borwein, J.M., López de Prado, M., & Zhu, Q.J. (2014). "Pseudo-Mathematics and Financial Charlatanism: The Effects of Backtest Overfitting on Out-of-Sample Performance." Notices of the AMS, 61(5).',
+          ],
         },
       ],
       quiz: [
@@ -2567,6 +2791,13 @@ const track7: Track = {
           type: 'callout',
           text: "This is precisely the tradeoff Halo's optimizer objectives encode: max_sharpe leans toward concentrating on the best risk-adjusted combination, while min_variance leans toward the diversification side. Picking an objective is picking a side of this debate.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Markowitz, H. (1952). "Portfolio Selection." The Journal of Finance, 7(1).',
+            'Ivković, Z., Sialm, C., & Weisbenner, S. (2008). "Portfolio Concentration and the Performance of Individual Investors." Journal of Financial and Quantitative Analysis, 43(3).',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2631,6 +2862,12 @@ const track7: Track = {
           type: 'callout',
           text: "Halo's target_return and target_risk objectives let you directly express a conviction — \"I want this level of return\" or \"I can tolerate this much risk\" — and let the optimizer solve the weighting problem, rather than eyeballing percentages yourself.",
         },
+        {
+          type: 'sources',
+          items: [
+            'Michaud, R.O. (1989). "The Markowitz Optimization Enigma: Is \'Optimized\' Optimal?" Financial Analysts Journal, 45(1) — the definitive paper on mean-variance instability from noisy inputs.',
+          ],
+        },
       ],
       quiz: [
         {
@@ -2694,6 +2931,13 @@ const track7: Track = {
         {
           type: 'callout',
           text: 'The min_variance and target_risk objectives, paired with the Ledoit-Wolf or EWMA risk models, are Halo\'s tools for reasoning about a portfolio in terms of risk contribution rather than dollar weights — the same shift in thinking this module describes.',
+        },
+        {
+          type: 'sources',
+          items: [
+            'Qian, E. (2005). "Risk Parity Portfolios: Efficient Portfolios Through True Diversification." PanAgora Asset Management research paper.',
+            'Bridgewater Associates, "The All Weather Story" (bridgewater.com).',
+          ],
         },
       ],
       quiz: [
@@ -2761,6 +3005,13 @@ const track7: Track = {
         {
           type: 'callout',
           text: "This is exactly what Halo's Invest platform rebalancing tools do: compare your current live positions to your target weights and generate the trade plan needed to bring them back in line.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'Vanguard Research, "Best Practices for Portfolio Rebalancing" (vanguard.com).',
+            'Daryanani, G. (2008). "Opportunistic Rebalancing: A New Paradigm for Wealth Managers." Journal of Financial Planning, 21(1).',
+          ],
         },
       ],
       quiz: [
@@ -2830,6 +3081,13 @@ const track7: Track = {
         {
           type: 'callout',
           text: "Halo's Pro-tier sector and position constraints exist for exactly this reason: to keep the optimizer's mathematical rigor while enforcing the real-world limits this module describes, instead of trusting an unconstrained \"best\" portfolio blindly.",
+        },
+        {
+          type: 'sources',
+          items: [
+            'Perold, A.F. (1988). "The Implementation Shortfall: Paper Versus Reality." The Journal of Portfolio Management, 14(3).',
+            'Grinold, R.C. & Kahn, R.N. Active Portfolio Management (McGraw-Hill) — constrained optimization in practice.',
+          ],
         },
       ],
       quiz: [
