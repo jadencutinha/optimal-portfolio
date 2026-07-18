@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
 import { starsForRetakes, xpForStars } from '../lib/courseProgress'
+import { CourseAssistant } from './CourseAssistant'
 import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
 interface Props {
@@ -192,9 +193,23 @@ export function ModuleLayout({
                 </div>
               )
             }
+            if (block.type === 'sources') {
+              return (
+                <div key={i} className="lesson-sources">
+                  <span className="lesson-sources-label">Sources</span>
+                  <ul className="lesson-sources-list">
+                    {(block.items ?? []).map((item, j) => (
+                      <li key={j}>{renderText(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }
             return null
           })}
         </div>
+
+        <CourseAssistant trackTitle={track.title} moduleTitle={mod.title} />
 
         <div className="quiz">
           <h2 className="quiz-heading">Check your knowledge</h2>

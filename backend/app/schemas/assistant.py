@@ -27,3 +27,14 @@ class AssistantResponse(BaseModel):
     explanation: str
     config: AssistantConfig
     result: OptimizeResponse
+
+
+class CourseAssistantRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    track_title: str | None = None
+    module_title: str | None = None
+
+
+class CourseAssistantResponse(BaseModel):
+    model: str
+    reply: str

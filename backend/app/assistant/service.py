@@ -4,7 +4,13 @@ from app.assistant.client import AssistantError, call_text, call_tool, resolved_
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.optimizer.service import OptimizationServiceError, run_optimization
-from app.schemas.assistant import AssistantConfig, AssistantRequest, AssistantResponse
+from app.schemas.assistant import (
+    AssistantConfig,
+    AssistantRequest,
+    AssistantResponse,
+    CourseAssistantRequest,
+    CourseAssistantResponse,
+)
 from app.schemas.optimize import OptimizeRequest, OptimizeResponse
 
 DEFAULT_UNIVERSE = ["AAPL", "MSFT", "GOOGL", "AMZN", "JPM", "JNJ", "XOM", "KO"]
@@ -234,4 +240,27 @@ async def run_assistant(
         explanation=explanation,
         config=config,
         result=result,
+    )
+
+
+COURSE_SYSTEM = (
+    "You are Halo's course assistant, a friendly personal-finance and investing tutor. "
+    "Answer general financial-literacy and money questions in plain English, 2-4 short "
+    "sentences: saving vs investing, emergency funds, short-term savings goals, budgeting, "
+    "how markets/indexes/bonds work, etc. You are NOT the portfolio optimizer: never "
+    "recommend specific stocks, tickers, or percentage allocations — if asked to build a "
+    "portfolio, point them to Halo's Portfolio assistant instead. When relevant, tie your "
+    "answer back to a concept from the course."
+)
+
+
+async def run_course_assistant(request: CourseAssistantRequest, settings: Settings) -> CourseAssistantResponse:
+    context = ""
+    if request.module_title:
+        context = f'The student is on the lesson "{request.module_title}"'
+        context += f' in the track "{request.track_title}".\n\n' if request.track_title else ".\n\n"
+    reply = await call_text(settings, system=COURSE_SYSTEM, user=f"{context}Student question: {request.message}")
+    return CourseAssistantResponse(
+        model=resolved_model(settings),
+        reply=reply or "I couldn't come up with an answer to that — try rephrasing.",
     )
