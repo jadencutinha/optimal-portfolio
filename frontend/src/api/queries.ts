@@ -9,6 +9,7 @@ import type {
   BacktestResponse,
   BehaviorGapRequest,
   BehaviorGapResponse,
+  BillingConfig,
   CourseAssistantRequest,
   CourseAssistantResponse,
   CourseDetail,
@@ -16,6 +17,11 @@ import type {
   ExplainResponse,
   FrontierParams,
   FrontierResponse,
+  CreateRoomResponse,
+  GameRequest,
+  GameResponse,
+  JoinRoomResponse,
+  RoomState,
   InvestAccount,
   InvestBenchmark,
   InvestHistory,
@@ -105,6 +111,65 @@ export function useSetPlan() {
   })
 }
 
+export function useGameSimulate() {
+  return useMutation({
+    mutationFn: async (request: GameRequest) =>
+      (await apiClient.post<GameResponse>('/api/game/simulate', request)).data,
+  })
+}
+
+export function useCreateRoom() {
+  return useMutation({
+    mutationFn: async (body: { host_name: string; years: number }) =>
+      (await apiClient.post<CreateRoomResponse>('/api/game/rooms', body)).data,
+  })
+}
+
+export function useJoinRoom() {
+  return useMutation({
+    mutationFn: async ({ code, name }: { code: string; name: string }) =>
+      (await apiClient.post<JoinRoomResponse>(`/api/game/rooms/${code}/join`, { name })).data,
+  })
+}
+
+export function useSetRoomPicks() {
+  return useMutation({
+    mutationFn: async ({ code, player_id, tickers }: { code: string; player_id: string; tickers: string[] }) =>
+      (await apiClient.post<RoomState>(`/api/game/rooms/${code}/picks`, { player_id, tickers })).data,
+  })
+}
+
+export function useSetReady() {
+  return useMutation({
+    mutationFn: async ({ code, player_id, ready }: { code: string; player_id: string; ready: boolean }) =>
+      (await apiClient.post<RoomState>(`/api/game/rooms/${code}/ready`, { player_id, ready })).data,
+  })
+}
+
+export function useStartRoom() {
+  return useMutation({
+    mutationFn: async ({ code, player_id }: { code: string; player_id: string }) =>
+      (await apiClient.post<RoomState>(`/api/game/rooms/${code}/start`, { player_id })).data,
+  })
+}
+
+export function useRoom(code: string | null) {
+  return useQuery({
+    queryKey: ['room', code],
+    enabled: Boolean(code),
+    refetchInterval: (query) => (query.state.data?.status === 'done' ? false : 2500),
+    queryFn: async () => (await apiClient.get<RoomState>(`/api/game/rooms/${code}`)).data,
+  })
+}
+
+export function useBillingConfig() {
+  return useQuery({
+    queryKey: ['billing', 'config'],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => (await apiClient.get<BillingConfig>('/api/billing/config')).data,
+  })
+}
+
 export function useUniverse() {
   return useQuery({
     queryKey: ['universe'],
@@ -116,6 +181,7 @@ export function usePrices(tickers: string[], enabled: boolean) {
   return useQuery({
     queryKey: ['prices', [...tickers].sort().join(',')],
     enabled: enabled && tickers.length > 0,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () =>
       (await apiClient.get<PricesResponse>('/api/prices', { params: { tickers: tickers.join(',') } })).data,
   })

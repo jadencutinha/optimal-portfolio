@@ -24,3 +24,5 @@ export const METALLIC_SERIES = [
 ]
 
 export const metallicAt = (index: number) => METALLIC_SERIES[index % METALLIC_SERIES.length]
+
+export const GAME_COLORS = ['#f0d98c', '#6fb3dd', '#2fd6a4', '#e8705f', '#c58cf0', '#f0a56f']

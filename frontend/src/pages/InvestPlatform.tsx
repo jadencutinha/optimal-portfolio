@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { Suspense, lazy, useState } from 'react'
 import {
   useCancelOrder,
@@ -46,69 +45,14 @@ const signClass = (value: number) => (value > 0 ? 'gain' : value < 0 ? 'loss' : 
 const CLOSED_ORDER_STATES = ['filled', 'canceled', 'expired', 'rejected', 'done_for_day']
 const isOpenOrder = (status: string) => !CLOSED_ORDER_STATES.includes(status)
 
-function WalletIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M3 8.5A2.5 2.5 0 0 1 5.5 6H18a2 2 0 0 1 2 2v1H6.5A2.5 2.5 0 0 0 4 11.5v5A2.5 2.5 0 0 0 6.5 19H18a2 2 0 0 0 2-2v-1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <rect x="15" y="11" width="6" height="4" rx="2" fill="currentColor" />
-    </svg>
-  )
-}
-
-function CashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="3" y="6" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.7" />
-      <circle cx="12" cy="12" r="2.6" fill="currentColor" />
-    </svg>
-  )
-}
-
-function GlobeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.7" />
-      <path
-        d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.3 3.6 8.5S14.4 18.2 12 20.5c-2.4-2.3-3.6-5.3-3.6-8.5S9.6 5.8 12 3.5z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-    </svg>
-  )
-}
-
-function TrendIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M4 16.5 9.5 11l3.5 3.5L20 7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M15 7h5v5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 interface StatProps {
   label: string
   value: string
   delta?: string
   deltaClass?: string
-  icon: ReactNode
 }
 
-function StatTile({ label, value, delta, deltaClass, icon }: StatProps) {
+function StatTile({ label, value, delta, deltaClass }: StatProps) {
   return (
     <div className="ist">
       <div className="ist__text">
@@ -118,7 +62,6 @@ function StatTile({ label, value, delta, deltaClass, icon }: StatProps) {
           {delta && <span className={`ist__delta ${deltaClass ?? ''}`}>{delta}</span>}
         </div>
       </div>
-      <span className="ist__icon">{icon}</span>
     </div>
   )
 }
@@ -284,21 +227,18 @@ export function InvestPlatform() {
                 value={usd(account.data.portfolio_value)}
                 delta={dayChange !== 0 ? `${dayChange > 0 ? '+' : ''}${pct(dayPct)} today` : undefined}
                 deltaClass={signClass(dayChange)}
-                icon={<WalletIcon />}
               />
-              <StatTile label="Cash available" value={usd(account.data.cash)} icon={<CashIcon />} />
+              <StatTile label="Cash available" value={usd(account.data.cash)} />
               <StatTile
                 label="Invested"
                 value={usd(account.data.long_market_value)}
                 delta={`${positionList.length} holding${positionList.length === 1 ? '' : 's'}`}
-                icon={<GlobeIcon />}
               />
               <StatTile
                 label="Open profit and loss"
                 value={usd(totalPl)}
                 delta={costBasis > 0 ? `${totalPl >= 0 ? '+' : ''}${pct(totalPlPct)}` : undefined}
                 deltaClass={signClass(totalPl)}
-                icon={<TrendIcon />}
               />
             </div>
           ) : null}

@@ -119,11 +119,19 @@ def rate_limited(client):
 
 
 def test_validate_reports_a_rate_limit_rather_than_blaming_the_tickers(rate_limited):
-    response = rate_limited.post("/api/tickers/validate", json={"tickers": ["AAPL", "MSFT"]})
+    # Unknown tickers still hit the provider (known universe tickers are validated for free).
+    response = rate_limited.post("/api/tickers/validate", json={"tickers": ["ZZZZ", "WXYZ"]})
     assert response.status_code == 503
     detail = response.json()["detail"]
     assert "request limit" in detail.lower()
-    assert "AAPL" not in detail
+    assert "ZZZZ" not in detail
+
+
+def test_validate_known_universe_tickers_without_the_provider(rate_limited):
+    # Even when the provider is rate limited, curated universe tickers validate for free.
+    response = rate_limited.post("/api/tickers/validate", json={"tickers": ["AAPL", "MSFT"]})
+    assert response.status_code == 200
+    assert response.json()["valid"] == ["AAPL", "MSFT"]
 
 
 def test_optimize_reports_a_rate_limit_as_503(rate_limited):

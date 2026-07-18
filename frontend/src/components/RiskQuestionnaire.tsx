@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSurface } from '../lib/useSurface'
 
 const QUESTIONS = [
   {
@@ -116,6 +117,7 @@ interface Props {
 }
 
 export function RiskQuestionnaire({ onComplete }: Props) {
+  useSurface('platform')
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
 

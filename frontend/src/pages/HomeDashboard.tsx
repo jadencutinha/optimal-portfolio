@@ -1,5 +1,4 @@
 import { Suspense, lazy } from 'react'
-import { motion } from 'framer-motion'
 import { useCourses, useSavedPortfolios } from '../api/queries'
 import type { Plan } from '../api/types'
 import { useAuth } from '../auth/useAuth'
@@ -20,6 +19,7 @@ interface Props {
   onAbout: () => void
   onManagePlan: () => void
   onUpgrade: () => void
+  onCompete: () => void
 }
 
 export function HomeDashboard({
@@ -30,6 +30,7 @@ export function HomeDashboard({
   onAbout,
   onManagePlan,
   onUpgrade,
+  onCompete,
 }: Props) {
   const { session } = useAuth()
   const portfolios = useSavedPortfolios()
@@ -113,20 +114,18 @@ export function HomeDashboard({
       <div className="home-areas">
         {areas.map((area) => (
           <button key={area.title} type="button" className="home-area" onClick={area.onOpen}>
-            {area.title === 'Learn' ? (
-              <motion.span
-                className="home-area__body-slot shared-planet"
-                layoutId="course-planet"
-                transition={{ type: 'tween', duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
-                aria-hidden="true"
-              />
-            ) : (
-              <span className="home-area__body-slot">
-                <Suspense fallback={<span className="mini-body is-fallback" aria-hidden="true" />}>
-                  <MiniBody kind={area.kind} />
-                </Suspense>
-              </span>
-            )}
+            <span className="home-area__body-slot">
+              <Suspense
+                fallback={
+                  <span
+                    className={`mini-body is-fallback${area.kind === 'moon' ? ' is-fallback--moon' : ''}`}
+                    aria-hidden="true"
+                  />
+                }
+              >
+                <MiniBody kind={area.kind} />
+              </Suspense>
+            </span>
             <span className="home-area__title">{area.title}</span>
             <span className="home-area__body">{area.body}</span>
             <span className="home-area__meta">{area.meta}</span>
@@ -134,6 +133,15 @@ export function HomeDashboard({
           </button>
         ))}
       </div>
+
+      <button type="button" className="home-compete" onClick={onCompete}>
+        <span className="home-compete__icon" aria-hidden="true">🏆</span>
+        <span className="home-compete__text">
+          <strong>Click to compete with friends</strong>
+          <span>Draft stocks with 2 to 4 players, simulate years of the market, and crown a champion.</span>
+        </span>
+        <span className="home-compete__cta">Play →</span>
+      </button>
 
       <section className="home-mission">
         <span className="home-mission__eyebrow">Our mission</span>

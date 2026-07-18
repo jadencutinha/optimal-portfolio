@@ -1,6 +1,6 @@
 from pydantic import ValidationError
 
-from app.assistant.client import AssistantError, call_text, call_tool, resolved_model
+from app.assistant.client import AssistantError, call_agent, call_text, resolved_model
 from app.config import Settings
 from app.data.provider import DataProvider
 from app.optimizer.service import OptimizationServiceError, run_optimization
@@ -46,6 +46,18 @@ EXPLAIN_SYSTEM = (
     "investor's goal, and the return-versus-risk trade-off, then end with one honest caveat. "
     "Reference the Sharpe ratio, expected return, and volatility. Do not use markdown headers "
     "or bullet points. Be concise, encouraging, and honest."
+)
+
+AGENT_SYSTEM = (
+    "You are Halo's investing assistant, friendly, knowledgeable, and conversational. "
+    "Reply naturally to whatever the user says. Greet them back when greeted, and answer general or "
+    "investing questions directly and concisely in plain English. "
+    "You also have a configure_portfolio tool that builds an optimized portfolio, but only call it when the "
+    "user clearly asks you to build, optimize, design, or suggest a portfolio or allocation. For anything "
+    "else, including greetings, small talk, and general questions, just reply with a helpful text answer and "
+    "do NOT call the tool. When you do build a portfolio, only use tickers from the provided universe, prefer "
+    "max_sharpe for growth, min_variance or target_risk for safety, risk_parity or max_diversification for "
+    "balance, and cvar for crash protection. Keep answers concise and do not use markdown headers."
 )
 
 CONFIGURE_TOOL = {
@@ -205,11 +217,14 @@ async def run_assistant(
     sectors: dict[str, str] | None = None,
 ) -> AssistantResponse:
     user_prompt = (
-        f"Investor goal:\n{request.message}\n\n"
-        f"Available tickers: {', '.join(universe)}.\n"
-        "Choose one configuration using only these tickers by calling the tool."
+        f"{request.message}\n\n"
+        f"(If, and only if, you build a portfolio, choose from these tickers: {', '.join(universe)}.)"
     )
-    tool_input = await call_tool(settings, system=CONFIG_SYSTEM, user=user_prompt, tool=CONFIGURE_TOOL)
+    tool_input, text = await call_agent(settings, system=AGENT_SYSTEM, user=user_prompt, tool=CONFIGURE_TOOL)
+
+    if tool_input is None:
+        reply = text or "I'm here to help. Ask me anything about investing, or ask me to build you a portfolio."
+        return AssistantResponse(model=resolved_model(settings), reply=reply)
 
     opt_request = build_optimize_request(tool_input, universe)
     try:
@@ -236,6 +251,7 @@ async def run_assistant(
     )
     return AssistantResponse(
         model=resolved_model(settings),
+        reply=text.strip(),
         rationale=str(tool_input.get("rationale", "")).strip(),
         explanation=explanation,
         config=config,
