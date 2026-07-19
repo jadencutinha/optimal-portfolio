@@ -12,17 +12,14 @@ import { TRACKS, type Track } from '../data/courseData'
 import { displayName } from '../lib/displayName'
 import { useSurface } from '../lib/useSurface'
 import {
-  awardXP,
   ensureTrackCompletion,
   loadMastery,
   loadProgress,
   loadStreak,
-  loadXP,
   moduleKey,
   recordMastery,
   saveProgress,
   touchStreak,
-  xpForStars,
   type CourseProgress,
   type MasteryMap,
   type StreakState,
@@ -249,7 +246,6 @@ export function CoursePage({
   const [progress, setProgress] = useState<CourseProgress>(loadProgress)
   const [certificateTrack, setCertificateTrack] = useState<Track | null>(null)
   const [mastery, setMastery] = useState<MasteryMap>(loadMastery)
-  const [xp, setXp] = useState<number>(loadXP)
   const [streak, setStreak] = useState<StreakState>(loadStreak)
   const [zoomingTrackId, setZoomingTrackId] = useState<number | null>(null)
   const [linePoints, setLinePoints] = useState<LinePoint[]>([])
@@ -328,9 +324,8 @@ export function CoursePage({
       if (prev[key]) return prev
       const next = { ...prev, [key]: true }
       saveProgress(next)
-      const stars = recordMastery(trackId, moduleId, retakes)
+      recordMastery(trackId, moduleId, retakes)
       setMastery(loadMastery())
-      setXp(awardXP(xpForStars(stars)))
       setStreak(touchStreak())
       return next
     })
@@ -373,7 +368,6 @@ export function CoursePage({
         isModuleComplete={(moduleId) => isComplete(selectedTrack.id, moduleId)}
         onModuleComplete={(moduleId, retakes) => markComplete(selectedTrack.id, moduleId, retakes)}
         getModuleStars={(moduleId) => mastery[moduleKey(selectedTrack.id, moduleId)] ?? 0}
-        xp={xp}
         streak={streak.current}
       />
     )
