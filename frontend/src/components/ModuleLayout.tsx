@@ -304,10 +304,11 @@ export function ModuleLayout({
             onClick={() => {
               if (nextModule) {
                 onSelectModule(moduleIndex + 1)
+              } else {
+                onBackToTracks()
               }
               setSidebarOpen(false)
             }}
-            disabled={!nextModule}
           >
             {nextModule ? 'Next module →' : 'Track complete'}
           </button>
