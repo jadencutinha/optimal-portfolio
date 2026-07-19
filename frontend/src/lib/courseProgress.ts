@@ -1,6 +1,5 @@
 const KEY = 'course_progress_v1'
 const COMPLETIONS_KEY = 'course_completions_v1'
-const XP_KEY = 'course_xp_v1'
 const MASTERY_KEY = 'course_mastery_v1'
 const STREAK_KEY = 'course_streak_v1'
 
@@ -61,43 +60,11 @@ export function ensureTrackCompletion(trackId: number): TrackCompletion {
   return completion
 }
 
-export function loadXP(): number {
-  try {
-    const raw = localStorage.getItem(XP_KEY)
-    return raw ? Number(raw) || 0 : 0
-  } catch {
-    return 0
-  }
-}
-
-const XP_EVENT = 'course-xp'
-
-export function awardXP(amount: number): number {
-  const next = loadXP() + amount
-  localStorage.setItem(XP_KEY, String(next))
-  window.dispatchEvent(new CustomEvent<number>(XP_EVENT, { detail: next }))
-  return next
-}
-
-// Lets components outside the one that called awardXP (e.g. the dashboard HUD) stay in sync,
-// since a localStorage write alone doesn't trigger a re-render anywhere else.
-export function onXPChange(handler: (xp: number) => void): () => void {
-  const listener = (event: Event) => handler((event as CustomEvent<number>).detail)
-  window.addEventListener(XP_EVENT, listener)
-  return () => window.removeEventListener(XP_EVENT, listener)
-}
-
 // 3 stars for a first-try perfect run, fewer for each retake it took.
 export function starsForRetakes(retakes: number): number {
   if (retakes <= 0) return 3
   if (retakes === 1) return 2
   return 1
-}
-
-export function xpForStars(stars: number): number {
-  if (stars >= 3) return 50
-  if (stars === 2) return 30
-  return 15
 }
 
 export type MasteryMap = Record<string, number>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { loadStreak, loadXP, onXPChange, touchStreak, type StreakState } from '../lib/courseProgress'
+import { loadStreak, touchStreak, type StreakState } from '../lib/courseProgress'
 import { useAnimatedNumber } from '../lib/useAnimatedNumber'
 
 import type { Plan } from '../api/types'
@@ -10,9 +10,6 @@ const PLAN_LABEL: Record<Plan, string> = {
 }
 
 export function MissionControlHUD({ plan }: { plan: Plan }) {
-  const [xpValue, setXpValue] = useState<number>(loadXP)
-  useEffect(() => onXPChange(setXpValue), [])
-  const xp = useAnimatedNumber(xpValue)
   const [streak, setStreak] = useState<StreakState>(loadStreak)
   useEffect(() => {
     setStreak(touchStreak())
@@ -25,11 +22,6 @@ export function MissionControlHUD({ plan }: { plan: Plan }) {
       <div className="hud-bar__group">
         <span className="hud-bar__label">TIER</span>
         <span className="hud-bar__value hud-bar__value--plan">{PLAN_LABEL[plan]}</span>
-      </div>
-      <div className="hud-bar__sep" aria-hidden="true" />
-      <div className="hud-bar__group">
-        <span className="hud-bar__label">XP</span>
-        <span className="hud-bar__value">{xp.toLocaleString()}</span>
       </div>
       <div className="hud-bar__sep" aria-hidden="true" />
       <div className="hud-bar__group">

@@ -1,6 +1,6 @@
-import { act, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { awardXP, loadStreak } from '../lib/courseProgress'
+import { loadStreak } from '../lib/courseProgress'
 import { MissionControlHUD } from './MissionControlHUD'
 
 beforeEach(() => {
@@ -11,12 +11,10 @@ beforeEach(() => {
 })
 
 describe('MissionControlHUD', () => {
-  it('shows the plan tier, current XP, and streak', () => {
-    awardXP(80)
+  it('shows the plan tier and streak', () => {
     render(<MissionControlHUD plan="pro" />)
 
     expect(screen.getByText('PRO')).toBeInTheDocument()
-    expect(screen.getByText('80')).toBeInTheDocument()
   })
 
   it('touches the streak on mount, so just loading the dashboard counts as a visit', () => {
@@ -24,17 +22,5 @@ describe('MissionControlHUD', () => {
     render(<MissionControlHUD plan="free" />)
 
     expect(loadStreak().current).toBe(1)
-  })
-
-  it('updates live when XP is awarded elsewhere, instead of staying stuck at its mount-time value', () => {
-    render(<MissionControlHUD plan="free" />)
-    expect(screen.getByText('0')).toBeInTheDocument()
-
-    act(() => {
-      awardXP(50)
-    })
-
-    expect(screen.getByText('50')).toBeInTheDocument()
-    expect(screen.queryByText('0')).not.toBeInTheDocument()
   })
 })
