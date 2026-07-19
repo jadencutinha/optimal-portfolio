@@ -299,7 +299,7 @@ export function OptimizerPage({ autoStart = false }: { autoStart?: boolean } = {
         <h2>Results</h2>
         {!result && !optimize.isPending && (
           <EmptyState
-            icon="◎"
+            icon={null}
             title="No portfolio yet"
             description="Configure your universe and objective, then run the optimizer to see the optimal allocation."
           />

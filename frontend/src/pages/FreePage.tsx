@@ -148,6 +148,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'anal
               ← All features
             </button>
           </div>
+          <h1 className="tool-title">{FREE_FEATURES.find((f) => f.id === feature)?.name}</h1>
           {feature === 'optimizer' && <OptimizerPage />}
           {feature === 'planner' && <PlannerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}

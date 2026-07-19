@@ -3,6 +3,7 @@ import { usePlan } from '../api/queries'
 import type { PlanResponse } from '../api/types'
 import { Loader } from '../components/Loader'
 import { NumberInput } from '../components/NumberInput'
+import { OddsOverTime } from '../components/OddsOverTime'
 import { ProjectionFan } from '../components/ProjectionFan'
 import { money, percent } from '../lib/format'
 import { useLastOptimization } from '../optimizer/useLastOptimization'
@@ -38,6 +39,7 @@ export function PlannerPage() {
       years: Math.round(years),
       target: target > 0 ? target : null,
       trials: 3000,
+      solve_confidence: 0.85,
     })
   }
 
@@ -46,7 +48,6 @@ export function PlannerPage() {
   return (
     <div className="planner">
       <div className="planner-intro">
-        <h2>Goal-based planner</h2>
         <p className="muted">
           Simulate thousands of possible futures for your portfolio to see the odds of reaching your
           goal and the risk of a deep drawdown along the way.
@@ -145,19 +146,22 @@ export function PlannerPage() {
             <p className="muted">Set your plan and run the simulation to see the fan of outcomes.</p>
           )}
           {plan.isPending && <Loader fullscreen={false} label="Running 3,000 market simulations…" />}
-          {result && <PlannerOutput result={result} />}
+          {result && <PlannerOutput result={result} monthly={monthly} />}
         </section>
       </div>
     </div>
   )
 }
 
-function PlannerOutput({ result }: { result: PlanResponse }) {
+function PlannerOutput({ result, monthly }: { result: PlanResponse; monthly: number }) {
+  const confidencePct = percent(result.solve_confidence, 0)
+  const hasGoal = result.target !== null
+
   return (
     <div className="planner-output">
       <div className="planner-stats">
         {result.prob_success !== null && (
-          <div className="planner-stat highlight">
+          <div className="planner-stat">
             <span className="planner-stat-value">{percent(result.prob_success, 0)}</span>
             <span className="planner-stat-label">chance of reaching {money(result.target ?? 0)}</span>
           </div>
@@ -180,7 +184,68 @@ function PlannerOutput({ result }: { result: PlanResponse }) {
         </div>
       </div>
 
+      {hasGoal && (
+        <div className="planner-solver">
+          <span className="planner-solver-eyebrow">What it would take</span>
+          <p className="planner-solver-lead">
+            To reach {confidencePct} confidence of hitting {money(result.target ?? 0)}
+          </p>
+          <div className="planner-solver-options">
+            <div className="planner-solver-opt">
+              <span className="planner-solver-value">
+                {result.solved_monthly !== null ? `${money(result.solved_monthly)}/mo` : 'Out of reach'}
+              </span>
+              <span className="planner-solver-note">
+                {result.solved_monthly === null
+                  ? `even large contributions fall short within ${result.years} years`
+                  : result.solved_monthly > monthly
+                    ? `up from ${money(monthly)}/mo today`
+                    : `you are already above this at ${money(monthly)}/mo`}
+              </span>
+            </div>
+            <div className="planner-solver-divider">or</div>
+            <div className="planner-solver-opt">
+              <span className="planner-solver-value">
+                {result.solved_years !== null ? `${result.solved_years} years` : '50+ years'}
+              </span>
+              <span className="planner-solver-note">
+                {result.solved_years === null
+                  ? 'not reachable within 50 years at this pace'
+                  : `keeping ${money(monthly)}/mo`}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ProjectionFan timeline={result.timeline} target={result.target} />
+
+      {result.success_over_time.length > 0 && (
+        <OddsOverTime
+          points={result.success_over_time}
+          confidence={result.solve_confidence}
+          medianMonths={result.median_months_to_goal}
+          years={result.years}
+        />
+      )}
+
+      {result.levers.length > 0 && (
+        <div className="planner-levers">
+          <span className="planner-levers-eyebrow">Move the odds</span>
+          <p className="planner-levers-sub">How each change shifts your chance of reaching the goal.</p>
+          <div className="planner-levers-row">
+            {result.levers.map((lever) => (
+              <div key={lever.label} className="planner-lever">
+                <span className="planner-lever-label">{lever.label}</span>
+                <span className={`planner-lever-delta ${lever.delta >= 0 ? 'up' : 'down'}`}>
+                  {lever.delta >= 0 ? '+' : '-'}
+                  {Math.abs(Math.round(lever.delta * 100))} pts
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <p className="provenance">
         {result.trials.toLocaleString()} simulations · {result.years} years · you invest{' '}

@@ -326,6 +326,7 @@ export interface PlanRequest {
   target?: number | null
   trials?: number
   large_drawdown?: number
+  solve_confidence?: number
   seed?: number | null
 }
 
@@ -336,6 +337,16 @@ export interface PlanPoint {
   p50: number
   p75: number
   p90: number
+}
+
+export interface SuccessPoint {
+  month: number
+  prob: number
+}
+
+export interface PlanLever {
+  label: string
+  delta: number
 }
 
 export interface PlanResponse {
@@ -352,6 +363,12 @@ export interface PlanResponse {
   p10_final: number
   p90_final: number
   timeline: PlanPoint[]
+  solve_confidence: number
+  solved_monthly: number | null
+  solved_years: number | null
+  median_months_to_goal: number | null
+  success_over_time: SuccessPoint[]
+  levers: PlanLever[]
 }
 
 export type BiasName = 'lossAversion' | 'overconfidence' | 'anchoring'

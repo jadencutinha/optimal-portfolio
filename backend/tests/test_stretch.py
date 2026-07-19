@@ -29,6 +29,69 @@ def test_monte_carlo_endpoint(client: TestClient) -> None:
     assert body["total_contributions"] == 10000 + 500 * 120
 
 
+def test_monte_carlo_includes_solver_levers_and_odds_curve(client: TestClient) -> None:
+    payload = {
+        "expected_return": 0.10,
+        "volatility": 0.15,
+        "initial": 10000,
+        "monthly_contribution": 500,
+        "years": 20,
+        "target": 500000,
+        "trials": 900,
+        "solve_confidence": 0.85,
+        "seed": 7,
+    }
+    body = client.post("/api/plan/montecarlo", json=payload).json()
+    assert body["solve_confidence"] == 0.85
+    assert {lever["label"] for lever in body["levers"]} == {
+        "Add $100 / month",
+        "Start with $5,000 more",
+        "Invest 2 more years",
+    }
+    # First-passage odds only ever grow through time.
+    probs = [point["prob"] for point in body["success_over_time"]]
+    assert probs == sorted(probs)
+    assert body["solved_years"] is None or 1 <= body["solved_years"] <= 50
+    assert body["solved_monthly"] is None or body["solved_monthly"] >= 0
+
+
+def test_solver_needs_more_contribution_for_higher_confidence() -> None:
+    from app.planner.montecarlo import solve_contribution
+
+    common = dict(
+        expected_return=0.08,
+        volatility=0.15,
+        initial=10000,
+        years=20,
+        target=400000,
+        current_monthly=500,
+        trials=1200,
+    )
+    low = solve_contribution(confidence=0.6, **common)
+    high = solve_contribution(confidence=0.9, **common)
+    assert low is not None and high is not None
+    assert high >= low
+
+
+def test_more_money_never_lowers_the_odds() -> None:
+    from app.planner.montecarlo import sensitivity_levers
+
+    levers = {
+        lever.label: lever.delta
+        for lever in sensitivity_levers(
+            expected_return=0.08,
+            volatility=0.15,
+            initial=10000,
+            monthly_contribution=500,
+            years=20,
+            target=500000,
+            trials=1500,
+        )
+    }
+    assert levers["Add $100 / month"] >= 0
+    assert levers["Start with $5,000 more"] >= 0
+
+
 def test_simulate_percentiles_ordered() -> None:
     result = simulate(
         expected_return=0.08,

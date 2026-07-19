@@ -86,7 +86,6 @@ export function SideBySidePage() {
   return (
     <div className="side-by-side">
       <div className="planner-intro">
-        <h2>Side by side</h2>
         <p className="muted">
           Optimize several portfolios at once, each with its own tickers and objective, and compare
           them on one screen. Nothing has to be saved first.
@@ -214,7 +213,7 @@ export function SideBySidePage() {
         {compare.isPending && <Loader fullscreen={false} label="Optimizing every portfolio…" />}
         {!compare.data && !compare.isPending && (
           <EmptyState
-            icon="⚖"
+            icon={null}
             title="Nothing compared yet"
             description="Configure each portfolio above, then run them together to see them side by side."
           />
