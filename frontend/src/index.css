@@ -10952,9 +10952,9 @@ body[data-surface='platform'] .hud-bar__value--plan {
   display: grid;
   place-items: center;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   border-radius: 14px;
-  border: 1px dashed rgba(212, 175, 55, 0.32);
+  border: 1px solid var(--hairline);
   background: rgba(255, 255, 255, 0.03);
   overflow: hidden;
   margin-bottom: 14px;
