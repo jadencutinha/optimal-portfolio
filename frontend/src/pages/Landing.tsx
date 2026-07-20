@@ -277,9 +277,9 @@ export function Landing() {
       <div className="hero-shot">
         <div className="hero-glow shot-glow" />
         <ShotFrame
-          src="/screenshots/optimizer.png"
-          alt="Halo optimizer, allocation donut, expected return, volatility, Sharpe ratio, and weight table"
-          tab="Halo · Optimizer"
+          src="/screenshots/home.png"
+          alt="Halo home screen with a live market ticker and three platforms, Analyze, Learn, and Invest"
+          tab="Halo · Home"
         />
       </div>
 
@@ -303,77 +303,64 @@ export function Landing() {
       </div>
 
       <div className="features-intro section-head">
-        <span className="section-eyebrow">Everything inside</span>
-        <h2>A quant desk, in the browser</h2>
-        <p>The same optimization stack a professional would use, made approachable, visual, and yours.</p>
+        <span className="section-eyebrow">Three ways in</span>
+        <h2>One app, three platforms</h2>
+        <p>Everything runs from a single home screen. Step into Analyze to build portfolios, Learn to master the theory, or Invest to put a portfolio to work with paper trading.</p>
       </div>
 
       <Showcase
-        eyebrow="Backtesting"
-        title="Prove every strategy out of sample"
-        body="Replay your portfolio through years of real history and stack it against SPY, an equal-weight basket, and 60/40, with growth, drawdown, rolling Sharpe, and a full metrics table."
-        src="/screenshots/backtest.png"
-        alt="Halo backtest, growth of $1, drawdown, rolling Sharpe charts, and a metrics table versus benchmarks"
-        tab="Halo · Backtest"
+        eyebrow="Analyze"
+        title="A full quant toolkit, one deck away"
+        body="Flip through a deck of pro tools and open the one you need. Solve for the optimal mix with the Optimizer, walk the efficient frontier, project a savings goal, compare portfolios side by side, backtest against the index, and stress test through past crises."
+        src="/screenshots/analyze.png"
+        alt="Halo Analyze workspace showing the Pro toolkit card deck with Optimizer, Frontier Walk, AI Assistant, and Goal Planner"
+        tab="Halo · Analyze"
       />
 
       <div className="spot-rows">
         <SpotlightRow
-          eyebrow="Efficient frontier"
-          title="See the whole risk and return trade-off"
-          body="Every portfolio is plotted on its efficient frontier, with the min-variance and max-Sharpe points marked and a full risk X-ray of your result."
+          eyebrow="Learn"
+          title="Chart a route through the whole curriculum"
+          body="Work through the hidden curriculum of investing as a map of sectors, from money fundamentals to behavioral finance to portfolio optimization. Clear one sector to unlock the next."
           bullets={[
-            'Min-variance, max-Sharpe, and your portfolio, side by side',
-            'Concentration, effective holdings, and largest position',
-            'Sector breakdown at a glance',
+            'Seven sectors from beginner to advanced',
+            'Short interactive modules with knowledge checks',
+            'Earn a verifiable certificate as you go',
           ]}
-          src="/screenshots/frontier.png"
-          alt="Halo efficient frontier chart with an optimized-portfolio risk breakdown and sector allocation"
-          tab="Halo · Efficient frontier"
+          src="/screenshots/learn-map.png"
+          alt="Halo Learn galaxy map with sectors like Foundations and Mindset laid out as a route"
+          tab="Halo · Learn"
         />
         <SpotlightRow
           reverse
-          eyebrow="Goal planner"
-          title="Plan for a number that actually matters"
-          body="Simulate thousands of possible futures for your plan and see the odds of hitting your goal, plus the risk of a deep drawdown on the way there."
+          eyebrow="Invest"
+          title="Put a portfolio to work, risk free"
+          body="Take a saved portfolio into a paper account with $100,000 of simulated cash and real market prices. Trade it, track your profit and loss, and watch how the weights drift over time."
           bullets={[
-            'Monte Carlo projections with a likely-range fan',
-            'Probability of reaching your target',
-            'Contributions, horizon, and starting balance',
+            'Paper account with real market prices and no real money',
+            'Live portfolio value, cash, and open profit and loss',
+            'No trading fee on Pro',
           ]}
-          src="/screenshots/planner.png"
-          alt="Halo goal-based planner with Monte Carlo projected outcomes and probability of reaching the goal"
-          tab="Halo · Goal planner"
-        />
-        <SpotlightRow
-          eyebrow="Live tracking"
-          title="Know exactly when to rebalance"
-          body="Save a portfolio and Halo watches how its weights drift as prices move and tells you when a position has wandered outside your band."
-          bullets={[
-            'Per-holding drift versus target',
-            'Rebalance-band alerts',
-            'Turnover needed to get back on track',
-          ]}
-          src="/screenshots/tracker.png"
-          alt="Halo live tracking and rebalance alerts with per-holding drift versus target weights"
-          tab="Halo · Tracker"
+          src="/screenshots/invest.png"
+          alt="Halo Invest simulator with a paper account showing portfolio value, cash available, and open profit and loss"
+          tab="Halo · Invest"
         />
       </div>
 
       <section className="learn-band">
         <SpotlightRow
           reverse
-          eyebrow="Learn as you invest"
-          title="From saving basics to the math hedge funds use"
-          body="Three guided tracks build on each other, from money fundamentals to behavioral finance to portfolio optimization. Each has short modules, knowledge checks, and a certificate at the end."
+          eyebrow="Inside every module"
+          title="Bite-sized lessons that actually stick"
+          body="Each module is a short read with the core idea up front, worked examples, and a knowledge check before you move on. Read Saving vs Investing in a minute, then keep building toward the math hedge funds use."
           bullets={[
-            'Beginner to advanced, in bite-sized modules',
-            'Knowledge checks that make it stick',
-            'Earn a verifiable certificate per track',
+            'One idea per module, a minute or two each',
+            'Plain language with real examples',
+            'Progress and streak tracked as you learn',
           ]}
-          src="/screenshots/learn.png"
-          alt="Halo Learn, three learning tracks with progress and downloadable certificates"
-          tab="Halo · Learn"
+          src="/screenshots/learn-lesson.png"
+          alt="Halo lesson view showing the Money Fundamentals module list and a Saving vs Investing reading"
+          tab="Halo · Lesson"
         />
       </section>
 

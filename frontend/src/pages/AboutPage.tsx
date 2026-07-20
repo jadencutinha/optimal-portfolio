@@ -7,10 +7,10 @@ interface Member {
 }
 
 const TEAM: Member[] = [
-  { name: 'Jaden', role: 'Co-founder' },
-  { name: 'Nadia', role: 'Co-founder' },
-  { name: 'Bernardo', role: 'Co-founder' },
-  { name: 'Chloe', role: 'Chief Morale Officer' },
+  { name: 'Jaden', role: 'Co-founder', photo: '/team/jaden.png' },
+  { name: 'Nadia', role: 'Co-founder', photo: '/team/nadia.png' },
+  { name: 'Bernardo', role: 'Co-founder', photo: '/team/bernardo.png' },
+  { name: 'Chloe', role: 'Chief Morale Officer', photo: '/team/chloe.png' },
 ]
 
 export function AboutPage({ onBack }: { onBack: () => void }) {
