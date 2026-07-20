@@ -30,6 +30,27 @@ describe('progress', () => {
   })
 })
 
+// JSON.parse throws a real runtime error on malformed input, and localStorage
+// content isn't type-checked by TypeScript at all -- it's just a string that
+// could have been corrupted, truncated, or hand-edited. Each loader wraps its
+// parse in try/catch specifically to survive that; these tests prove it.
+describe('malformed localStorage data', () => {
+  it('loadProgress falls back to {} instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_progress_v1', '{not valid json')
+    expect(loadProgress()).toEqual({})
+  })
+
+  it('loadMastery falls back to {} instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_mastery_v1', '{not valid json')
+    expect(loadMastery()).toEqual({})
+  })
+
+  it('loadStreak falls back to a fresh streak instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_streak_v1', '{not valid json')
+    expect(loadStreak()).toEqual({ current: 0, longest: 0, lastActiveDate: null })
+  })
+})
+
 describe('ensureTrackCompletion', () => {
   it('creates a completion record the first time and reuses it after', () => {
     const first = ensureTrackCompletion(2)
