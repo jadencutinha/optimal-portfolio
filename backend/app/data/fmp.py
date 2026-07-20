@@ -76,6 +76,12 @@ class FMPProvider(DataProvider):
                 await asyncio.sleep(0.5 * (attempt + 1))
                 continue
 
+            if response.status_code == 402:
+                logger.warning(
+                    "FMP symbol %s is not available on the current plan (HTTP 402); skipping it.", ticker
+                )
+                return None
+
             if response.status_code in (401, 403):
                 raise ProviderUnavailable(
                     "The market data provider rejected the API key. Check FMP_API_KEY in your environment."
