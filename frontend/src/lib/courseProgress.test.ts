@@ -1,18 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  awardXP,
   ensureTrackCompletion,
   loadMastery,
   loadProgress,
   loadStreak,
-  loadXP,
   moduleKey,
-  onXPChange,
   recordMastery,
   saveProgress,
   starsForRetakes,
   touchStreak,
-  xpForStars,
 } from './courseProgress'
 
 beforeEach(() => {
@@ -34,6 +30,27 @@ describe('progress', () => {
   })
 })
 
+// JSON.parse throws a real runtime error on malformed input, and localStorage
+// content isn't type-checked by TypeScript at all -- it's just a string that
+// could have been corrupted, truncated, or hand-edited. Each loader wraps its
+// parse in try/catch specifically to survive that; these tests prove it.
+describe('malformed localStorage data', () => {
+  it('loadProgress falls back to {} instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_progress_v1', '{not valid json')
+    expect(loadProgress()).toEqual({})
+  })
+
+  it('loadMastery falls back to {} instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_mastery_v1', '{not valid json')
+    expect(loadMastery()).toEqual({})
+  })
+
+  it('loadStreak falls back to a fresh streak instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_streak_v1', '{not valid json')
+    expect(loadStreak()).toEqual({ current: 0, longest: 0, lastActiveDate: null })
+  })
+})
+
 describe('ensureTrackCompletion', () => {
   it('creates a completion record the first time and reuses it after', () => {
     const first = ensureTrackCompletion(2)
@@ -50,46 +67,18 @@ describe('ensureTrackCompletion', () => {
   })
 })
 
-describe('xp', () => {
-  it('starts at 0 and accumulates across awards', () => {
-    expect(loadXP()).toBe(0)
-    awardXP(50)
-    expect(loadXP()).toBe(50)
-    awardXP(30)
-    expect(loadXP()).toBe(80)
-  })
-
-  it('notifies subscribers with the running total, not just the delta', () => {
-    const handler = vi.fn()
-    const unsubscribe = onXPChange(handler)
-
-    awardXP(50)
-    awardXP(15)
-
-    expect(handler).toHaveBeenNthCalledWith(1, 50)
-    expect(handler).toHaveBeenNthCalledWith(2, 65)
-
-    unsubscribe()
-    awardXP(100)
-    expect(handler).toHaveBeenCalledTimes(2)
-  })
-})
-
-describe('starsForRetakes / xpForStars', () => {
-  it('gives 3 stars and 50 XP for a first-try perfect run', () => {
+describe('starsForRetakes', () => {
+  it('gives 3 stars for a first-try perfect run', () => {
     expect(starsForRetakes(0)).toBe(3)
-    expect(xpForStars(3)).toBe(50)
   })
 
-  it('gives 2 stars and 30 XP after one retake', () => {
+  it('gives 2 stars after one retake', () => {
     expect(starsForRetakes(1)).toBe(2)
-    expect(xpForStars(2)).toBe(30)
   })
 
-  it('gives 1 star and 15 XP after two or more retakes', () => {
+  it('gives 1 star after two or more retakes', () => {
     expect(starsForRetakes(2)).toBe(1)
     expect(starsForRetakes(5)).toBe(1)
-    expect(xpForStars(1)).toBe(15)
   })
 })
 

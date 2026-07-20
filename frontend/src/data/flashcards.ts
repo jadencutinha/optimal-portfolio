@@ -100,6 +100,56 @@ export const FLASHCARDS: Flashcard[] = [
     definition: "Short for Conditional Value at Risk: the average loss you'd expect in the worst-case scenarios, not just everyday swings.",
     category: 'Portfolio Optimization',
   },
+  {
+    term: 'Risk Parity',
+    definition: 'An allocation approach that gives each asset an equal contribution to overall portfolio risk, rather than an equal dollar weight.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Max Diversification',
+    definition: "An optimization goal that maximizes the ratio between individual holdings' average volatility and the portfolio's overall volatility.",
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Minimum CVaR',
+    definition: 'An optimization approach that minimizes expected loss in worst-case scenarios, rather than minimizing everyday volatility.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Hierarchical Risk Parity (HRP)',
+    definition: 'A portfolio construction method that clusters similar assets together before allocating risk, avoiding the need to invert a covariance matrix.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Target Return',
+    definition: 'An optimization goal that finds the lowest-risk portfolio that still hits a specified return target.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Target Risk',
+    definition: 'An optimization goal that finds the highest-return portfolio that still stays within a specified risk limit.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Ledoit-Wolf Shrinkage',
+    definition: 'A technique that pulls a noisy covariance matrix estimate toward a more stable target, improving reliability when data is limited.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'EWMA',
+    definition: 'Short for Exponentially Weighted Moving Average: a way of estimating volatility and covariance that weights recent data more heavily than older data.',
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Factor Model (PCA)',
+    definition: "A way of estimating risk by summarizing many assets' movements with a handful of underlying statistical factors, found using principal component analysis.",
+    category: 'Portfolio Optimization',
+  },
+  {
+    term: 'Resampled Frontier (Michaud)',
+    definition: 'An efficient frontier built by averaging many frontiers from randomly resampled data, producing allocations less sensitive to estimation error.',
+    category: 'Portfolio Optimization',
+  },
   // Portfolio Analysis
   {
     term: 'Beta',
@@ -129,6 +179,36 @@ export const FLASHCARDS: Flashcard[] = [
   {
     term: 'Effective Holdings',
     definition: 'An estimate of how many truly independent positions a portfolio actually holds, once overlap is accounted for.',
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'CAGR',
+    definition: 'Short for Compound Annual Growth Rate: the smoothed yearly growth rate that would take an investment from its starting value to its ending value.',
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'Calmar Ratio',
+    definition: "A measure of return relative to a strategy's worst drawdown, rewarding steady growth over deep declines.",
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'Alpha',
+    definition: "The extra return a portfolio generates beyond what would be expected given its exposure to the market, or beta.",
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'Rolling Sharpe',
+    definition: "A Sharpe ratio recalculated over a moving window of time, showing how a strategy's risk-adjusted performance has changed rather than a single average.",
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'Stress Test',
+    definition: 'Checking how a portfolio would have performed during a specific historical crisis, like 2008 or the COVID crash, to reveal hidden vulnerabilities.',
+    category: 'Portfolio Analysis',
+  },
+  {
+    term: 'Benchmark',
+    definition: "A reference portfolio or index, like the S&P 500 or a 60/40 mix, used as a baseline to judge whether a strategy is actually adding value.",
     category: 'Portfolio Analysis',
   },
   // Institutional Investing
@@ -188,6 +268,16 @@ export const FLASHCARDS: Flashcard[] = [
     definition: 'Testing an investing strategy against historical data to see how it would have performed.',
     category: 'Quantitative Investing',
   },
+  {
+    term: 'Walk-Forward Testing',
+    definition: 'A backtesting method that repeatedly re-optimizes a strategy on past data and tests it on the period right after, mimicking how it would really be used.',
+    category: 'Quantitative Investing',
+  },
+  {
+    term: 'Monte Carlo Simulation',
+    definition: 'Running a strategy or plan through thousands of randomly generated future scenarios to see a range of possible outcomes, not just one guess.',
+    category: 'Quantitative Investing',
+  },
   // Capital Allocation
   {
     term: 'Rebalancing',
@@ -212,6 +302,21 @@ export const FLASHCARDS: Flashcard[] = [
   {
     term: 'Liquidity Constraint',
     definition: "Sizing a position small enough relative to its trading volume that it can actually be exited without moving the price.",
+    category: 'Capital Allocation',
+  },
+  {
+    term: 'Turnover',
+    definition: "How much of a portfolio's holdings are bought and sold over a period, relative to its size. Higher turnover usually means higher trading costs.",
+    category: 'Capital Allocation',
+  },
+  {
+    term: 'No-Trade Band',
+    definition: "A buffer around target weights within which small drifts are ignored, so the portfolio isn't rebalanced over insignificant moves.",
+    category: 'Capital Allocation',
+  },
+  {
+    term: 'Transaction Cost',
+    definition: 'The cost, usually measured in basis points, of actually buying or selling an asset, including fees and the price impact of the trade.',
     category: 'Capital Allocation',
   },
 ]

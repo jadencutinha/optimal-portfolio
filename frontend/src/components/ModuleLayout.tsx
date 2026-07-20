@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
-import { starsForRetakes, xpForStars } from '../lib/courseProgress'
+import { starsForRetakes } from '../lib/courseProgress'
 import { CourseAssistant } from './CourseAssistant'
 import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
@@ -12,7 +12,6 @@ interface Props {
   isModuleComplete: (moduleId: number) => boolean
   onModuleComplete: (moduleId: number, retakes: number) => void
   getModuleStars?: (moduleId: number) => number
-  xp?: number
   streak?: number
 }
 
@@ -51,13 +50,11 @@ export function ModuleLayout({
   isModuleComplete,
   onModuleComplete,
   getModuleStars,
-  xp,
   streak,
 }: Props) {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [retakeCount, setRetakeCount] = useState(0)
   const mod = track.modules[moduleIndex]
-  const wasAlreadyComplete = isModuleComplete(mod.id)
 
   useEffect(() => {
     setAnswers({})
@@ -100,15 +97,12 @@ export function ModuleLayout({
           ← Back to map
         </button>
         <h2 className="sidebar-track-title">{track.title}</h2>
-        {(xp !== undefined || streak !== undefined) && (
+        {streak !== undefined && streak > 0 && (
           <div className="sidebar-stats">
-            {xp !== undefined && <span className="xp-badge">{xp} XP</span>}
-            {streak !== undefined && streak > 0 && (
-              <span className="streak-badge">
-                <FlameIcon />
-                {streak} day{streak === 1 ? '' : 's'}
-              </span>
-            )}
+            <span className="streak-badge">
+              <FlameIcon />
+              {streak} day{streak === 1 ? '' : 's'}
+            </span>
           </div>
         )}
         <nav className="sidebar-module-list">
@@ -274,7 +268,6 @@ export function ModuleLayout({
               {allCorrect && (
                 <div className="quiz-mastery">
                   <StarRow stars={earnedStars} />
-                  {!wasAlreadyComplete && <span className="quiz-xp-gain">+{xpForStars(earnedStars)} XP</span>}
                 </div>
               )}
               <button
@@ -311,10 +304,11 @@ export function ModuleLayout({
             onClick={() => {
               if (nextModule) {
                 onSelectModule(moduleIndex + 1)
+              } else {
+                onBackToTracks()
               }
               setSidebarOpen(false)
             }}
-            disabled={!nextModule}
           >
             {nextModule ? 'Next module →' : 'Track complete'}
           </button>

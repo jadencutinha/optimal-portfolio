@@ -6620,7 +6620,6 @@ table.weights td {
   margin-bottom: 14px;
 }
 
-.xp-badge,
 .streak-badge {
   display: inline-flex;
   align-items: center;
@@ -6630,15 +6629,6 @@ table.weights td {
   font-size: 12.5px;
   font-weight: 600;
   white-space: nowrap;
-}
-
-.xp-badge {
-  background: rgba(224, 151, 67, 0.15);
-  border: 1px solid rgba(224, 151, 67, 0.4);
-  color: var(--accent);
-}
-
-.streak-badge {
   background: rgba(73, 145, 196, 0.14);
   border: 1px solid rgba(73, 145, 196, 0.4);
   color: var(--accent-hover);
@@ -6678,12 +6668,6 @@ table.weights td {
 .quiz-mastery .star-row svg {
   width: 15px;
   height: 15px;
-}
-
-.quiz-xp-gain {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-hover);
 }
 
 .quiz-result.celebrate {
