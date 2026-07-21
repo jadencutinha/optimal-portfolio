@@ -53,17 +53,21 @@ export function AboutPage({ onBack }: { onBack: () => void }) {
       <div className="about-grid">
         {TEAM.map((member) => (
           <article key={member.name} className="about-card">
-            <div className="about-photo">
-              {member.photo ? (
-                <img src={member.photo} alt={member.name} />
-              ) : (
-                <span className="about-photo__empty" aria-hidden="true">
-                  {member.name.charAt(0)}
-                </span>
-              )}
+            <div className="about-card__head">
+              <div className="about-photo">
+                {member.photo ? (
+                  <img src={member.photo} alt={member.name} />
+                ) : (
+                  <span className="about-photo__empty" aria-hidden="true">
+                    {member.name.charAt(0)}
+                  </span>
+                )}
+              </div>
+              <div className="about-info">
+                <h2 className="about-name">{member.name}</h2>
+                <p className="about-role">{member.role}</p>
+              </div>
             </div>
-            <h2 className="about-name">{member.name}</h2>
-            <p className="about-role">{member.role}</p>
             <p className="about-bio">{member.bio ?? '[fill out]'}</p>
           </article>
         ))}
