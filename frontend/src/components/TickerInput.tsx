@@ -89,10 +89,13 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
   const concentrated = tickers.length >= 3 && heaviest && heaviest[1] / tickers.length > 0.6
 
   const matches = useMemo(() => {
+    const pool = suggestions.filter((asset) => !tickers.includes(asset.ticker))
     const query = draft.trim().toLowerCase()
-    if (!query) return []
-    return suggestions
-      .filter((asset) => !tickers.includes(asset.ticker))
+    if (!query) {
+      const sortKey = (name: string) => name.replace(/^the\s+/i, '')
+      return [...pool].sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name)))
+    }
+    return pool
       .filter(
         (asset) => asset.ticker.toLowerCase().startsWith(query) || asset.name.toLowerCase().includes(query),
       )
@@ -101,8 +104,13 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
         const bStarts = b.ticker.toLowerCase().startsWith(query) ? 0 : 1
         return aStarts - bStarts || a.name.localeCompare(b.name)
       })
-      .slice(0, 8)
   }, [draft, suggestions, tickers])
+
+  const commit = () => {
+    const query = draft.trim()
+    if (!query) return
+    add(matches.length > 0 ? matches[0].ticker : query)
+  }
 
   return (
     <div className="field">
@@ -193,7 +201,7 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault()
-                add(matches.length > 0 ? matches[0].ticker : draft)
+                commit()
               }
             }}
           />
@@ -215,7 +223,7 @@ export function TickerInput({ tickers, suggestions, onChange }: Props) {
             </ul>
           )}
         </div>
-        <button type="button" onClick={() => add(matches[0]?.ticker ?? draft)}>
+        <button type="button" onClick={commit}>
           Add
         </button>
       </div>

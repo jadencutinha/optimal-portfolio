@@ -77,6 +77,7 @@ export default function App() {
       <main className="app-main">
         <Home />
       </main>
+      <div key={view} className="page-sweep" aria-hidden="true" />
     </div>
   )
 }

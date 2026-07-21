@@ -81,6 +81,7 @@ async def _anthropic_call(
     payload: dict = {
         "model": settings.anthropic_model,
         "max_tokens": settings.anthropic_max_tokens,
+        "thinking": {"type": "disabled"},
         "system": system,
         "messages": messages,
     }
