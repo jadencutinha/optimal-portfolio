@@ -133,7 +133,8 @@ export function ProWorkspace({
         <>
           <div className="workspace-tools">
             <button type="button" className="tour-launch" onClick={() => setShowHub(true)}>
-              ← All features
+              <span className="tour-launch__arrow" aria-hidden="true">←</span>
+              All features
             </button>
           </div>
           <h1 className="tool-title">{PRO_FEATURES.find((f) => f.id === feature)?.name}</h1>

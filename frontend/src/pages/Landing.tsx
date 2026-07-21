@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { AuthModal } from '../components/AuthModal'
+import { ReviewRail } from '../components/ReviewRail'
 
 const HeroHalo = lazy(() =>
   import('../components/HeroHalo').then((module) => ({ default: module.HeroHalo })),
@@ -237,6 +238,7 @@ export function Landing() {
         >
           <HeroHalo paused={spent} />
         </Suspense>
+        <ReviewRail />
         <div className="hero-cue" aria-hidden="true">
           <span>Scroll</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
