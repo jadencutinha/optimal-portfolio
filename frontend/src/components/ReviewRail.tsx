@@ -1,91 +1,51 @@
 interface Review {
   name: string
-  role: string
   rating: number
   quote: string
 }
 
-const LEFT_REVIEWS: Review[] = [
+const REVIEWS: Review[] = [
   {
-    name: 'Maya R.',
-    role: 'First-time investor',
+    name: 'Nindya Cutinha',
     rating: 5,
     quote:
-      'I finally understand what the efficient frontier actually is. The lessons are short and everything just clicked.',
+      'I loved the usability of the app and the multitude of features! I felt a lot more confident about my investing decisions and how to effectively use my money in the future. I would definitely recommend it!',
   },
   {
-    name: 'Devin K.',
-    role: 'Retail investor',
+    name: 'Mike Osman',
     rating: 5,
     quote:
-      'Backtested my own picks against the S&P in about two minutes. Watching my portfolio beat the index was the moment it hooked me.',
+      'I thought it was very easy to use and understand. I look forward to seeing how much it can make me. I feel like I learned so much already.',
   },
   {
-    name: 'Priya S.',
-    role: 'Pro member',
+    name: 'Sol Park',
     rating: 5,
     quote:
-      'The behavioral coach caught me over concentrating in tech and I had no idea I was doing it.',
+      'I loved the investment features of the app. It was good to understand and play with paper trading before I actually went through with real funds. I also loved the details and visuals throughout!',
   },
   {
-    name: 'Leo M.',
-    role: 'CS student',
-    rating: 4,
-    quote: 'Clean, fast and it actually teaches the why behind every number.',
-  },
-  {
-    name: 'Sofia L.',
-    role: 'Day-one user',
-    rating: 5,
-    quote: 'The paper trading account made me confident before putting in a single real dollar.',
-  },
-  {
-    name: 'Grace H.',
-    role: 'Finance major',
-    rating: 5,
-    quote: 'Finally a tool that treats investing like math and not a casino.',
-  },
-]
-
-const RIGHT_REVIEWS: Review[] = [
-  {
-    name: 'Marcus T.',
-    role: 'Weekend builder',
+    name: 'Rahel Samantrai',
     rating: 5,
     quote:
-      'Went from zero to building a real optimized portfolio in a weekend. The math is right there but it never feels heavy.',
+      'The app was very user friendly and offered a great variety of helpful features. It made investing feel a lot less intimidating and gave me more confidence in managing my finances. I would definitely recommend it to others.',
   },
   {
-    name: 'Hannah B.',
-    role: 'Long-term investor',
-    rating: 5,
-    quote: 'Stress testing through past crashes was eye opening. I rebalanced the next day.',
-  },
-  {
-    name: 'Aaron W.',
-    role: 'Pro member',
+    name: 'Violet Lee',
     rating: 5,
     quote:
-      'Best finance learning tool I have used and I have tried a lot of them. The certificate was a nice bonus.',
+      'I loved the idea and execution of the app. The space design was also top tier. Definitely going to use it to help me invest my summer income!',
   },
   {
-    name: 'Ines G.',
-    role: 'New to investing',
-    rating: 4,
-    quote: 'I love that the optimizer explains its choices instead of just handing me weights.',
-  },
-  {
-    name: 'Noah P.',
-    role: 'Verified learner',
+    name: 'Andrew Grant',
     rating: 5,
     quote:
-      'The course map makes learning feel like a game. I cleared three sectors without noticing the time.',
+      "I signed up expecting another investing app with a pretty dashboard, and instead got an actual convex optimizer that made me feel like I'd snuck into a hedge fund's back office. The Learn map is dangerously fun, I cleared three sectors before realizing I'd been studying for an hour.",
   },
   {
-    name: 'Tomas V.',
-    role: 'Retail investor',
+    name: 'Rodrigo Panigassi',
     rating: 5,
-    quote: 'The AI assistant answered my portfolio questions better than my finance professor.',
+    quote:
+      'The app was so easy to use and helped me finally understand how to properly invest. Could not recommend more highly.',
   },
 ]
 
@@ -110,9 +70,9 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ review, hidden }: { review: Review; hidden?: boolean }) {
   return (
-    <article className="review-card">
+    <article className="review-card" aria-hidden={hidden || undefined}>
       <Stars rating={review.rating} />
       <p className="review-card__quote">{review.quote}</p>
       <div className="review-card__who">
@@ -121,36 +81,23 @@ function ReviewCard({ review }: { review: Review }) {
         </span>
         <span className="review-card__meta">
           <span className="review-card__name">{review.name}</span>
-          <span className="review-card__role">{review.role}</span>
+          <span className="review-card__role">Verified user</span>
         </span>
       </div>
     </article>
   )
 }
 
-function Rail({ reviews, direction }: { reviews: Review[]; direction: 'up' | 'down' }) {
-  const trackClass =
-    direction === 'down' ? 'review-rail__track review-rail__track--down' : 'review-rail__track'
+export function ReviewRail() {
   return (
-    <div className={`review-rail review-rail--${direction === 'up' ? 'left' : 'right'}`}>
-      <div className={trackClass}>
+    <div className="review-rail" aria-label="What our users say about Halo!">
+      <div className="review-rail__track">
         {[0, 1].map((copy) =>
-          reviews.map((review) => (
-            <div key={`${copy}-${review.name}`} aria-hidden={copy === 1 ? true : undefined}>
-              <ReviewCard review={review} />
-            </div>
+          REVIEWS.map((review) => (
+            <ReviewCard key={`${copy}-${review.name}`} review={review} hidden={copy === 1} />
           )),
         )}
       </div>
-    </div>
-  )
-}
-
-export function ReviewRail() {
-  return (
-    <div className="review-rails" aria-label="What learners say about Halo!">
-      <Rail reviews={LEFT_REVIEWS} direction="up" />
-      <Rail reviews={RIGHT_REVIEWS} direction="down" />
     </div>
   )
 }

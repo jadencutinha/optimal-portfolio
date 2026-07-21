@@ -6,8 +6,8 @@ const RING_RADIUS = 2.42
 const LOGO_WIDTH = 3.0
 const LOGO_LIFT = 0.42
 const TILT_X = -1.12
-const FIT_WIDTH = 6.2
-const FIT_HEIGHT = 6.2
+const FIT_WIDTH = 6.9
+const FIT_HEIGHT = 6.9
 
 export function HeroHalo({ className, paused = false }: { className?: string; paused?: boolean }) {
   const mountRef = useRef<HTMLDivElement>(null)

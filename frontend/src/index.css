@@ -10341,62 +10341,44 @@ body[data-surface='platform'] .pl {
   }
 }
 
-/* ---------- Floating review rails around the hero halo ---------- */
-.review-rails {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-
+/* ---------- Horizontal review ticker along the bottom of the hero ---------- */
 .review-rail {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: clamp(212px, 20vw, 292px);
+  left: 0;
+  right: 0;
+  bottom: 82px;
+  z-index: 2;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
-}
-.review-rail--left {
-  left: clamp(10px, 3.4vw, 54px);
-}
-.review-rail--right {
-  right: clamp(10px, 3.4vw, 54px);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
 .review-rail__track {
   display: flex;
-  flex-direction: column;
-  padding: 14px 0;
-  animation: review-scroll-up 40s linear infinite;
+  width: max-content;
+  padding: 4px 8px;
+  animation: review-scroll-x 95s linear infinite;
   will-change: transform;
 }
-.review-rail__track--down {
-  animation-name: review-scroll-down;
-  animation-duration: 46s;
-}
 
-@keyframes review-scroll-up {
+@keyframes review-scroll-x {
   from {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   to {
-    transform: translateY(-50%);
-  }
-}
-@keyframes review-scroll-down {
-  from {
-    transform: translateY(-50%);
-  }
-  to {
-    transform: translateY(0);
+    transform: translateX(-50%);
   }
 }
 
 .review-card {
-  margin-bottom: 16px;
-  padding: 13px 15px 14px;
+  flex: none;
+  width: 340px;
+  height: 168px;
+  margin-right: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 15px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: linear-gradient(158deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
@@ -10426,15 +10408,20 @@ body[data-surface='platform'] .pl {
 .review-card__quote {
   margin: 0;
   font-size: 12.5px;
-  line-height: 1.5;
+  line-height: 1.45;
   color: rgba(231, 242, 245, 0.94);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .review-card__who {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-top: 11px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 .review-card__avatar {
   flex: 0 0 auto;
@@ -10466,9 +10453,10 @@ body[data-surface='platform'] .pl {
   color: var(--muted);
 }
 
-@media (max-width: 960px) {
-  .review-rails {
-    display: none;
+@media (max-width: 640px) {
+  .review-card {
+    width: 280px;
+    height: 176px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
