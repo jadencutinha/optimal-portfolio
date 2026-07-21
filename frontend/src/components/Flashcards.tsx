@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FLASHCARDS, type Flashcard } from '../data/flashcards'
+import { loadKnownFlashcards, saveKnownFlashcards } from '../lib/courseProgress'
 
 interface Props {
   onClose: () => void
@@ -14,11 +15,16 @@ function shuffle<T>(items: T[]): T[] {
   return copy
 }
 
+function deckFor(unknownOnly: boolean, known: Set<string>): Flashcard[] {
+  return unknownOnly ? FLASHCARDS.filter((c) => !known.has(c.term)) : FLASHCARDS
+}
+
 export function Flashcards({ onClose }: Props) {
-  const [order, setOrder] = useState<Flashcard[]>(FLASHCARDS)
+  const [known, setKnown] = useState<Set<string>>(() => loadKnownFlashcards())
+  const [unknownOnly, setUnknownOnly] = useState(false)
+  const [order, setOrder] = useState<Flashcard[]>(() => deckFor(false, known))
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
-  const [known, setKnown] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -35,31 +41,61 @@ export function Flashcards({ onClose }: Props) {
   }, [index, order.length])
 
   const card = order[index]
-  const progressPct = Math.round(((index + 1) / order.length) * 100)
+  const progressPct = order.length > 0 ? Math.round(((index + 1) / order.length) * 100) : 100
 
   function goNext() {
+    if (order.length === 0) return
     setFlipped(false)
     setIndex((i) => Math.min(i + 1, order.length - 1))
   }
 
   function goPrev() {
+    if (order.length === 0) return
     setFlipped(false)
     setIndex((i) => Math.max(i - 1, 0))
   }
 
   function markKnown() {
-    setKnown((prev) => new Set(prev).add(card.term))
-    goNext()
+    if (!card) return
+    const next = new Set(known).add(card.term)
+    setKnown(next)
+    saveKnownFlashcards(next)
+    if (unknownOnly) {
+      const remaining = deckFor(true, next)
+      setOrder(remaining)
+      setIndex((i) => Math.min(i, Math.max(remaining.length - 1, 0)))
+      setFlipped(false)
+    } else {
+      goNext()
+    }
+  }
+
+  function toggleUnknownOnly() {
+    setUnknownOnly((prev) => {
+      const next = !prev
+      setOrder(deckFor(next, known))
+      setIndex(0)
+      setFlipped(false)
+      return next
+    })
+  }
+
+  function forgetKnown() {
+    setKnown(new Set())
+    saveKnownFlashcards(new Set())
+    setOrder(deckFor(unknownOnly, new Set()))
+    setIndex(0)
+    setFlipped(false)
   }
 
   function restart({ withShuffle }: { withShuffle: boolean }) {
-    setOrder(withShuffle ? shuffle(FLASHCARDS) : FLASHCARDS)
+    const base = deckFor(unknownOnly, known)
+    setOrder(withShuffle ? shuffle(base) : base)
     setIndex(0)
     setFlipped(false)
-    setKnown(new Set())
   }
 
-  const isLast = index === order.length - 1
+  const isLast = order.length === 0 || index === order.length - 1
 
   return (
     <div className="flashcards-shell">
@@ -68,44 +104,58 @@ export function Flashcards({ onClose }: Props) {
           ← Back
         </button>
         <span className="flashcards-track-name">Course Flashcards</span>
+        <button
+          type="button"
+          className={`flashcards-filter-btn ${unknownOnly ? 'is-active' : ''}`}
+          onClick={toggleUnknownOnly}
+        >
+          Unknown only
+        </button>
       </div>
 
       <div className="flashcards-progress">
         <span className="flashcards-progress-label">
-          {index + 1} / {order.length} · {known.size} known
+          {order.length > 0 ? `${index + 1} / ${order.length}` : '0 / 0'} · {known.size} known
         </span>
         <div className="flashcards-progress-track">
           <div className="flashcards-progress-fill" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
 
-      <button
-        type="button"
-        className={`flashcard ${flipped ? 'is-flipped' : ''}`}
-        onClick={() => setFlipped((f) => !f)}
-        aria-label={flipped ? 'Showing definition, click to flip back' : 'Showing term, click to reveal definition'}
-      >
-        <div className="flashcard-inner">
-          <div className="flashcard-face flashcard-front">
-            <span className="flashcard-eyebrow">{card.category}</span>
-            <p className="flashcard-text">{card.term}</p>
-            <span className="flashcard-hint">Click or press space to flip</span>
+      {card ? (
+        <button
+          type="button"
+          className={`flashcard ${flipped ? 'is-flipped' : ''}`}
+          onClick={() => setFlipped((f) => !f)}
+          aria-label={flipped ? 'Showing definition, click to flip back' : 'Showing term, click to reveal definition'}
+        >
+          <div className="flashcard-inner">
+            <div className="flashcard-face flashcard-front">
+              <span className="flashcard-eyebrow">{card.category}</span>
+              <p className="flashcard-text">{card.term}</p>
+              <span className="flashcard-hint">Click or press space to flip</span>
+            </div>
+            <div className="flashcard-face flashcard-back">
+              <span className="flashcard-eyebrow">Definition</span>
+              <p className="flashcard-text flashcard-definition">{card.definition}</p>
+            </div>
           </div>
-          <div className="flashcard-face flashcard-back">
-            <span className="flashcard-eyebrow">Definition</span>
-            <p className="flashcard-text flashcard-definition">{card.definition}</p>
-          </div>
+        </button>
+      ) : (
+        <div className="flashcards-empty">
+          You know every card in this deck. Turn off "Unknown only" to review them again, or forget your known
+          cards to start fresh.
         </div>
-      </button>
+      )}
 
       <div className="flashcards-controls">
-        <button type="button" className="module-nav-btn" onClick={goPrev} disabled={index === 0}>
+        <button type="button" className="module-nav-btn" onClick={goPrev} disabled={!card || index === 0}>
           ← Prev
         </button>
-        <button type="button" className="flashcard-known-btn" onClick={markKnown}>
+        <button type="button" className="flashcard-known-btn" onClick={markKnown} disabled={!card}>
           {isLast ? 'Got it · Finish' : 'Got it →'}
         </button>
-        <button type="button" className="module-nav-btn" onClick={goNext} disabled={isLast}>
+        <button type="button" className="module-nav-btn" onClick={goNext} disabled={!card || isLast}>
           Next →
         </button>
       </div>
@@ -117,6 +167,11 @@ export function Flashcards({ onClose }: Props) {
         <button type="button" className="flashcards-shuffle-btn" onClick={() => restart({ withShuffle: false })}>
           Restart in order
         </button>
+        {known.size > 0 && (
+          <button type="button" className="flashcards-shuffle-btn" onClick={forgetKnown}>
+            Forget known cards
+          </button>
+        )}
       </div>
     </div>
   )

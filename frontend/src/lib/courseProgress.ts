@@ -2,6 +2,7 @@ const KEY = 'course_progress_v1'
 const COMPLETIONS_KEY = 'course_completions_v1'
 const MASTERY_KEY = 'course_mastery_v1'
 const STREAK_KEY = 'course_streak_v1'
+const KNOWN_FLASHCARDS_KEY = 'course_known_flashcards_v1'
 
 export type CourseProgress = Record<string, boolean>
 
@@ -132,4 +133,19 @@ export function touchStreak(): StreakState {
   }
   localStorage.setItem(STREAK_KEY, JSON.stringify(next))
   return next
+}
+
+// Flashcard terms the learner has marked "Got it", keyed by term text so the
+// set survives the deck being reordered or extended.
+export function loadKnownFlashcards(): Set<string> {
+  try {
+    const raw = localStorage.getItem(KNOWN_FLASHCARDS_KEY)
+    return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
+  } catch {
+    return new Set()
+  }
+}
+
+export function saveKnownFlashcards(known: Set<string>): void {
+  localStorage.setItem(KNOWN_FLASHCARDS_KEY, JSON.stringify([...known]))
 }

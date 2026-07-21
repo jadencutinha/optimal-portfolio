@@ -383,8 +383,10 @@ export function CoursePage({
         >
           ← Back to Tracks
         </button>
-        <h1 className="track-page-title">{selectedTrack.title}</h1>
-        <p className="track-page-desc">{selectedTrack.description}</p>
+        <div className="track-page-header">
+          <h1 className="track-page-title">{selectedTrack.title}</h1>
+          <p className="track-page-desc">{selectedTrack.description}</p>
+        </div>
         <Suspense fallback={<div className="constellation" />}>
           <ConstellationMap
             track={selectedTrack}
