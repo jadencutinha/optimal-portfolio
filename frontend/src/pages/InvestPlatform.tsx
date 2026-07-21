@@ -5,7 +5,6 @@ import {
   useClosePosition,
   useInvest,
   useInvestAccount,
-  useInvestBenchmark,
   useInvestHistory,
   useInvestOrders,
   useInvestPositions,
@@ -17,7 +16,6 @@ import {
   useSavedPortfolios,
   useTrade,
 } from '../api/queries'
-import { BenchmarkChart } from '../components/BenchmarkChart'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EmptyState } from '../components/EmptyState'
 import { PortfolioChart } from '../components/PortfolioChart'
@@ -73,8 +71,6 @@ export function InvestPlatform() {
   const positions = useInvestPositions()
   const [historyWindow, setHistoryWindow] = useState('1D')
   const history = useInvestHistory(historyWindow)
-  const [benchWindow, setBenchWindow] = useState('3M')
-  const benchmark = useInvestBenchmark(benchWindow)
   const orders = useInvestOrders()
   const saved = useSavedPortfolios()
   const invest = useInvest()
@@ -252,14 +248,6 @@ export function InvestPlatform() {
           ) : null}
         </div>
       </section>
-
-      <BenchmarkChart
-        data={benchmark.data}
-        window={benchWindow}
-        onWindowChange={setBenchWindow}
-        isLoading={benchmark.isLoading}
-        isError={benchmark.isError}
-      />
 
       <PortfolioChart
         points={history.data?.points ?? []}

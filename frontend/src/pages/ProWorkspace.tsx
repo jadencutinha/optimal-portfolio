@@ -9,20 +9,9 @@ import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
 import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
-import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
-import { StressPage } from './StressPage'
 
-type Feature =
-  | 'optimizer'
-  | 'frontier'
-  | 'assistant'
-  | 'planner'
-  | 'sidebyside'
-  | 'backtest'
-  | 'stress'
-  | 'behavioral'
-  | 'saved'
+type Feature = 'optimizer' | 'sidebyside' | 'backtest' | 'assistant' | 'behavioral' | 'saved'
 
 const PRO_FEATURES: HubFeature[] = [
   {
@@ -31,26 +20,6 @@ const PRO_FEATURES: HubFeature[] = [
     kicker: 'Build',
     description:
       'Construct a mathematically optimal portfolio from your tickers, with objectives, constraints, and the efficient frontier.',
-  },
-  {
-    id: 'frontier',
-    name: 'Frontier Walk',
-    kicker: 'Explore',
-    description:
-      'Drag your portfolio along the efficient frontier and watch the holdings re-form in real time. Every point on the curve is optimal.',
-  },
-  {
-    id: 'assistant',
-    name: 'AI Assistant',
-    kicker: 'Ask',
-    description:
-      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
-  },
-  {
-    id: 'planner',
-    name: 'Goal Planner',
-    kicker: 'Project',
-    description: 'Run thousands of Monte Carlo simulations to see your odds of reaching a savings goal.',
   },
   {
     id: 'sidebyside',
@@ -65,10 +34,11 @@ const PRO_FEATURES: HubFeature[] = [
     description: 'Walk your strategy through history against the index, equal weight, and a 60/40 benchmark.',
   },
   {
-    id: 'stress',
-    name: 'Stress Test',
-    kicker: 'Shock',
-    description: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock.',
+    id: 'assistant',
+    name: 'AI Assistant',
+    kicker: 'Ask',
+    description:
+      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
   },
   {
     id: 'behavioral',
@@ -124,6 +94,7 @@ export function ProWorkspace({
           title="Your Pro toolkit"
           subtitle="Drag the deck, tap a tool to focus it, or use the arrows. Open the centered tool to launch it."
           features={PRO_FEATURES}
+          initialIndex={PRO_FEATURES.findIndex((f) => f.id === feature)}
           onSelect={(id) => {
             setFeature(id as Feature)
             setShowHub(false)
@@ -139,12 +110,9 @@ export function ProWorkspace({
           </div>
           <h1 className="tool-title">{PRO_FEATURES.find((f) => f.id === feature)?.name}</h1>
           {feature === 'optimizer' && <OptimizerPage />}
-          {feature === 'frontier' && <OptimizerPage autoStart />}
-          {feature === 'assistant' && <AssistantPage />}
-          {feature === 'planner' && <PlannerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}
           {feature === 'backtest' && <BacktestPage />}
-          {feature === 'stress' && <StressPage />}
+          {feature === 'assistant' && <AssistantPage />}
           {feature === 'behavioral' && <BehavioralCoach />}
           {feature === 'saved' && <SavedPortfolios />}
         </>

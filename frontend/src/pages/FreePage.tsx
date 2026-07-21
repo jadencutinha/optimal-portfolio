@@ -6,12 +6,11 @@ import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
 import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
-import { PlannerPage } from './PlannerPage'
 import { SideBySidePage } from './SideBySidePage'
 
 const RISK_PROFILE_KEY = 'risk_profile'
 
-type Feature = 'optimizer' | 'planner' | 'sidebyside' | 'saved'
+type Feature = 'optimizer' | 'sidebyside' | 'saved'
 
 const FREE_FEATURES: HubFeature[] = [
   {
@@ -20,12 +19,6 @@ const FREE_FEATURES: HubFeature[] = [
     kicker: 'Build',
     description:
       'Construct an optimized portfolio from up to 8 tickers with Max-Sharpe or Min-Variance, and see the efficient frontier.',
-  },
-  {
-    id: 'planner',
-    name: 'Goal Planner',
-    kicker: 'Project',
-    description: 'Project your wealth with Monte Carlo simulations and see your odds of hitting a savings goal.',
   },
   {
     id: 'sidebyside',
@@ -59,13 +52,6 @@ const LOCKED_FEATURES: HubFeature[] = [
     locked: true,
   },
   {
-    id: 'stress',
-    name: 'Stress Test',
-    kicker: 'Shock',
-    description: 'See how your portfolio would have held up in 2008, the COVID crash, and the 2022 rate shock.',
-    locked: true,
-  },
-  {
     id: 'behavioral',
     name: 'Behavioral Coach',
     kicker: 'Reflect',
@@ -96,7 +82,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'anal
         <div>
           <h1>Free platform</h1>
           <p className="lead">
-            Core optimization, goal planning, and saved portfolios, all free. Upgrade to Pro for the full toolkit.
+            Core optimization, side-by-side comparison, and saved portfolios, all free. Upgrade to Pro for the full toolkit.
           </p>
         </div>
         <div className="free-header-actions">
@@ -135,6 +121,7 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'anal
           title="Your free toolkit"
           subtitle="Drag the deck, tap a tool to focus it, or use the arrows. Open the centered tool to launch it."
           features={[...FREE_FEATURES, ...LOCKED_FEATURES]}
+          initialIndex={[...FREE_FEATURES, ...LOCKED_FEATURES].findIndex((f) => f.id === feature)}
           onSelect={(id) => {
             setFeature(id as Feature)
             setShowHub(false)
@@ -151,7 +138,6 @@ export function FreePage({ onOpenRiskQ, onUpgrade, onSwitch, initialMode = 'anal
           </div>
           <h1 className="tool-title">{FREE_FEATURES.find((f) => f.id === feature)?.name}</h1>
           {feature === 'optimizer' && <OptimizerPage />}
-          {feature === 'planner' && <PlannerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}
           {feature === 'saved' && <SavedPortfolios />}
         </>

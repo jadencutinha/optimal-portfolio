@@ -767,6 +767,7 @@ export interface RoomState {
   years: number
   players: RoomPlayerState[]
   result: GameResponse | null
+  seconds_remaining?: number | null
 }
 
 export interface CreateRoomResponse {

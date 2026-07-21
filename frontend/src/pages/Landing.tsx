@@ -156,13 +156,6 @@ function BrainIcon() {
     </svg>
   )
 }
-function ShieldIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-      <path d="M12 3 20 6v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6Z" strokeLinejoin="round" />
-    </svg>
-  )
-}
 function ChatIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
@@ -189,11 +182,6 @@ const FEATURES = [
     icon: <BrainIcon />,
     title: 'Behavioral coach',
     body: 'Get flagged for loss aversion, over-concentration, and recency chasing as you build, so you invest on the math, not the mood.',
-  },
-  {
-    icon: <ShieldIcon />,
-    title: 'Stress testing',
-    body: 'Shock your portfolio through historical crises and hypothetical scenarios to see how it holds up before it has to.',
   },
   {
     icon: <TargetIcon />,
@@ -313,7 +301,7 @@ export function Landing() {
       <Showcase
         eyebrow="Analyze"
         title="A full quant toolkit, one deck away"
-        body="Flip through a deck of pro tools and open the one you need. Solve for the optimal mix with the Optimizer, walk the efficient frontier, project a savings goal, compare portfolios side by side, backtest against the index, and stress test through past crises."
+        body="Flip through a deck of pro tools and open the one you need. Solve for the optimal mix with the Optimizer, compare portfolios side by side, backtest against the index, and ask the AI assistant to explain any result in plain English."
         src="/screenshots/analyze.png"
         alt="Halo Analyze workspace showing the Pro toolkit card deck with Optimizer, Frontier Walk, AI Assistant, and Goal Planner"
         tab="Halo · Analyze"

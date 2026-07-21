@@ -70,8 +70,10 @@ def test_room_flow_create_join_start(client: TestClient) -> None:
     client.post(f"/api/game/rooms/{code}/ready", json={"player_id": host_id, "ready": True})
     client.post(f"/api/game/rooms/{code}/ready", json={"player_id": guest_id, "ready": True})
 
+    # Once everyone is ready a countdown starts and the game auto-starts when it ends.
     state = client.get(f"/api/game/rooms/{code}").json()
-    assert state["status"] == "lobby"
+    assert state["status"] == "countdown"
+    assert 0 < state["seconds_remaining"] <= 20
     assert len(state["players"]) == 2
     assert all(p["ready"] for p in state["players"])
     assert all(p["pick_count"] == 2 for p in state["players"])

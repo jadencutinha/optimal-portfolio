@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -12,6 +12,7 @@ import {
 } from '../api/queries'
 import type { GameResponse } from '../api/types'
 import { GameArena } from '../components/GameArena'
+import { GameCountdown } from '../components/GameCountdown'
 import { TickerInput } from '../components/TickerInput'
 import { extractApiError } from '../lib/errors'
 import { GAME_COLORS } from '../lib/series'
@@ -100,17 +101,6 @@ export function GamePage({ onExit }: { onExit: () => void }) {
     if (code && hostId) savePicks.mutate({ code, player_id: hostId, tickers: next })
   }
 
-  const onStart = () => {
-    if (!code || !hostId) return
-    startRoom.mutate(
-      { code, player_id: hostId },
-      {
-        onSuccess: (data) => queryClient.setQueryData(['room', code], data),
-        onError: (error) => toast(extractApiError(error, 'Could not start the game.'), 'error'),
-      },
-    )
-  }
-
   const copyLink = () => {
     if (!code) return
     const link = `${window.location.origin}/play/${code}`
@@ -124,7 +114,35 @@ export function GamePage({ onExit }: { onExit: () => void }) {
   const showingLocalResult = mode === 'local' && localResult
   const showingOnlineResult = mode === 'online' && roomState?.status === 'done' && roomState.result
   const me = roomState?.players.find((p) => p.id === hostId)
-  const allReady = Boolean(roomState && roomState.players.length >= 2 && roomState.players.every((p) => p.ready))
+  const countdown = roomState?.status === 'countdown' ? roomState.seconds_remaining ?? 0 : null
+
+  const startedRef = useRef(false)
+  useEffect(() => {
+    if (roomState?.status !== 'countdown') {
+      startedRef.current = false
+      return
+    }
+    if (
+      !startedRef.current &&
+      code &&
+      hostId &&
+      roomState.seconds_remaining != null &&
+      roomState.seconds_remaining <= 0
+    ) {
+      startedRef.current = true
+      startRoom.mutate(
+        { code, player_id: hostId },
+        {
+          onSuccess: (data) => queryClient.setQueryData(['room', code], data),
+          onError: (error) => {
+            startedRef.current = false
+            toast(extractApiError(error, 'Could not start the game.'), 'error')
+          },
+        },
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomState?.status, roomState?.seconds_remaining, code, hostId])
 
   const toggleReady = () => {
     if (!code || !hostId) return
@@ -137,8 +155,26 @@ export function GamePage({ onExit }: { onExit: () => void }) {
   return (
     <div className="game-page">
       <header className="game-head">
-        <button type="button" className="game-back" onClick={onExit}>
-          ← Home
+        <button type="button" className="switch-plan game-home" onClick={onExit}>
+          <svg className="switch-plan__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 11.2 12 4l8 7.2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M6 10.4V19a1 1 0 0 0 1 1h3.5v-4.5h3V20H17a1 1 0 0 0 1-1v-8.6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>Home</span>
         </button>
         <div className="game-head__text">
           <span className="game-eyebrow">Stock Showdown</span>
@@ -343,18 +379,13 @@ export function GamePage({ onExit }: { onExit: () => void }) {
                 ))}
               </ol>
 
-              <div className="game-setup__actions">
-                <button
-                  type="button"
-                  className="game-start"
-                  disabled={!allReady || startRoom.isPending}
-                  onClick={onStart}
-                >
-                  {startRoom.isPending ? 'Starting…' : '▶ Start the race'}
-                </button>
-              </div>
-              {!allReady && (
-                <p className="game-note">Everyone needs to lock their picks and hit ready before you can start.</p>
+              {countdown !== null ? (
+                <GameCountdown seconds={countdown} />
+              ) : (
+                <p className="game-note">
+                  Everyone locks their picks and hits ready, then a 20 second countdown starts the race
+                  automatically.
+                </p>
               )}
             </div>
           )}

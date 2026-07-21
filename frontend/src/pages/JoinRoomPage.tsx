@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useJoinRoom, useRoom, useSetReady, useSetRoomPicks, useUniverse } from '../api/queries'
 import { GameArena } from '../components/GameArena'
+import { GameCountdown } from '../components/GameCountdown'
 import { TickerInput } from '../components/TickerInput'
 import { extractApiError } from '../lib/errors'
 import { useSurface } from '../lib/useSurface'
@@ -100,6 +101,7 @@ export function JoinRoomPage({ code }: { code: string }) {
 
   return shell(
     <div className="join-card">
+      {state.status === 'countdown' && <GameCountdown seconds={state.seconds_remaining ?? 0} />}
       <p className="join-hello">You are in. Pick 3 to 5 stocks, then hit ready.</p>
       <TickerInput tickers={tickers} suggestions={suggestions} onChange={updateTickers} />
 
@@ -112,10 +114,10 @@ export function JoinRoomPage({ code }: { code: string }) {
         {me?.ready ? '✓ Ready — tap to undo' : "I'm ready"}
       </button>
 
-      {me?.ready && (
+      {me?.ready && state.status !== 'countdown' && (
         <div className="join-waiting">
           <span className="join-spinner" aria-hidden="true" />
-          Waiting for the host to start the race…
+          Waiting for everyone to ready up…
         </div>
       )}
 

@@ -157,7 +157,12 @@ export function useRoom(code: string | null) {
   return useQuery({
     queryKey: ['room', code],
     enabled: Boolean(code),
-    refetchInterval: (query) => (query.state.data?.status === 'done' ? false : 2500),
+    refetchInterval: (query) => {
+      const status = query.state.data?.status
+      if (status === 'done') return false
+      if (status === 'countdown') return 1000
+      return 2500
+    },
     queryFn: async () => (await apiClient.get<RoomState>(`/api/game/rooms/${code}`)).data,
   })
 }

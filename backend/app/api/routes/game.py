@@ -28,6 +28,7 @@ def _room_state(room: Room) -> RoomState:
         status=room.status,
         years=room.years,
         result=room.result,
+        seconds_remaining=room.seconds_remaining(),
         players=[
             RoomPlayerState(
                 id=player.id,

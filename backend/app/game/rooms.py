@@ -11,6 +11,7 @@ CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 CODE_LENGTH = 4
 ROOM_TTL_SECONDS = 3 * 3600
 MAX_PLAYERS = 6
+COUNTDOWN_SECONDS = 20
 
 
 class RoomError(Exception):
@@ -39,6 +40,26 @@ class Room:
     order: list[str]
     created_at: float
     result: GameResponse | None = None
+    starts_at: float | None = None
+
+    def _refresh_countdown(self) -> None:
+        """Start, hold, or cancel the auto-start countdown based on readiness."""
+        if self.status == "done":
+            return
+        everyone_ready = len(self.players) >= 2 and all(p.ready for p in self.players.values())
+        if everyone_ready:
+            if self.status != "countdown":
+                self.status = "countdown"
+                self.starts_at = time.time() + COUNTDOWN_SECONDS
+        else:
+            if self.status == "countdown":
+                self.status = "lobby"
+            self.starts_at = None
+
+    def seconds_remaining(self) -> int | None:
+        if self.status != "countdown" or self.starts_at is None:
+            return None
+        return max(0, int(round(self.starts_at - time.time())))
 
 
 class RoomStore:
@@ -104,6 +125,7 @@ class RoomStore:
             clean = [ticker.strip().upper() for ticker in tickers if ticker.strip()][:8]
             room.players[player_id].tickers = clean
             room.players[player_id].ready = False
+            room._refresh_countdown()
             return room
 
     async def set_ready(self, code: str, player_id: str, ready: bool) -> Room:
@@ -115,6 +137,7 @@ class RoomStore:
             if ready and not player.tickers:
                 raise RoomError("Pick at least one stock before you ready up.", 400)
             player.ready = ready
+            room._refresh_countdown()
             return room
 
     async def leave(self, code: str, player_id: str) -> Room | None:
@@ -125,6 +148,7 @@ class RoomStore:
             room.players.pop(player_id, None)
             if player_id in room.order:
                 room.order.remove(player_id)
+            room._refresh_countdown()
             return room
 
     async def set_result(self, code: str, result: GameResponse) -> Room:

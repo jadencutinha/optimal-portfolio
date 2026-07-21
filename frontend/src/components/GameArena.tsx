@@ -8,16 +8,51 @@ import { Confetti } from './Confetti'
 const usd = (value: number) =>
   value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
+function winnerReason(result: GameResponse): string {
+  const winner = result.players[result.winner_index]
+  const runnerUp = result.players
+    .filter((_, i) => i !== result.winner_index)
+    .sort((a, b) => b.median_final - a.median_final)[0]
+  const picks = winner.resolved_tickers.length ? winner.resolved_tickers : winner.tickers
+  const winPct = Math.round(winner.win_probability * 100)
+  const cagr = (winner.cagr * 100).toFixed(1)
+  const vol = Math.round(winner.volatility * 100)
+
+  const sentences: string[] = []
+  sentences.push(
+    `${winner.name}'s even split across ${picks.join(', ')} typically compounds to ${usd(
+      winner.median_final,
+    )}, about ${cagr}% a year.`,
+  )
+  sentences.push(
+    `That took first place in ${winPct}% of the ${result.meta?.simulations ?? ''} simulated runs${
+      runnerUp ? `, ahead of ${runnerUp.name}'s ${usd(runnerUp.median_final)}` : ''
+    }.`,
+  )
+  if (winner.best_ticker) {
+    sentences.push(
+      `Its strongest holding, ${winner.best_ticker}, did most of the heavy lifting, while spreading across ${picks.length} names held volatility near ${vol}% a year.`,
+    )
+  } else {
+    sentences.push(
+      `Spreading across ${picks.length} names held volatility near ${vol}% a year while still leading on the upside.`,
+    )
+  }
+  return sentences.join(' ')
+}
+
 type Phase = 'countdown' | 'lineup' | 'racing' | 'done'
 
 function Portfolio({
   player,
   color,
   highlight,
+  featured,
 }: {
   player: GamePlayerResult
   color: string
   highlight?: boolean
+  featured?: boolean
 }) {
   const resolved = player.resolved_tickers
   const weight = resolved.length ? 100 / resolved.length : 0
@@ -25,7 +60,9 @@ function Portfolio({
 
   return (
     <div
-      className={highlight ? 'game-portfolio is-winner' : 'game-portfolio'}
+      className={['game-portfolio', highlight ? 'is-winner' : '', featured ? 'is-featured' : '']
+        .filter(Boolean)
+        .join(' ')}
       style={{ '--pc': color } as CSSProperties}
     >
       <div className="game-portfolio__head">
@@ -239,27 +276,35 @@ export function GameArena({ result, actions }: { result: GameResponse; actions?:
             <span className="game-winner__crown" aria-hidden="true">
               🏆
             </span>
+            <span className="game-winner__eyebrow">Champion</span>
             <h3>{winner.name} wins!</h3>
-            <p>
-              Typically ends at {usd(winner.median_final)} from {usd(result.start_value)} ·{' '}
-              {(winner.cagr * 100).toFixed(1)}% a year · won {(winner.win_probability * 100).toFixed(0)}% of{' '}
-              {result.meta?.simulations ?? ''} runs
-              {winner.best_ticker ? ` · top pick ${winner.best_ticker}` : ''}
-            </p>
+            <p className="game-winner__why">{winnerReason(result)}</p>
 
-            <div className="game-portfolios game-portfolios--result">
-              <div className="game-portfolios__head">What each player picked</div>
-              <div className="game-portfolios__grid">
-                {result.players.map((player, i) => (
-                  <Portfolio
-                    key={player.name + i}
-                    player={player}
-                    color={GAME_COLORS[i % GAME_COLORS.length]}
-                    highlight={i === result.winner_index}
-                  />
-                ))}
-              </div>
+            <div className="game-winner__alloc">
+              <Portfolio
+                player={winner}
+                color={GAME_COLORS[result.winner_index % GAME_COLORS.length]}
+                highlight
+                featured
+              />
             </div>
+
+            {result.players.length > 1 && (
+              <div className="game-portfolios game-portfolios--result">
+                <div className="game-portfolios__head">The other portfolios</div>
+                <div className="game-portfolios__grid">
+                  {result.players.map((player, i) =>
+                    i === result.winner_index ? null : (
+                      <Portfolio
+                        key={player.name + i}
+                        player={player}
+                        color={GAME_COLORS[i % GAME_COLORS.length]}
+                      />
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
 
             {result.awards.length > 0 && (
               <div className="game-awards">

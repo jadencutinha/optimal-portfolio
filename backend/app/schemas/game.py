@@ -100,6 +100,7 @@ class RoomState(BaseModel):
     years: int
     players: list[RoomPlayerState]
     result: GameResponse | None = None
+    seconds_remaining: int | None = None
 
 
 class CreateRoomResponse(BaseModel):

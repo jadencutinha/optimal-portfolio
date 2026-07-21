@@ -16,6 +16,7 @@ interface FeatureHubProps {
   onSelect: (id: string) => void
   onLockedSelect?: (id: string) => void
   lockedLabel?: string
+  initialIndex?: number
 }
 
 const ANCHOR_PX = 44
@@ -29,8 +30,11 @@ export function FeatureHub({
   onSelect,
   onLockedSelect,
   lockedLabel = 'Pro only',
+  initialIndex = 0,
 }: FeatureHubProps) {
-  const [center, setCenter] = useState(0)
+  const [center, setCenter] = useState(
+    initialIndex >= 0 && initialIndex < features.length ? initialIndex : 0,
+  )
   const [dragPx, setDragPx] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
