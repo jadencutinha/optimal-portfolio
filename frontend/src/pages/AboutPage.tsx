@@ -99,7 +99,7 @@ export function AboutPage({ onBack }: { onBack: () => void }) {
                   </span>
                 )}
               </div>
-              <div className="about-card__id">
+              <div className="about-info">
                 <h2 className="about-name">{member.name}</h2>
                 <p className="about-role">{member.role}</p>
               </div>
