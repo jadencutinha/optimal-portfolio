@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 
 export interface HubFeature {
@@ -33,7 +33,9 @@ export function FeatureHub({
   const [center, setCenter] = useState(0)
   const [dragPx, setDragPx] = useState(0)
   const [dragging, setDragging] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
+  const selectRef = useRef<HTMLDivElement>(null)
   const startXRef = useRef(0)
   const activeRef = useRef(false)
   const movedRef = useRef(false)
@@ -42,6 +44,22 @@ export function FeatureHub({
 
   const clamp = (i: number) => Math.max(0, Math.min(features.length - 1, i))
   const go = (delta: number) => setCenter((c) => clamp(c + delta))
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onDown = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) setMenuOpen(false)
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
 
   const activate = (index: number) => {
     const feature = features[index]
@@ -115,6 +133,65 @@ export function FeatureHub({
       <div className="fhub__head">
         <h1>{title}</h1>
         {subtitle && <p className="muted">{subtitle}</p>}
+
+        <div className="fhub__select" ref={selectRef}>
+          <button
+            type="button"
+            className={`fhub__select-trigger${menuOpen ? ' is-open' : ''}`}
+            aria-haspopup="listbox"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span className="fhub__select-current">
+              <span className="fhub__select-kicker">{features[center]?.kicker}</span>
+              <span className="fhub__select-name">{features[center]?.name}</span>
+            </span>
+            <svg className="fhub__select-chevron" viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                d="M4 6l4 4 4-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {menuOpen && (
+            <ul className="fhub__select-menu" role="listbox" aria-label="Select a tool">
+              {features.map((feature, i) => (
+                <li key={feature.id} role="option" aria-selected={i === center}>
+                  <button
+                    type="button"
+                    className={`fhub__select-option${i === center ? ' is-current' : ''}${
+                      feature.locked ? ' is-locked' : ''
+                    }`}
+                    onClick={() => {
+                      setCenter(i)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="fhub__select-option-name">{feature.name}</span>
+                    {feature.locked && <span className="fhub__select-badge">{lockedLabel}</span>}
+                    {i === center && (
+                      <svg className="fhub__select-check" viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                          d="M3.5 8.5l3 3 6-7"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.9"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="fhub__stage">
@@ -142,7 +219,7 @@ export function FeatureHub({
               const rotateY = Math.max(Math.min(-offset * 9, 26), -26)
               const style: CSSProperties = {
                 transform: `translateX(${ANCHOR_PX + offset * STEP_PX + dragPx}px) translateY(-50%) translateZ(${-abs * 30}px) rotateY(${rotateY}deg) scale(${isCenter ? 1 : 0.94})`,
-                opacity: offset < 0 ? 0.2 : Math.max(0.5, 1 - offset * 0.14),
+                opacity: offset < 0 ? 0.16 : Math.max(0.18, 1 - Math.max(0, offset - 2) * 0.34),
                 zIndex: 100 - abs,
                 transition: dragging ? 'none' : undefined,
               }

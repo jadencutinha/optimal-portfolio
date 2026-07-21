@@ -5,9 +5,10 @@ import { makeMaterial, ringDisc } from './celestial/particles'
 const RING_RADIUS = 2.42
 const LOGO_WIDTH = 3.0
 const LOGO_LIFT = 0.42
+const SCENE_LIFT = 0.75
 const TILT_X = -1.12
-const FIT_WIDTH = 6.9
-const FIT_HEIGHT = 6.9
+const FIT_WIDTH = 8.0
+const FIT_HEIGHT = 8.0
 
 export function HeroHalo({ className, paused = false }: { className?: string; paused?: boolean }) {
   const mountRef = useRef<HTMLDivElement>(null)
@@ -48,7 +49,7 @@ export function HeroHalo({ className, paused = false }: { className?: string; pa
     const logo = new THREE.Mesh(logoGeometry, logoMaterial)
     logo.renderOrder = 0
     logo.visible = false
-    logo.position.y = LOGO_LIFT
+    logo.position.y = LOGO_LIFT + SCENE_LIFT
     scene.add(logo)
 
     const loader = new THREE.TextureLoader()
@@ -65,6 +66,7 @@ export function HeroHalo({ className, paused = false }: { className?: string; pa
 
     const halo = new THREE.Group()
     halo.rotation.x = TILT_X
+    halo.position.y = SCENE_LIFT
     scene.add(halo)
 
     const spin = new THREE.Group()

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../auth/useAuth'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { useSurface } from '../lib/useSurface'
@@ -111,7 +111,166 @@ export function EditProfilePage({ mode, onDone, onCancel }: Props) {
   const requiredKeys = useMemo(() => TABS.filter((tab) => tab.required).map((tab) => tab.key), [])
   const requiredDone = requiredKeys.every((key) => isComplete(key))
   const previewIndex = TABS.length
-  const onPreview = active === previewIndex
+
+  const sectionRefs = useRef<Array<HTMLElement | null>>([])
+  const setSectionRef = (index: number) => (el: HTMLElement | null) => {
+    sectionRefs.current[index] = el
+  }
+  const scrollToSection = (index: number) => {
+    setActive(index)
+    sectionRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  useEffect(() => {
+    const sections = sectionRefs.current.filter(Boolean) as HTMLElement[]
+    if (sections.length === 0) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const shown = entries.filter((entry) => entry.isIntersecting)
+        if (shown.length === 0) return
+        const topmost = shown.reduce((a, b) =>
+          a.boundingClientRect.top <= b.boundingClientRect.top ? a : b,
+        )
+        const index = Number((topmost.target as HTMLElement).dataset.index)
+        if (!Number.isNaN(index)) setActive(index)
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    )
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
+
+  const renderField = (tab: TabDef) => {
+    switch (tab.key) {
+      case 'fullName':
+        return (
+          <label className="profile-input">
+            <span>Your full name</span>
+            <input
+              type="text"
+              placeholder="Jane Doe"
+              value={form.fullName}
+              onChange={(event) => set('fullName', event.target.value)}
+            />
+          </label>
+        )
+      case 'photo':
+        return (
+          <div className="profile-photo">
+            <div className="profile-avatar" aria-hidden="true">
+              {avatar ? <img src={avatar} alt="" /> : <span>{initials}</span>}
+            </div>
+            <div className="profile-photo__actions">
+              <label className="profile-file">
+                {avatar ? 'Change photo' : 'Upload photo'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => onPickPhoto(event.target.files?.[0])}
+                />
+              </label>
+              {avatar && (
+                <button type="button" className="profile-remove" onClick={() => setAvatar('')}>
+                  Remove
+                </button>
+              )}
+              <p className="profile-hint">Square works best. Stored on this device only.</p>
+            </div>
+          </div>
+        )
+      case 'dob':
+        return (
+          <label className="profile-input">
+            <span>Date of birth</span>
+            <input
+              type="date"
+              max={new Date().toISOString().slice(0, 10)}
+              value={form.dob}
+              onChange={(event) => set('dob', event.target.value)}
+            />
+          </label>
+        )
+      case 'country':
+        return (
+          <label className="profile-input">
+            <span>Country</span>
+            <select value={form.country} onChange={(event) => set('country', event.target.value)}>
+              <option value="">Select your country</option>
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </label>
+        )
+      case 'region':
+        return (
+          <label className="profile-input">
+            <span>State or region</span>
+            <input
+              type="text"
+              placeholder="e.g. California"
+              value={form.region}
+              onChange={(event) => set('region', event.target.value)}
+            />
+          </label>
+        )
+      case 'income':
+        return (
+          <label className="profile-input">
+            <span>Your exact annual income</span>
+            <div className="profile-money">
+              <span className="profile-money__prefix" aria-hidden="true">
+                $
+              </span>
+              <input
+                type="number"
+                min={0}
+                step={1000}
+                inputMode="numeric"
+                placeholder="85000"
+                value={form.income}
+                onChange={(event) => set('income', event.target.value)}
+              />
+            </div>
+          </label>
+        )
+      case 'experience':
+        return (
+          <label className="profile-input">
+            <span>How much investing experience do you have?</span>
+            <select
+              value={form.experience}
+              onChange={(event) => set('experience', event.target.value)}
+            >
+              <option value="">Select one</option>
+              {EXPERIENCE.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+          </label>
+        )
+      case 'goal':
+        return (
+          <label className="profile-input">
+            <span>What brings you here?</span>
+            <select value={form.goal} onChange={(event) => set('goal', event.target.value)}>
+              <option value="">Select one</option>
+              {GOALS.map((goal) => (
+                <option key={goal} value={goal}>
+                  {goal}
+                </option>
+              ))}
+            </select>
+          </label>
+        )
+      default:
+        return null
+    }
+  }
 
   const statusClass = (tab: TabDef) => {
     if (isComplete(tab.key)) return 'is-done'
@@ -191,7 +350,7 @@ export function EditProfilePage({ mode, onDone, onCancel }: Props) {
               key={tab.key}
               type="button"
               className={`profile-tab ${active === index ? 'is-active' : ''} ${statusClass(tab)}`}
-              onClick={() => setActive(index)}
+              onClick={() => scrollToSection(index)}
             >
               <span className="profile-tab__dot" aria-hidden="true" />
               <span className="profile-tab__label">{tab.label}</span>
@@ -200,174 +359,53 @@ export function EditProfilePage({ mode, onDone, onCancel }: Props) {
           ))}
           <button
             type="button"
-            className={`profile-tab is-preview ${onPreview ? 'is-active' : ''}`}
-            onClick={() => setActive(previewIndex)}
+            className={`profile-tab is-preview ${active === previewIndex ? 'is-active' : ''}`}
+            onClick={() => scrollToSection(previewIndex)}
           >
             <span className="profile-tab__dot" aria-hidden="true" />
             <span className="profile-tab__label">Preview</span>
           </button>
         </nav>
 
-        <section className="profile-panel">
-          {!onPreview && (
-            <div className="profile-field">
-              <h3>{TABS[active].label}</h3>
-
-              {TABS[active].key === 'fullName' && (
-                <label className="profile-input">
-                  <span>Your full name</span>
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder="Jane Doe"
-                    value={form.fullName}
-                    onChange={(event) => set('fullName', event.target.value)}
-                  />
-                </label>
-              )}
-
-              {TABS[active].key === 'photo' && (
-                <div className="profile-photo">
-                  <div className="profile-avatar" aria-hidden="true">
-                    {avatar ? <img src={avatar} alt="" /> : <span>{initials}</span>}
-                  </div>
-                  <div className="profile-photo__actions">
-                    <label className="profile-file">
-                      {avatar ? 'Change photo' : 'Upload photo'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => onPickPhoto(event.target.files?.[0])}
-                      />
-                    </label>
-                    {avatar && (
-                      <button type="button" className="profile-remove" onClick={() => setAvatar('')}>
-                        Remove
-                      </button>
-                    )}
-                    <p className="profile-hint">Square works best. Stored on this device only.</p>
-                  </div>
-                </div>
-              )}
-
-              {TABS[active].key === 'dob' && (
-                <label className="profile-input">
-                  <span>Date of birth</span>
-                  <input
-                    type="date"
-                    max={new Date().toISOString().slice(0, 10)}
-                    value={form.dob}
-                    onChange={(event) => set('dob', event.target.value)}
-                  />
-                </label>
-              )}
-
-              {TABS[active].key === 'country' && (
-                <label className="profile-input">
-                  <span>Country</span>
-                  <select value={form.country} onChange={(event) => set('country', event.target.value)}>
-                    <option value="">Select your country</option>
-                    {COUNTRIES.map((country) => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-
-              {TABS[active].key === 'region' && (
-                <label className="profile-input">
-                  <span>State or region</span>
-                  <input
-                    type="text"
-                    placeholder="e.g. California"
-                    value={form.region}
-                    onChange={(event) => set('region', event.target.value)}
-                  />
-                </label>
-              )}
-
-              {TABS[active].key === 'income' && (
-                <label className="profile-input">
-                  <span>Your exact annual income</span>
-                  <div className="profile-money">
-                    <span className="profile-money__prefix" aria-hidden="true">$</span>
-                    <input
-                      type="number"
-                      min={0}
-                      step={1000}
-                      inputMode="numeric"
-                      placeholder="85000"
-                      value={form.income}
-                      onChange={(event) => set('income', event.target.value)}
-                    />
-                  </div>
-                </label>
-              )}
-
-              {TABS[active].key === 'experience' && (
-                <label className="profile-input">
-                  <span>How much investing experience do you have?</span>
-                  <select value={form.experience} onChange={(event) => set('experience', event.target.value)}>
-                    <option value="">Select one</option>
-                    {EXPERIENCE.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-
-              {TABS[active].key === 'goal' && (
-                <label className="profile-input">
-                  <span>What brings you here?</span>
-                  <select value={form.goal} onChange={(event) => set('goal', event.target.value)}>
-                    <option value="">Select one</option>
-                    {GOALS.map((goal) => (
-                      <option key={goal} value={goal}>
-                        {goal}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-
-              <div className="profile-field__nav">
-                {active > 0 && (
-                  <button type="button" className="profile-ghost" onClick={() => setActive(active - 1)}>
-                    ← Back
-                  </button>
-                )}
-                <button type="button" className="profile-next" onClick={() => setActive(active + 1)}>
-                  {active === TABS.length - 1 ? 'Preview →' : 'Next →'}
-                </button>
-              </div>
+        <section className="profile-panel profile-panel--scroll">
+          {TABS.map((tab, index) => (
+            <div
+              key={tab.key}
+              ref={setSectionRef(index)}
+              data-index={index}
+              className="profile-field"
+            >
+              <h3>
+                {tab.label}
+                {tab.required && <span className="profile-field__req">Required</span>}
+              </h3>
+              {renderField(tab)}
             </div>
-          )}
+          ))}
 
-          {onPreview && (
-            <div className="profile-preview">
-              <h3>Review your profile</h3>
-              <div className="profile-preview__card">
-                <div className="profile-avatar profile-avatar--lg" aria-hidden="true">
-                  {avatar ? <img src={avatar} alt="" /> : <span>{initials}</span>}
-                </div>
-                <dl className="profile-summary">
-                  {TABS.filter((tab) => tab.key !== 'photo').map((tab) => (
-                    <div key={tab.key} className={isComplete(tab.key) ? '' : 'is-empty'}>
-                      <dt>{tab.label}</dt>
-                      <dd>{displayValue(tab.key) || (tab.required ? 'Required, not set' : 'Not provided')}</dd>
-                    </div>
-                  ))}
-                </dl>
+          <div
+            ref={setSectionRef(previewIndex)}
+            data-index={previewIndex}
+            className="profile-field profile-preview"
+          >
+            <h3>Review your profile</h3>
+            <div className="profile-preview__card">
+              <div className="profile-avatar profile-avatar--lg" aria-hidden="true">
+                {avatar ? <img src={avatar} alt="" /> : <span>{initials}</span>}
               </div>
-              {!requiredDone && (
-                <p className="profile-warn">Some required fields are still empty. They are highlighted in red.</p>
-              )}
+              <dl className="profile-summary">
+                {TABS.filter((tab) => tab.key !== 'photo').map((tab) => (
+                  <div key={tab.key} className={isComplete(tab.key) ? '' : 'is-empty'}>
+                    <dt>{tab.label}</dt>
+                    <dd>{displayValue(tab.key) || (tab.required ? 'Required, not set' : 'Not provided')}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-          )}
+            {!requiredDone && (
+              <p className="profile-warn">Some required fields are still empty. They are highlighted in red.</p>
+            )}
+          </div>
         </section>
       </div>
 

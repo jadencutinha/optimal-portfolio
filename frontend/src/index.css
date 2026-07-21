@@ -2774,6 +2774,31 @@ button.primary.cert-back-btn {
   background: linear-gradient(168deg, rgba(30, 27, 21, 0.6), rgba(10, 8, 12, 0.72));
   backdrop-filter: blur(12px);
 }
+.profile-tabs {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+.profile-panel--scroll .profile-field {
+  scroll-margin-top: 96px;
+}
+.profile-panel--scroll .profile-field + .profile-field {
+  margin-top: 26px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.profile-field__req {
+  margin-left: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(224, 151, 67, 0.4);
+  border-radius: 999px;
+  padding: 2px 8px;
+  vertical-align: middle;
+}
 .profile-field h3,
 .profile-preview h3 {
   margin: 0 0 18px;
@@ -7470,6 +7495,8 @@ table.weights td {
   overflow-x: clip;
 }
 .fhub__head {
+  position: relative;
+  z-index: 5;
   text-align: center;
   margin-bottom: clamp(12px, 2vw, 20px);
 }
@@ -7482,6 +7509,145 @@ table.weights td {
   margin: 0 auto;
   max-width: 62ch;
   font-size: 14.5px;
+}
+
+/* Fancy tool picker above the deck */
+.fhub__select {
+  position: relative;
+  width: min(340px, 86vw);
+  margin: 14px auto 0;
+  text-align: left;
+}
+.fhub__select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 10px 26px -18px rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.fhub__select-trigger:hover,
+.fhub__select-trigger.is-open {
+  border-color: rgba(212, 175, 55, 0.62);
+  background: linear-gradient(160deg, rgba(212, 175, 55, 0.14), rgba(212, 175, 55, 0.03));
+}
+.fhub__select-current {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.fhub__select-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+.fhub__select-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fhub__select-chevron {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--gold-bright);
+  transition: transform 0.22s ease;
+}
+.fhub__select-trigger.is-open .fhub__select-chevron {
+  transform: rotate(180deg);
+}
+.fhub__select-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  background: rgba(14, 16, 20, 0.98);
+  box-shadow: 0 26px 60px -24px rgba(0, 0, 0, 0.9);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  animation: fhub-select-in 0.16s ease-out;
+}
+@keyframes fhub-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fhub__select-menu li {
+  list-style: none;
+}
+.fhub__select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.fhub__select-option:hover {
+  background: rgba(212, 175, 55, 0.14);
+}
+.fhub__select-option.is-current {
+  color: var(--gold-bright);
+}
+.fhub__select-option-name {
+  flex: 1;
+  min-width: 0;
+}
+.fhub__select-option.is-locked .fhub__select-option-name {
+  color: var(--muted);
+}
+.fhub__select-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(224, 151, 67, 0.4);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.fhub__select-check {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  color: var(--gold-bright);
 }
 
 .fhub__stage {
@@ -7531,9 +7697,7 @@ table.weights td {
   position: absolute;
   inset: 0;
   border-radius: 26px;
-  background: linear-gradient(158deg, rgba(48, 55, 63, 0.46), rgba(28, 34, 40, 0.55));
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  background: linear-gradient(158deg, #2b333c, #171d24);
   border: 1px solid rgba(210, 224, 232, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
@@ -7555,7 +7719,7 @@ table.weights td {
     0 55px 110px -40px rgba(0, 0, 0, 0.75);
 }
 .fhub__card:hover .fhub__glass {
-  background: linear-gradient(158deg, rgba(126, 140, 150, 0.62), rgba(96, 110, 122, 0.68));
+  background: linear-gradient(158deg, #55606b, #3a444e);
   border-color: rgba(255, 255, 255, 0.5);
 }
 /* Cards overlap their neighbors; without this a hovered card's expanded
@@ -9694,7 +9858,7 @@ body[data-surface='space'] .app-header {
 
 /* ---------- Locked (Pro-only) feature cards ---------- */
 .fhub__card.is-locked .fhub__glass {
-  background: linear-gradient(158deg, rgba(30, 36, 46, 0.5), rgba(18, 22, 28, 0.62));
+  background: linear-gradient(158deg, #1f2530, #14181e);
   border-color: rgba(200, 214, 236, 0.12);
 }
 .fhub__card.is-locked .fhub__name,
@@ -9708,7 +9872,7 @@ body[data-surface='space'] .app-header {
   color: var(--accent);
 }
 .fhub__card.is-locked:hover .fhub__glass {
-  background: linear-gradient(158deg, rgba(224, 151, 67, 0.22), rgba(60, 42, 22, 0.55));
+  background: linear-gradient(158deg, #4a3a24, #2c2113);
   border-color: rgba(224, 151, 67, 0.6);
 }
 .fhub__card.is-locked:hover .fhub__name {
@@ -10299,7 +10463,7 @@ body[data-surface='platform'] .pl {
   content: '';
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 41%;
   width: 66%;
   height: 52%;
   transform: translate(-50%, -50%);
