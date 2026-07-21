@@ -1,20 +1,97 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import type { GameResponse } from '../api/types'
-import { GAME_COLORS } from '../lib/series'
+import type { GamePlayerResult, GameResponse } from '../api/types'
+import { GAME_COLORS, metallicAt } from '../lib/series'
 import { Confetti } from './Confetti'
 
 const usd = (value: number) =>
   value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
+type Phase = 'countdown' | 'lineup' | 'racing' | 'done'
+
+function Portfolio({
+  player,
+  color,
+  highlight,
+}: {
+  player: GamePlayerResult
+  color: string
+  highlight?: boolean
+}) {
+  const resolved = player.resolved_tickers
+  const weight = resolved.length ? 100 / resolved.length : 0
+  const segTickers = resolved.length ? resolved : player.tickers
+
+  return (
+    <div
+      className={highlight ? 'game-portfolio is-winner' : 'game-portfolio'}
+      style={{ '--pc': color } as CSSProperties}
+    >
+      <div className="game-portfolio__head">
+        <span className="game-portfolio__dot" aria-hidden="true" />
+        <span className="game-portfolio__name">{player.name}</span>
+        {highlight && (
+          <span className="game-portfolio__crown" aria-hidden="true">
+            🏆
+          </span>
+        )}
+      </div>
+
+      <div className="game-alloc-bar">
+        {segTickers.map((ticker, i) => (
+          <span
+            key={ticker}
+            className="game-alloc-seg"
+            style={{
+              flexGrow: 1,
+              background: resolved.length ? metallicAt(i) : 'rgba(255,255,255,0.12)',
+            }}
+            title={resolved.length ? `${ticker} · ${weight.toFixed(0)}%` : ticker}
+          />
+        ))}
+      </div>
+
+      <ul className="game-alloc-legend">
+        {player.tickers.map((ticker) => {
+          const on = resolved.includes(ticker)
+          const idx = segTickers.indexOf(ticker)
+          return (
+            <li key={ticker} className={on ? undefined : 'is-off'}>
+              <span
+                className="game-alloc-dot"
+                style={{ background: on ? metallicAt(idx) : 'rgba(255,255,255,0.16)' }}
+                aria-hidden="true"
+              />
+              <span className="game-alloc-ticker">{ticker}</span>
+              <span className="game-alloc-pct">{on ? `${weight.toFixed(0)}%` : 'no data'}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
 export function GameArena({ result, actions }: { result: GameResponse; actions?: ReactNode }) {
-  const [phase, setPhase] = useState<'racing' | 'done'>('racing')
+  const [phase, setPhase] = useState<Phase>('countdown')
+  const [count, setCount] = useState(3)
   const [monthIndex, setMonthIndex] = useState(0)
 
   useEffect(() => {
-    setPhase('racing')
+    setPhase('countdown')
+    setCount(3)
     setMonthIndex(0)
+    const timers: number[] = []
+    timers.push(window.setTimeout(() => setCount(2), 750))
+    timers.push(window.setTimeout(() => setCount(1), 1500))
+    timers.push(window.setTimeout(() => setPhase('lineup'), 2250))
+    timers.push(window.setTimeout(() => setPhase('racing'), 5250))
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [result])
+
+  useEffect(() => {
+    if (phase !== 'racing') return
     const months = result.months
     const stepMs = Math.max(18, 4200 / months)
     let month = 0
@@ -27,7 +104,7 @@ export function GameArena({ result, actions }: { result: GameResponse; actions?:
       }
     }, stepMs)
     return () => window.clearInterval(id)
-  }, [result])
+  }, [phase, result])
 
   const shownMonth = phase === 'done' ? result.months : monthIndex
 
@@ -56,6 +133,42 @@ export function GameArena({ result, actions }: { result: GameResponse; actions?:
   )
 
   const winner = result.players[result.winner_index]
+
+  if (phase === 'countdown') {
+    return (
+      <div className="game-arena">
+        <div className="game-countdown">
+          <span className="game-countdown__label">Get ready</span>
+          <span key={count} className="game-countdown__num">
+            {count}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (phase === 'lineup') {
+    return (
+      <div className="game-arena">
+        <div className="game-lineup">
+          <div className="game-lineup__head">
+            <span className="game-eyebrow">On the starting line</span>
+            <h3>Who picked what</h3>
+            <p>Each portfolio is split evenly across its picks. The race starts in a moment.</p>
+          </div>
+          <div className="game-portfolios">
+            {result.players.map((player, i) => (
+              <Portfolio
+                key={player.name + i}
+                player={player}
+                color={GAME_COLORS[i % GAME_COLORS.length]}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="game-arena">
@@ -133,6 +246,20 @@ export function GameArena({ result, actions }: { result: GameResponse; actions?:
               {result.meta?.simulations ?? ''} runs
               {winner.best_ticker ? ` · top pick ${winner.best_ticker}` : ''}
             </p>
+
+            <div className="game-portfolios game-portfolios--result">
+              <div className="game-portfolios__head">What each player picked</div>
+              <div className="game-portfolios__grid">
+                {result.players.map((player, i) => (
+                  <Portfolio
+                    key={player.name + i}
+                    player={player}
+                    color={GAME_COLORS[i % GAME_COLORS.length]}
+                    highlight={i === result.winner_index}
+                  />
+                ))}
+              </div>
+            </div>
 
             {result.awards.length > 0 && (
               <div className="game-awards">

@@ -18,6 +18,7 @@ import {
   useTrade,
 } from '../api/queries'
 import { BenchmarkChart } from '../components/BenchmarkChart'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EmptyState } from '../components/EmptyState'
 import { PortfolioChart } from '../components/PortfolioChart'
 import { RebalancePanel } from '../components/RebalancePanel'
@@ -91,6 +92,8 @@ export function InvestPlatform() {
 
   const [targetId, setTargetId] = useState<number | null>(null)
   const plan = useRebalancePlan(targetId)
+
+  const [confirmingReset, setConfirmingReset] = useState(false)
 
   const entitlements = (me.data?.entitlements ?? {}) as Record<string, unknown>
   const feeBps = typeof entitlements.trade_fee_bps === 'number' ? entitlements.trade_fee_bps : 0
@@ -168,11 +171,16 @@ export function InvestPlatform() {
     )
   }
 
-  const onReset = () => {
-    if (!window.confirm('Reset your simulator back to $100,000? This clears every holding and pending order.')) return
+  const confirmReset = () => {
     liquidate.mutate(undefined, {
-      onSuccess: () => toast('Simulator reset to $100,000.', 'success'),
-      onError: (error) => toast(extractApiError(error, 'Could not reset the simulator.'), 'error'),
+      onSuccess: () => {
+        toast('Simulator reset to $100,000.', 'success')
+        setConfirmingReset(false)
+      },
+      onError: (error) => {
+        toast(extractApiError(error, 'Could not reset the simulator.'), 'error')
+        setConfirmingReset(false)
+      },
     })
   }
 
@@ -336,7 +344,12 @@ export function InvestPlatform() {
         <div className="invest-panel-head">
           <h3>Positions</h3>
           {(positionList.length > 0 || openOrders.length > 0) && (
-            <button type="button" className="invest-reset" onClick={onReset} disabled={liquidate.isPending}>
+            <button
+              type="button"
+              className="invest-reset"
+              onClick={() => setConfirmingReset(true)}
+              disabled={liquidate.isPending}
+            >
               {liquidate.isPending ? 'Resetting…' : 'Reset investments'}
             </button>
           )}
@@ -459,6 +472,18 @@ export function InvestPlatform() {
             </p>
           )}
         </div>
+      )}
+
+      {confirmingReset && (
+        <ConfirmDialog
+          title="Reset investments?"
+          message="This resets your simulator back to $100,000 and clears every holding and pending order. This cannot be undone."
+          confirmLabel="Reset to $100,000"
+          cancelLabel="Keep my investments"
+          busy={liquidate.isPending}
+          onConfirm={confirmReset}
+          onCancel={() => setConfirmingReset(false)}
+        />
       )}
     </div>
   )

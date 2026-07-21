@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     assistant_provider: Literal["auto", "anthropic", "openai"] = "auto"
 
     anthropic_api_key: str | None = None
-    anthropic_model: str = "claude-sonnet-4-6"
+    anthropic_model: str = "claude-sonnet-5"
     anthropic_base_url: str = "https://api.anthropic.com/v1"
     anthropic_version: str = "2023-06-01"
     anthropic_max_tokens: int = 1200
