@@ -4127,10 +4127,6 @@ table.weights td {
 
 .course-hero-content {
   max-width: 640px;
-  padding: 24px 32px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
 }
 
 .course-hero-tag {
@@ -12221,6 +12217,35 @@ body[data-surface='space'] .auth-menu-card button:hover {
 .flashcards-empty {
   color: var(--muted);
   font-size: 14px;
+  text-align: center;
+  padding: 60px 24px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.flashcards-filter-btn {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.flashcards-filter-btn:hover {
+  color: var(--text);
+}
+
+.flashcards-filter-btn.is-active {
+  background: rgba(255, 214, 107, 0.14);
+  border-color: var(--accent);
+  color: #ffd66b;
 }
 
 @media (max-width: 620px) {
