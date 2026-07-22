@@ -2,13 +2,13 @@ import {
   CartesianGrid,
   LabelList,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Scatter,
   ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
-  ZAxis,
 } from 'recharts'
 import type { ComparisonOutcome } from '../api/queries'
 import type { OptimizeResponse } from '../api/types'
@@ -65,6 +65,24 @@ function ScatterTooltip({ active, payload }: TooltipProps) {
       <div className="mono">Volatility {percent(point.volatility)}</div>
       <div className="mono muted">Sharpe {ratio(point.sharpe)}</div>
     </div>
+  )
+}
+
+function GlowMarker(props: {
+  cx?: number
+  cy?: number
+  fill?: string
+  payload?: { radius?: number }
+}) {
+  const { cx = 0, cy = 0, fill = '#d4af37', payload } = props
+  const r = payload?.radius ?? 12
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={r + 11} fill={fill} opacity={0.13} />
+      <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke={fill} strokeOpacity={0.45} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={r} fill={fill} stroke="rgba(255,255,255,0.65)" strokeWidth={1.5} />
+      <circle cx={cx - r * 0.32} cy={cy - r * 0.32} r={r * 0.42} fill="#ffffff" opacity={0.4} />
+    </g>
   )
 }
 
@@ -149,6 +167,15 @@ export function CompareResults({ outcomes }: { outcomes: ComparisonOutcome[] }) 
     sharpe: item.response.metrics.sharpe_ratio,
   }))
 
+  const sharpes = points.map((point) => point.sharpe)
+  const minSharpe = Math.min(...sharpes)
+  const maxSharpe = Math.max(...sharpes)
+  const radiusFor = (sharpe: number) =>
+    maxSharpe === minSharpe ? 13 : 10 + ((sharpe - minSharpe) / (maxSharpe - minSharpe)) * 8
+  const plotted = points.map((point) => ({ ...point, radius: radiusFor(point.sharpe) }))
+  const avgVol = points.reduce((sum, point) => sum + point.volatility, 0) / points.length
+  const avgReturn = points.reduce((sum, point) => sum + point.expectedReturn, 0) / points.length
+
   const universe = new Map<string, number>()
   solved.forEach((item) =>
     item.response.weights.forEach((allocation) => {
@@ -225,30 +252,43 @@ export function CompareResults({ outcomes }: { outcomes: ComparisonOutcome[] }) 
 
       <section className="compare-block">
         <h3>Risk versus return</h3>
-        <div className="planner-chart">
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart margin={{ top: 28, right: 32, bottom: 16, left: 8 }}>
-              <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
+        <div className="compare-scatter">
+          <span className="compare-scatter__better" aria-hidden="true">
+            Better ↖
+          </span>
+          <ResponsiveContainer width="100%" height={320}>
+            <ScatterChart margin={{ top: 30, right: 34, bottom: 22, left: 8 }}>
+              <CartesianGrid stroke="var(--border)" strokeOpacity={0.2} vertical horizontal />
               <XAxis
                 type="number"
                 dataKey="volatility"
                 name="Volatility"
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: 'var(--muted)' }}
                 tickFormatter={(value: number) => percent(value, 0)}
                 domain={['dataMin - 0.02', 'dataMax + 0.02']}
-                label={{ value: 'Volatility', position: 'insideBottom', offset: -8, fontSize: 11, fill: 'var(--muted)' }}
+                axisLine={{ stroke: 'var(--border)' }}
+                tickLine={{ stroke: 'var(--border)' }}
+                label={{ value: 'Volatility', position: 'insideBottom', offset: -12, fontSize: 11, fill: 'var(--muted)' }}
               />
               <YAxis
                 type="number"
                 dataKey="expectedReturn"
                 name="Expected return"
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: 'var(--muted)' }}
                 tickFormatter={(value: number) => percent(value, 0)}
                 domain={['dataMin - 0.02', 'dataMax + 0.02']}
+                axisLine={{ stroke: 'var(--border)' }}
+                tickLine={{ stroke: 'var(--border)' }}
                 width={54}
+                label={{ value: 'Return', angle: -90, position: 'insideLeft', offset: 16, fontSize: 11, fill: 'var(--muted)' }}
               />
-              <ZAxis range={[160, 160]} />
-              <Tooltip content={<ScatterTooltip />} cursor={{ strokeDasharray: '4 4' }} />
+              {points.length > 1 && (
+                <>
+                  <ReferenceLine x={avgVol} stroke="var(--muted)" strokeDasharray="4 5" strokeOpacity={0.28} />
+                  <ReferenceLine y={avgReturn} stroke="var(--muted)" strokeDasharray="4 5" strokeOpacity={0.28} />
+                </>
+              )}
+              <Tooltip content={<ScatterTooltip />} cursor={{ strokeDasharray: '4 4', stroke: 'var(--gold)' }} />
               <Legend
                 verticalAlign="top"
                 height={30}
@@ -259,21 +299,28 @@ export function CompareResults({ outcomes }: { outcomes: ComparisonOutcome[] }) 
                 <Scatter
                   key={item.id}
                   name={item.label}
-                  data={[points[index]]}
+                  data={[plotted[index]]}
                   fill={item.color}
-                  shape={item.shape}
-                  stroke="var(--bg)"
-                  strokeWidth={2}
+                  legendType="circle"
+                  shape={GlowMarker}
                   isAnimationActive={false}
                 >
-                  <LabelList dataKey="label" position="top" offset={10} fontSize={11} fill="var(--text)" />
+                  <LabelList
+                    dataKey="label"
+                    position="top"
+                    offset={16}
+                    fontSize={12}
+                    fontWeight={700}
+                    fill="var(--text)"
+                  />
                 </Scatter>
               ))}
             </ScatterChart>
           </ResponsiveContainer>
         </div>
         <p className="muted compare-note">
-          Up and to the left is better, meaning more expected return for less volatility.
+          Up and to the left is better, meaning more expected return for less volatility. Marker size
+          scales with each portfolio's Sharpe ratio.
         </p>
       </section>
 

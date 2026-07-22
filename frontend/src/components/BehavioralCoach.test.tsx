@@ -49,7 +49,9 @@ async function answerEveryQuestionWithTheFirstOption(user: ReturnType<typeof use
   for (let index = 0; index < BIAS_QUESTIONS.length; index += 1) {
     const radios = screen.getAllByRole('radio')
     await user.click(radios[0])
-    const button = screen.getByRole('button', { name: index < BIAS_QUESTIONS.length - 1 ? 'Next' : 'Replay my portfolio' })
+    const button = screen.getByRole('button', {
+      name: index < BIAS_QUESTIONS.length - 1 ? /Next/ : /Replay my portfolio/,
+    })
     await user.click(button)
   }
 }

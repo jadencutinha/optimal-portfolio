@@ -42,7 +42,18 @@ function SeriesChart({
             minTickGap={56}
           />
           <YAxis tick={{ fontSize: 11 }} width={52} tickFormatter={format} />
-          <Tooltip formatter={(value: number) => format(value)} labelFormatter={(label) => String(label)} />
+          <Tooltip
+            formatter={(value: number) => format(value)}
+            labelFormatter={(label) => String(label)}
+            contentStyle={{
+              background: 'rgba(12,12,16,0.94)',
+              border: '1px solid rgba(212,175,55,0.3)',
+              borderRadius: 10,
+              boxShadow: '0 18px 40px -20px rgba(0,0,0,0.8)',
+            }}
+            labelStyle={{ color: '#e7f2f5', fontWeight: 700, marginBottom: 4 }}
+            itemStyle={{ padding: '1px 0' }}
+          />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {names.map((name, index) => (
             <Line key={name} type="monotone" dataKey={name} stroke={colorFor(index)} dot={false} strokeWidth={1.8} />

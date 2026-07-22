@@ -42,20 +42,6 @@ class Room:
     result: GameResponse | None = None
     starts_at: float | None = None
 
-    def _refresh_countdown(self) -> None:
-        """Start, hold, or cancel the auto-start countdown based on readiness."""
-        if self.status == "done":
-            return
-        everyone_ready = len(self.players) >= 2 and all(p.ready for p in self.players.values())
-        if everyone_ready:
-            if self.status != "countdown":
-                self.status = "countdown"
-                self.starts_at = time.time() + COUNTDOWN_SECONDS
-        else:
-            if self.status == "countdown":
-                self.status = "lobby"
-            self.starts_at = None
-
     def seconds_remaining(self) -> int | None:
         if self.status != "countdown" or self.starts_at is None:
             return None
@@ -84,14 +70,16 @@ class RoomStore:
             code = self._new_code()
             player_id = secrets.token_hex(6)
             host = RoomPlayer(id=player_id, name=host_name.strip() or "Host", is_host=True)
+            now = time.time()
             room = Room(
                 code=code,
                 host_id=player_id,
                 years=years,
-                status="lobby",
+                status="countdown",
                 players={player_id: host},
                 order=[player_id],
-                created_at=time.time(),
+                created_at=now,
+                starts_at=now + COUNTDOWN_SECONDS,
             )
             self._rooms[code] = room
             return room, player_id
@@ -108,8 +96,8 @@ class RoomStore:
             room = self._rooms.get(code.strip().upper())
             if room is None:
                 raise RoomError("That game code was not found.", 404)
-            if room.status != "lobby":
-                raise RoomError("That game has already started.", 409)
+            if room.status == "done":
+                raise RoomError("That game has already finished.", 409)
             if len(room.players) >= MAX_PLAYERS:
                 raise RoomError("That game is full.", 409)
             player_id = secrets.token_hex(6)
@@ -125,7 +113,6 @@ class RoomStore:
             clean = [ticker.strip().upper() for ticker in tickers if ticker.strip()][:8]
             room.players[player_id].tickers = clean
             room.players[player_id].ready = False
-            room._refresh_countdown()
             return room
 
     async def set_ready(self, code: str, player_id: str, ready: bool) -> Room:
@@ -137,7 +124,6 @@ class RoomStore:
             if ready and not player.tickers:
                 raise RoomError("Pick at least one stock before you ready up.", 400)
             player.ready = ready
-            room._refresh_countdown()
             return room
 
     async def leave(self, code: str, player_id: str) -> Room | None:
@@ -148,8 +134,31 @@ class RoomStore:
             room.players.pop(player_id, None)
             if player_id in room.order:
                 room.order.remove(player_id)
-            room._refresh_countdown()
             return room
+
+    async def begin_if_due(self, code: str) -> list[RoomPlayer] | None:
+        """Atomically claim the auto-start once the countdown has expired.
+
+        Returns the ready roster to simulate, or None if the game is not due yet,
+        already started, or does not have at least two ready players. Flipping the
+        status to ``running`` inside the lock means only one poll ever triggers the
+        simulation, no matter how many clients are polling.
+        """
+        async with self._lock:
+            room = self._rooms.get(code.strip().upper())
+            if room is None or room.status != "countdown":
+                return None
+            if room.starts_at is None or time.time() < room.starts_at:
+                return None
+            ready = [
+                room.players[pid]
+                for pid in room.order
+                if pid in room.players and room.players[pid].ready and room.players[pid].tickers
+            ]
+            if len(ready) < 2:
+                return None
+            room.status = "running"
+            return ready
 
     async def set_result(self, code: str, result: GameResponse) -> Room:
         async with self._lock:

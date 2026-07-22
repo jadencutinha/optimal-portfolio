@@ -20,6 +20,7 @@ import { FrontierChart } from '../components/FrontierChart'
 import { FrontierWalk } from '../components/FrontierWalk'
 import { GrowthProjection } from '../components/GrowthProjection'
 import { ObjectiveControls } from '../components/ObjectiveControls'
+import { PortfolioChat } from '../components/PortfolioChat'
 import { PortfolioDetail } from '../components/PortfolioDetail'
 import { PromptModal } from '../components/PromptModal'
 import { ResampledFrontierChart } from '../components/ResampledFrontierChart'
@@ -476,6 +477,8 @@ export function OptimizerPage({ autoStart = false }: { autoStart?: boolean } = {
           onCancel={() => setNaming(false)}
         />
       )}
+
+      <PortfolioChat tickers={tickers} result={result ?? null} />
     </div>
   )
 }

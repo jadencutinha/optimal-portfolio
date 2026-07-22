@@ -12,6 +12,8 @@ import type {
   BillingConfig,
   CourseAssistantRequest,
   CourseAssistantResponse,
+  PortfolioChatRequest,
+  PortfolioChatResponse,
   CourseDetail,
   CourseSummary,
   ExplainResponse,
@@ -160,7 +162,7 @@ export function useRoom(code: string | null) {
     refetchInterval: (query) => {
       const status = query.state.data?.status
       if (status === 'done') return false
-      if (status === 'countdown') return 1000
+      if (status === 'countdown' || status === 'running') return 1000
       return 2500
     },
     queryFn: async () => (await apiClient.get<RoomState>(`/api/game/rooms/${code}`)).data,
@@ -268,6 +270,13 @@ export function useCourseAssistant() {
   return useMutation({
     mutationFn: async (request: CourseAssistantRequest) =>
       (await apiClient.post<CourseAssistantResponse>('/api/course-assistant', request)).data,
+  })
+}
+
+export function usePortfolioChat() {
+  return useMutation({
+    mutationFn: async (request: PortfolioChatRequest) =>
+      (await apiClient.post<PortfolioChatResponse>('/api/portfolio-chat', request)).data,
   })
 }
 

@@ -102,6 +102,12 @@ export function JoinRoomPage({ code }: { code: string }) {
   return shell(
     <div className="join-card">
       {state.status === 'countdown' && <GameCountdown seconds={state.seconds_remaining ?? 0} />}
+      {state.status === 'running' && (
+        <div className="game-starting">
+          <span className="join-spinner" aria-hidden="true" />
+          Starting the race…
+        </div>
+      )}
       <p className="join-hello">You are in. Pick 3 to 5 stocks, then hit ready.</p>
       <TickerInput tickers={tickers} suggestions={suggestions} onChange={updateTickers} />
 

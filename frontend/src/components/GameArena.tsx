@@ -130,7 +130,7 @@ export function GameArena({ result, actions }: { result: GameResponse; actions?:
   useEffect(() => {
     if (phase !== 'racing') return
     const months = result.months
-    const stepMs = Math.max(18, 4200 / months)
+    const stepMs = Math.max(36, 8400 / months)
     let month = 0
     const id = window.setInterval(() => {
       month += 1

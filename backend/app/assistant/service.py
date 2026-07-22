@@ -10,6 +10,8 @@ from app.schemas.assistant import (
     AssistantResponse,
     CourseAssistantRequest,
     CourseAssistantResponse,
+    PortfolioChatRequest,
+    PortfolioChatResponse,
 )
 from app.schemas.optimize import OptimizeRequest, OptimizeResponse
 
@@ -268,6 +270,56 @@ COURSE_SYSTEM = (
     "portfolio, point them to Halo's Portfolio assistant instead. When relevant, tie your "
     "answer back to a concept from the course."
 )
+
+
+PORTFOLIO_CHAT_SYSTEM = (
+    "You are Halo AI, a sharp and friendly investing guide built into the portfolio optimizer. "
+    "Answer the user's question in plain English, 2 to 4 short sentences, and sound clear and "
+    "confident. When the portfolio context below is relevant, ground your answer in it: explain "
+    "what the metrics mean, comment on diversification and concentration, expected return, "
+    "volatility, and the Sharpe ratio, and connect them to the user's holdings. You also answer "
+    "general investing and market questions. Do NOT give personalized financial advice, do not "
+    "promise or predict returns, and never tell the user to buy or sell a specific security. If no "
+    "portfolio has been optimized yet, say so briefly and still answer the general question. "
+    "Write in plain sentences and do not use em dashes."
+)
+
+
+def _portfolio_context(request: PortfolioChatRequest) -> str:
+    if not request.tickers and not request.weights:
+        return "Portfolio context: the user has not run the optimizer yet.\n\n"
+    lines = ["Portfolio context:"]
+    if request.objective:
+        lines.append(f"- Objective: {request.objective}")
+    if request.weights:
+        holdings = ", ".join(
+            f"{ticker} {weight * 100:.1f}%"
+            for ticker, weight in sorted(request.weights.items(), key=lambda kv: kv[1], reverse=True)
+        )
+        lines.append(f"- Holdings: {holdings}")
+    elif request.tickers:
+        lines.append(f"- Tickers: {', '.join(request.tickers)}")
+    metrics: list[str] = []
+    if request.expected_return is not None:
+        metrics.append(f"expected return {request.expected_return * 100:.1f}%")
+    if request.volatility is not None:
+        metrics.append(f"volatility {request.volatility * 100:.1f}%")
+    if request.sharpe is not None:
+        metrics.append(f"Sharpe ratio {request.sharpe:.2f}")
+    if metrics:
+        lines.append(f"- Metrics: {', '.join(metrics)}")
+    return "\n".join(lines) + "\n\n"
+
+
+async def run_portfolio_chat(request: PortfolioChatRequest, settings: Settings) -> PortfolioChatResponse:
+    context = _portfolio_context(request)
+    reply = await call_text(
+        settings, system=PORTFOLIO_CHAT_SYSTEM, user=f"{context}Question: {request.message}"
+    )
+    return PortfolioChatResponse(
+        model=resolved_model(settings),
+        reply=reply or "I could not come up with an answer to that. Try rephrasing your question.",
+    )
 
 
 async def run_course_assistant(request: CourseAssistantRequest, settings: Settings) -> CourseAssistantResponse:

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -7,7 +7,6 @@ import {
   useRoom,
   useSetReady,
   useSetRoomPicks,
-  useStartRoom,
   useUniverse,
 } from '../api/queries'
 import type { GameResponse } from '../api/types'
@@ -59,7 +58,6 @@ export function GamePage({ onExit }: { onExit: () => void }) {
   const createRoom = useCreateRoom()
   const savePicks = useSetRoomPicks()
   const setReady = useSetReady()
-  const startRoom = useStartRoom()
   const room = useRoom(mode === 'online' ? code : null)
 
   const setPlayer = (id: string, patch: Partial<Player>) =>
@@ -115,34 +113,7 @@ export function GamePage({ onExit }: { onExit: () => void }) {
   const showingOnlineResult = mode === 'online' && roomState?.status === 'done' && roomState.result
   const me = roomState?.players.find((p) => p.id === hostId)
   const countdown = roomState?.status === 'countdown' ? roomState.seconds_remaining ?? 0 : null
-
-  const startedRef = useRef(false)
-  useEffect(() => {
-    if (roomState?.status !== 'countdown') {
-      startedRef.current = false
-      return
-    }
-    if (
-      !startedRef.current &&
-      code &&
-      hostId &&
-      roomState.seconds_remaining != null &&
-      roomState.seconds_remaining <= 0
-    ) {
-      startedRef.current = true
-      startRoom.mutate(
-        { code, player_id: hostId },
-        {
-          onSuccess: (data) => queryClient.setQueryData(['room', code], data),
-          onError: (error) => {
-            startedRef.current = false
-            toast(extractApiError(error, 'Could not start the game.'), 'error')
-          },
-        },
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomState?.status, roomState?.seconds_remaining, code, hostId])
+  const starting = roomState?.status === 'running'
 
   const toggleReady = () => {
     if (!code || !hostId) return
@@ -336,6 +307,21 @@ export function GamePage({ onExit }: { onExit: () => void }) {
 
           {mode === 'online' && code && (
             <div className="game-lobby">
+              {countdown !== null && (
+                <>
+                  <GameCountdown seconds={countdown} />
+                  <p className="game-note game-lobby__hint">
+                    Pick your stocks and hit ready before the timer runs out. Only players who are ready
+                    will race.
+                  </p>
+                </>
+              )}
+              {starting && (
+                <div className="game-starting">
+                  <span className="join-spinner" aria-hidden="true" />
+                  Starting the race…
+                </div>
+              )}
               <div className="game-lobby__code">
                 <span className="game-lobby__label">Game code</span>
                 <strong>{code}</strong>
@@ -379,14 +365,6 @@ export function GamePage({ onExit }: { onExit: () => void }) {
                 ))}
               </ol>
 
-              {countdown !== null ? (
-                <GameCountdown seconds={countdown} />
-              ) : (
-                <p className="game-note">
-                  Everyone locks their picks and hits ready, then a 20 second countdown starts the race
-                  automatically.
-                </p>
-              )}
             </div>
           )}
         </>

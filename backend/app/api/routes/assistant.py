@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.deps import get_access, get_provider, get_sector_provider, get_settings
 from app.assistant.client import AssistantError
-from app.assistant.service import resolve_universe, run_assistant, run_course_assistant
+from app.assistant.service import (
+    resolve_universe,
+    run_assistant,
+    run_course_assistant,
+    run_portfolio_chat,
+)
 from app.auth.gating import Access, require_pro
 from app.config import Settings
 from app.data.provider import DataProvider
@@ -13,6 +18,8 @@ from app.schemas.assistant import (
     AssistantResponse,
     CourseAssistantRequest,
     CourseAssistantResponse,
+    PortfolioChatRequest,
+    PortfolioChatResponse,
 )
 
 router = APIRouter(tags=["assistant"])
@@ -46,5 +53,18 @@ async def course_assistant(
 ) -> CourseAssistantResponse:
     try:
         return await run_course_assistant(payload, settings)
+    except AssistantError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+
+@router.post("/portfolio-chat", response_model=PortfolioChatResponse)
+@limiter.limit(AI)
+async def portfolio_chat(
+    request: Request,
+    payload: PortfolioChatRequest,
+    settings: Settings = Depends(get_settings),
+) -> PortfolioChatResponse:
+    try:
+        return await run_portfolio_chat(payload, settings)
     except AssistantError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error

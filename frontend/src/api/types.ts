@@ -480,6 +480,21 @@ export interface CourseAssistantResponse {
   reply: string
 }
 
+export interface PortfolioChatRequest {
+  message: string
+  tickers?: string[]
+  weights?: Record<string, number>
+  objective?: string
+  expected_return?: number
+  volatility?: number
+  sharpe?: number
+}
+
+export interface PortfolioChatResponse {
+  model: string
+  reply: string
+}
+
 export interface StressCurvePoint {
   date: string
   equity: number

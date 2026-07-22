@@ -62,11 +62,25 @@ async def create_room(
 
 
 @router.get("/game/rooms/{code}", response_model=RoomState)
-async def get_room(code: str, store: RoomStore = Depends(get_room_store)) -> RoomState:
+async def get_room(
+    code: str,
+    store: RoomStore = Depends(get_room_store),
+    provider: DataProvider = Depends(get_provider),
+) -> RoomState:
     try:
         room = await store.get(code)
     except RoomError as error:
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+    # When the countdown has run out, the first poll to notice runs the race server
+    # side, so the game starts whether or not the host's tab is in the foreground.
+    if room.status == "countdown":
+        ready = await store.begin_if_due(code)
+        if ready is not None:
+            players = [{"name": player.name, "tickers": player.tickers} for player in ready]
+            result = await simulate_game(GameRequest(players=players, years=room.years), provider)
+            room = await store.set_result(code, result)
+
     return _room_state(room)
 
 
@@ -134,14 +148,17 @@ async def start_room(
         raise HTTPException(status_code=error.status_code, detail=error.message) from error
     if payload.player_id != room.host_id:
         raise HTTPException(status_code=403, detail="Only the host can start the game.")
+    if room.status in ("running", "done"):
+        return _room_state(room)
 
     roster = [room.players[pid] for pid in room.order if pid in room.players]
-    if len(roster) < 2:
-        raise HTTPException(status_code=400, detail="Need at least two players to start.")
-    if not all(player.ready for player in roster):
-        raise HTTPException(status_code=400, detail="Everyone needs to ready up before the game can start.")
+    playable = [player for player in roster if player.ready and player.tickers]
+    if len(playable) < 2:
+        raise HTTPException(
+            status_code=400, detail="Need at least two players ready to start the race."
+        )
 
-    players = [{"name": player.name, "tickers": player.tickers} for player in roster]
+    players = [{"name": player.name, "tickers": player.tickers} for player in playable]
 
     result = await simulate_game(GameRequest(players=players, years=room.years), provider)
     room = await store.set_result(code, result)

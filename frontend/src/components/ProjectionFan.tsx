@@ -46,6 +46,13 @@ export function ProjectionFan({ timeline, target = null, height = 300 }: Props) 
     bandWidth: point.p90 - point.p10,
   }))
 
+  const maxYear = chartData.length ? chartData[chartData.length - 1].year : 0
+  const tickStep = Math.max(1, Math.round(maxYear / 6))
+  const yearTicks: number[] = []
+  for (let year = 0; year <= maxYear + 0.001; year += tickStep) {
+    yearTicks.push(year)
+  }
+
   return (
     <div className="planner-chart">
       <ResponsiveContainer width="100%" height={height}>
@@ -53,6 +60,10 @@ export function ProjectionFan({ timeline, target = null, height = 300 }: Props) 
           <CartesianGrid stroke="var(--border)" strokeOpacity={0.25} />
           <XAxis
             dataKey="year"
+            type="number"
+            domain={[0, maxYear]}
+            ticks={yearTicks}
+            allowDecimals={false}
             tick={{ fontSize: 12 }}
             tickFormatter={(value: number) => `${Math.round(value)}y`}
           />

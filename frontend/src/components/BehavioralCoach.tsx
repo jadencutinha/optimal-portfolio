@@ -86,37 +86,57 @@ export function BehavioralCoach() {
   }
 
   return (
-    <div className="behavioral-quiz">
-      <h2>Behavioral Coach</h2>
-      <p className="muted">
-        Answer honestly. The coach then replays your own portfolio through history twice, once rebalanced
-        with discipline and once the way your answers say you would have traded it.
-      </p>
-      <p className="muted planner-source">
-        Using your last optimizer run, {lastRun.request.tickers.length} tickers.
-        {substituted && ` The gap engine backtests max Sharpe, so ${lastRun.objective} was substituted.`}
-      </p>
+    <div className="bcoach">
+      <header className="bcoach__head">
+        <span className="bcoach__eyebrow">Behavioral Coach</span>
+        <h2>How would your instincts trade?</h2>
+        <p>
+          Answer honestly. The coach then replays your own portfolio through history twice, once
+          rebalanced with discipline and once the way your answers say you would have traded it.
+        </p>
+        <p className="bcoach__source">
+          Using your last optimizer run, {lastRun.request.tickers.length} tickers.
+          {substituted && ` The gap engine backtests max Sharpe, so ${lastRun.objective} was substituted.`}
+        </p>
+      </header>
 
-      <p className="muted">
-        Question {step + 1} of {total}
-      </p>
-      <div className="course-progress-track">
-        <div className="course-progress-fill" style={{ width: `${(step / total) * 100}%` }} />
+      <div className="bcoach__progress">
+        <span>
+          Question {step + 1} of {total}
+        </span>
+        <div className="bcoach__track">
+          <div
+            className="bcoach__fill"
+            style={{ width: `${((step + (answered ? 1 : 0)) / total) * 100}%` }}
+          />
+        </div>
       </div>
 
-      <div className="topic-card">
-        <p className="quiz-prompt">{question.text}</p>
-        {question.options.map((option, optionIndex) => (
-          <label key={option.label} className={`quiz-option ${answers[question.id] === optionIndex ? 'selected' : ''}`}>
-            <input
-              type="radio"
-              name={question.id}
-              checked={answers[question.id] === optionIndex}
-              onChange={() => setAnswers((current) => ({ ...current, [question.id]: optionIndex }))}
-            />
-            {option.label}
-          </label>
-        ))}
+      <div className="bcoach__card" key={step}>
+        <p className="bcoach__q">{question.text}</p>
+        <div className="bcoach__options" role="radiogroup" aria-label={question.text}>
+          {question.options.map((option, optionIndex) => {
+            const selected = answers[question.id] === optionIndex
+            return (
+              <label key={option.label} className={selected ? 'bopt is-selected' : 'bopt'}>
+                <input
+                  type="radio"
+                  className="bopt__input"
+                  name={question.id}
+                  checked={selected}
+                  onChange={() =>
+                    setAnswers((current) => ({ ...current, [question.id]: optionIndex }))
+                  }
+                />
+                <span className="bopt__badge">{String.fromCharCode(65 + optionIndex)}</span>
+                <span className="bopt__label">{option.label}</span>
+                <span className="bopt__check" aria-hidden="true">
+                  ✓
+                </span>
+              </label>
+            )
+          })}
+        </div>
 
         {step === total - 1 && (
           <div className="planner-field behavioral-stake">
@@ -128,9 +148,16 @@ export function BehavioralCoach() {
           </div>
         )}
 
-        <button className="primary" disabled={!answered} onClick={next}>
-          {step < total - 1 ? 'Next' : 'Replay my portfolio'}
-        </button>
+        <div className="bcoach__actions">
+          {step > 0 && (
+            <button type="button" className="bcoach__back" onClick={() => setStep(step - 1)}>
+              ← Back
+            </button>
+          )}
+          <button className="primary bcoach__next" disabled={!answered} onClick={next}>
+            {step < total - 1 ? 'Next →' : 'Replay my portfolio →'}
+          </button>
+        </div>
       </div>
     </div>
   )

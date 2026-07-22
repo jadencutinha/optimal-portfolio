@@ -37,14 +37,6 @@ const FREE_FEATURES: HubFeature[] = [
 // Shown locked on Free so the Pro tools are visible rather than hidden.
 const LOCKED_FEATURES: HubFeature[] = [
   {
-    id: 'assistant',
-    name: 'AI Assistant',
-    kicker: 'Ask',
-    description:
-      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
-    locked: true,
-  },
-  {
     id: 'backtest',
     name: 'Backtest',
     kicker: 'Replay',

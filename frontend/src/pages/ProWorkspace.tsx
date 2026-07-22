@@ -5,13 +5,12 @@ import { MarketStrip } from '../components/MarketStrip'
 import { PlatformHeader } from '../components/PlatformHeader'
 import { SavedPortfolios } from '../components/SavedPortfolios'
 import { useSurface } from '../lib/useSurface'
-import { AssistantPage } from './AssistantPage'
 import { BacktestPage } from './BacktestPage'
 import { InvestPlatform } from './InvestPlatform'
 import { OptimizerPage } from './OptimizerPage'
 import { SideBySidePage } from './SideBySidePage'
 
-type Feature = 'optimizer' | 'sidebyside' | 'backtest' | 'assistant' | 'behavioral' | 'saved'
+type Feature = 'optimizer' | 'sidebyside' | 'backtest' | 'behavioral' | 'saved'
 
 const PRO_FEATURES: HubFeature[] = [
   {
@@ -32,13 +31,6 @@ const PRO_FEATURES: HubFeature[] = [
     name: 'Backtest',
     kicker: 'Replay',
     description: 'Walk your strategy through history against the index, equal weight, and a 60/40 benchmark.',
-  },
-  {
-    id: 'assistant',
-    name: 'AI Assistant',
-    kicker: 'Ask',
-    description:
-      'Describe your goal in plain English and the assistant picks the strategy, runs it, and explains the result.',
   },
   {
     id: 'behavioral',
@@ -112,7 +104,6 @@ export function ProWorkspace({
           {feature === 'optimizer' && <OptimizerPage />}
           {feature === 'sidebyside' && <SideBySidePage />}
           {feature === 'backtest' && <BacktestPage />}
-          {feature === 'assistant' && <AssistantPage />}
           {feature === 'behavioral' && <BehavioralCoach />}
           {feature === 'saved' && <SavedPortfolios />}
         </>

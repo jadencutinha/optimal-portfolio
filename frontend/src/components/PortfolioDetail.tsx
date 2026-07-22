@@ -1,4 +1,3 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import type { WeightAllocation } from '../api/types'
 import { percent, ratio } from '../lib/format'
 import { Tooltip as CustomTooltip } from './Tooltip'
@@ -32,19 +31,6 @@ export function PortfolioDetail({ title, weights, expectedReturn, volatility, sh
     <div className="portfolio-detail">
       <h3>{title}</h3>
       <div className="detail-grid">
-        <div className="detail-chart">
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={sectorData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={90} paddingAngle={2}>
-                {sectorData.map((entry, index) => (
-                  <Cell key={entry.name} fill={SECTOR_COLORS[index % SECTOR_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
         <div className="detail-stats">
           <dl>
             <div>
