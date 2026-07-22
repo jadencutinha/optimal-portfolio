@@ -96,6 +96,48 @@ def test_room_unknown_code_is_404(client: TestClient) -> None:
     assert client.get("/api/game/rooms/ZZZZ").status_code == 404
 
 
+def test_get_room_auto_starts_over_http_when_countdown_expires(client: TestClient) -> None:
+    import time
+
+    created = client.post("/api/game/rooms", json={"host_name": "Host", "years": 10}).json()
+    code = created["code"]
+    host_id = created["player_id"]
+    guest_id = client.post(f"/api/game/rooms/{code}/join", json={"name": "Guest"}).json()["player_id"]
+
+    client.post(f"/api/game/rooms/{code}/picks", json={"player_id": host_id, "tickers": ["AAPL", "MSFT"]})
+    client.post(f"/api/game/rooms/{code}/picks", json={"player_id": guest_id, "tickers": ["GOOGL", "AMZN"]})
+    client.post(f"/api/game/rooms/{code}/ready", json={"player_id": host_id, "ready": True})
+    client.post(f"/api/game/rooms/{code}/ready", json={"player_id": guest_id, "ready": True})
+
+    # Force the countdown to expire, then a plain poll should start the race server side.
+    client.app.state.room_store._rooms[code].starts_at = time.time() - 1
+
+    done = client.get(f"/api/game/rooms/{code}").json()
+    assert done["status"] == "done"
+    assert done["result"]["winner_index"] in (0, 1)
+
+
+def test_get_room_auto_start_excludes_players_who_never_readied(client: TestClient) -> None:
+    import time
+
+    created = client.post("/api/game/rooms", json={"host_name": "Host", "years": 10}).json()
+    code = created["code"]
+    host_id = created["player_id"]
+    ready_guest = client.post(f"/api/game/rooms/{code}/join", json={"name": "Ready"}).json()["player_id"]
+    lazy_guest = client.post(f"/api/game/rooms/{code}/join", json={"name": "Lazy"}).json()["player_id"]
+
+    for player in (host_id, ready_guest, lazy_guest):
+        client.post(f"/api/game/rooms/{code}/picks", json={"player_id": player, "tickers": ["AAPL", "MSFT"]})
+    client.post(f"/api/game/rooms/{code}/ready", json={"player_id": host_id, "ready": True})
+    client.post(f"/api/game/rooms/{code}/ready", json={"player_id": ready_guest, "ready": True})
+
+    client.app.state.room_store._rooms[code].starts_at = time.time() - 1
+
+    done = client.get(f"/api/game/rooms/{code}").json()
+    assert done["status"] == "done"
+    assert len(done["result"]["players"]) == 2
+
+
 def test_auto_start_claims_once_when_countdown_expires() -> None:
     import asyncio
     import time

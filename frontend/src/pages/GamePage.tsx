@@ -114,6 +114,7 @@ export function GamePage({ onExit }: { onExit: () => void }) {
   const me = roomState?.players.find((p) => p.id === hostId)
   const countdown = roomState?.status === 'countdown' ? roomState.seconds_remaining ?? 0 : null
   const starting = roomState?.status === 'running'
+  const readyCount = roomState?.players.filter((p) => p.ready).length ?? 0
 
   const toggleReady = () => {
     if (!code || !hostId) return
@@ -307,7 +308,7 @@ export function GamePage({ onExit }: { onExit: () => void }) {
 
           {mode === 'online' && code && (
             <div className="game-lobby">
-              {countdown !== null && (
+              {countdown !== null && countdown > 0 && (
                 <>
                   <GameCountdown seconds={countdown} />
                   <p className="game-note game-lobby__hint">
@@ -316,10 +317,16 @@ export function GamePage({ onExit }: { onExit: () => void }) {
                   </p>
                 </>
               )}
-              {starting && (
+              {(starting || (countdown === 0 && readyCount >= 2)) && (
                 <div className="game-starting">
                   <span className="join-spinner" aria-hidden="true" />
                   Starting the race…
+                </div>
+              )}
+              {countdown === 0 && readyCount < 2 && (
+                <div className="game-starting">
+                  <span className="join-spinner" aria-hidden="true" />
+                  Waiting for at least two players to ready up…
                 </div>
               )}
               <div className="game-lobby__code">

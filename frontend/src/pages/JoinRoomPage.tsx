@@ -99,13 +99,22 @@ export function JoinRoomPage({ code }: { code: string }) {
     )
   }
 
+  const seconds = state.status === 'countdown' ? state.seconds_remaining ?? 0 : null
+  const readyCount = state.players.filter((player) => player.ready).length
+
   return shell(
     <div className="join-card">
-      {state.status === 'countdown' && <GameCountdown seconds={state.seconds_remaining ?? 0} />}
-      {state.status === 'running' && (
+      {seconds !== null && seconds > 0 && <GameCountdown seconds={seconds} />}
+      {(state.status === 'running' || (seconds === 0 && readyCount >= 2)) && (
         <div className="game-starting">
           <span className="join-spinner" aria-hidden="true" />
           Starting the race…
+        </div>
+      )}
+      {seconds === 0 && readyCount < 2 && (
+        <div className="game-starting">
+          <span className="join-spinner" aria-hidden="true" />
+          Waiting for at least two players to ready up…
         </div>
       )}
       <p className="join-hello">You are in. Pick 3 to 5 stocks, then hit ready.</p>
@@ -119,13 +128,6 @@ export function JoinRoomPage({ code }: { code: string }) {
       >
         {me?.ready ? '✓ Ready — tap to undo' : "I'm ready"}
       </button>
-
-      {me?.ready && state.status !== 'countdown' && (
-        <div className="join-waiting">
-          <span className="join-spinner" aria-hidden="true" />
-          Waiting for everyone to ready up…
-        </div>
-      )}
 
       <ul className="join-players">
         {state.players.map((player) => (

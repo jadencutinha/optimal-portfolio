@@ -171,6 +171,14 @@ function CapIcon() {
     </svg>
   )
 }
+function ChartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <path d="M4 4v16h16" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7.5 13.5l3-3.5 3 2.5 5-6.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 const FEATURES = [
   {
@@ -187,6 +195,11 @@ const FEATURES = [
     icon: <TargetIcon />,
     title: 'Factor analysis',
     body: 'Decompose returns into market, size, value, and momentum factors to understand what is really driving performance.',
+  },
+  {
+    icon: <ChartIcon />,
+    title: 'Backtesting',
+    body: 'Replay any strategy through real market history with no look-ahead, benchmarked against the index, equal weight, and a 60/40 mix.',
   },
   {
     icon: <ChatIcon />,

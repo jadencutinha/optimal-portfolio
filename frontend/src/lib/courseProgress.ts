@@ -90,6 +90,33 @@ export function recordMastery(trackId: number, moduleId: number, retakes: number
   return stars
 }
 
+// The learner's in-progress quiz answers per module, so a quiz keeps the picks
+// they already made when they leave the module, the platform, or the account.
+export interface QuizAttempt {
+  answers: Record<number, number>
+  retakes: number
+}
+
+function loadQuizAttempts(): Record<string, QuizAttempt> {
+  try {
+    const raw = localStorage.getItem(QUIZ_STATE_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, QuizAttempt>) : {}
+  } catch {
+    return {}
+  }
+}
+
+export function loadQuizAttempt(trackId: number, moduleId: number): QuizAttempt {
+  const attempt = loadQuizAttempts()[moduleKey(trackId, moduleId)]
+  return attempt ?? { answers: {}, retakes: 0 }
+}
+
+export function saveQuizAttempt(trackId: number, moduleId: number, attempt: QuizAttempt): void {
+  const attempts = loadQuizAttempts()
+  attempts[moduleKey(trackId, moduleId)] = attempt
+  localStorage.setItem(QUIZ_STATE_KEY, JSON.stringify(attempts))
+}
+
 export interface StreakState {
   current: number
   longest: number
