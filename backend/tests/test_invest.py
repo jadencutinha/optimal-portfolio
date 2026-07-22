@@ -63,6 +63,46 @@ def test_buy_reduces_cash_and_creates_position(client: TestClient, market_open) 
     assert positions[0]["market_value"] == pytest.approx(1000.0, abs=1.0)
 
 
+class _MovingQuoteProvider:
+    """A provider whose live quote can be nudged mid-test to simulate the market moving."""
+
+    def __init__(self) -> None:
+        self.price = 100.0
+
+    async def get_quotes(self, symbols):
+        return {symbol.upper(): self.price for symbol in symbols}
+
+    async def get_prices(self, tickers, start, end):
+        return {}
+
+
+def test_positions_are_marked_at_the_live_quote(client: TestClient, market_open, monkeypatch) -> None:
+    as_user(client, "quote-1")
+    fake = _MovingQuoteProvider()
+    monkeypatch.setattr(client.app.state.invest_simulator, "_provider", fake)
+
+    buy = client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 1000})
+    assert buy.status_code == 200, buy.text
+
+    # Bought at 100 and still marked at 100, so profit and loss starts at zero.
+    flat = client.get("/api/invest/positions").json()
+    assert flat[0]["unrealized_pl"] == pytest.approx(0.0, abs=0.01)
+
+    # The market ticks up 10% and the same holding is now worth more.
+    fake.price = 110.0
+    up = client.get("/api/invest/positions").json()
+    assert up[0]["market_value"] == pytest.approx(1100.0, abs=0.5)
+    assert up[0]["unrealized_pl"] == pytest.approx(100.0, abs=0.5)
+
+    account = client.get("/api/invest/account").json()
+    assert account["portfolio_value"] == pytest.approx(100100.0, abs=1.0)
+
+    # And back down below the entry price shows a loss.
+    fake.price = 90.0
+    down = client.get("/api/invest/positions").json()
+    assert down[0]["unrealized_pl"] == pytest.approx(-100.0, abs=0.5)
+
+
 def test_investments_are_isolated_per_user(client: TestClient, market_open) -> None:
     as_user(client, "iso-a")
     client.post("/api/invest/trade", json={"symbol": "AAPL", "side": "buy", "notional": 5000})

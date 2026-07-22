@@ -46,6 +46,42 @@ class FMPProvider(DataProvider):
                 prices[ticker] = result
         return prices
 
+    async def get_quotes(self, symbols: list[str]) -> dict[str, float]:
+        wanted = sorted({symbol.upper() for symbol in symbols if symbol})
+        if not wanted:
+            return {}
+        results = await asyncio.gather(*(self._fetch_quote(symbol) for symbol in wanted), return_exceptions=True)
+        quotes: dict[str, float] = {}
+        for symbol, result in zip(wanted, results, strict=True):
+            if isinstance(result, (int, float)) and result and result > 0:
+                quotes[symbol] = float(result)
+        return quotes
+
+    async def _fetch_quote(self, symbol: str) -> float | None:
+        # Best effort only: a real-time quote marks live positions, but if it is not
+        # on the plan or the call fails we return None and the caller falls back to
+        # the latest close rather than raising and blocking the whole portfolio view.
+        url = f"{self._base_url}/quote"
+        params = {"symbol": symbol, "apikey": self._api_key}
+        try:
+            response = await self._client.get(url, params=params)
+        except (httpx.TimeoutException, httpx.TransportError):
+            return None
+        if response.status_code != 200:
+            return None
+        try:
+            payload = response.json()
+        except ValueError:
+            return None
+        rows = payload if isinstance(payload, list) else [payload]
+        for row in rows:
+            if isinstance(row, dict) and row.get("price") is not None:
+                try:
+                    return float(row["price"])
+                except (TypeError, ValueError):
+                    return None
+        return None
+
     async def _fetch_one(self, ticker: str, start: date, end: date) -> pd.Series | None:
         logger.info("FMP fetch %s %s..%s", ticker, start.isoformat(), end.isoformat())
         url = f"{self._base_url}/historical-price-eod/full"

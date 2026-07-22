@@ -36,6 +36,16 @@ class DataProvider(ABC):
     @abstractmethod
     async def get_prices(self, tickers: list[str], start: date, end: date) -> dict[str, pd.Series]: ...
 
+    async def get_quotes(self, symbols: list[str]) -> dict[str, float]:
+        """Latest intraday price per symbol, best effort.
+
+        Used to mark live paper-trading positions so profit and loss move with the
+        market instead of being frozen at the last cached close. Returns whatever it
+        can and stays empty when the provider has no real-time feed, so callers must
+        fall back to the most recent close for any symbol left out.
+        """
+        return {}
+
     async def close(self) -> None:
         return None
 
@@ -116,19 +126,50 @@ class PersistentPriceProvider(DataProvider):
                 resolved[ticker] = self._slice(series, start, end)
         return {ticker: resolved[ticker] for ticker in tickers if ticker in resolved}
 
+    async def get_quotes(self, symbols: list[str]) -> dict[str, float]:
+        return await self._inner.get_quotes(symbols)
+
     async def close(self) -> None:
         await self._inner.close()
 
 
 class CachingDataProvider(DataProvider):
+    # Quotes are cached only briefly so live positions still move, while a burst of
+    # invest requests (account, positions, orders all poll together) shares one fetch.
+    QUOTE_TTL_SECONDS = 15
+
     def __init__(self, inner: DataProvider, cache: Cache, ttl: int) -> None:
         self._inner = inner
         self._cache = cache
         self._ttl = ttl
+        self._quote_ttl = min(ttl, self.QUOTE_TTL_SECONDS)
         self.name = inner.name
 
     def _key(self, ticker: str, start: date, end: date) -> str:
         return f"prices:{self.name}:{ticker}:{start.isoformat()}:{end.isoformat()}"
+
+    def _quote_key(self, symbol: str) -> str:
+        return f"quote:{self.name}:{symbol}"
+
+    async def get_quotes(self, symbols: list[str]) -> dict[str, float]:
+        wanted = sorted({symbol.upper() for symbol in symbols if symbol})
+        resolved: dict[str, float] = {}
+        missing: list[str] = []
+        for symbol in wanted:
+            cached = await self._cache.get(self._quote_key(symbol))
+            if cached is not None:
+                try:
+                    resolved[symbol] = float(cached)
+                    continue
+                except ValueError:
+                    pass
+            missing.append(symbol)
+        if missing:
+            fetched = await self._inner.get_quotes(missing)
+            for symbol, price in fetched.items():
+                await self._cache.set(self._quote_key(symbol), repr(float(price)), self._quote_ttl)
+                resolved[symbol] = float(price)
+        return resolved
 
     async def get_prices(self, tickers: list[str], start: date, end: date) -> dict[str, pd.Series]:
         resolved: dict[str, pd.Series] = {}

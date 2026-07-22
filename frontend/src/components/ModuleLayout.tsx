@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ContentBlock, Track } from '../data/courseData'
-import { starsForRetakes } from '../lib/courseProgress'
+import { loadQuizAttempt, saveQuizAttempt, starsForRetakes } from '../lib/courseProgress'
 import { CourseAssistant } from './CourseAssistant'
 import { CheckIcon, FlameIcon, StarIcon } from './icons'
 
@@ -52,18 +52,30 @@ export function ModuleLayout({
   getModuleStars,
   streak,
 }: Props) {
-  const [answers, setAnswers] = useState<Record<number, number>>({})
-  const [retakeCount, setRetakeCount] = useState(0)
   const mod = track.modules[moduleIndex]
+  const [answers, setAnswers] = useState<Record<number, number>>(() => loadQuizAttempt(track.id, mod.id).answers)
+  const [retakeCount, setRetakeCount] = useState(() => loadQuizAttempt(track.id, mod.id).retakes)
 
+  // Reload the saved picks whenever the learner opens a different module, so
+  // each quiz shows the answers that module was left with.
   useEffect(() => {
-    setAnswers({})
-    setRetakeCount(0)
-  }, [moduleIndex])
+    const saved = loadQuizAttempt(track.id, mod.id)
+    setAnswers(saved.answers)
+    setRetakeCount(saved.retakes)
+  }, [track.id, mod.id])
+
+  const isAllCorrect = (picks: Record<number, number>) =>
+    mod.quiz.length > 0 && mod.quiz.every((q, i) => {
+      const chosen = picks[i]
+      return chosen !== undefined && q.options[chosen]?.correct
+    })
 
   function handleAnswer(qIndex: number, oIndex: number) {
     if (qIndex in answers) return
-    setAnswers((prev) => ({ ...prev, [qIndex]: oIndex }))
+    const next = { ...answers, [qIndex]: oIndex }
+    setAnswers(next)
+    saveQuizAttempt(track.id, mod.id, { answers: next, retakes: retakeCount })
+    if (isAllCorrect(next)) onModuleComplete(mod.id, retakeCount)
   }
 
   const allAnswered = Object.keys(answers).length === mod.quiz.length
@@ -73,10 +85,6 @@ export function ModuleLayout({
   }).length
   const allCorrect = mod.quiz.length > 0 && allAnswered && correctCount === mod.quiz.length
   const earnedStars = starsForRetakes(retakeCount)
-
-  useEffect(() => {
-    if (allCorrect) onModuleComplete(mod.id, retakeCount)
-  }, [allCorrect, mod.id, onModuleComplete, retakeCount])
 
   const completedCount = track.modules.filter((m) => isModuleComplete(m.id)).length
   const progressPct = Math.round((completedCount / track.modules.length) * 100)
@@ -274,8 +282,10 @@ export function ModuleLayout({
                 type="button"
                 className="quiz-retake-btn"
                 onClick={() => {
+                  const nextRetakes = retakeCount + 1
                   setAnswers({})
-                  setRetakeCount((n) => n + 1)
+                  setRetakeCount(nextRetakes)
+                  saveQuizAttempt(track.id, mod.id, { answers: {}, retakes: nextRetakes })
                 }}
               >
                 Retake quiz

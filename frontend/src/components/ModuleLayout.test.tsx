@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Track } from '../data/courseData'
 
 vi.mock('../api/queries', () => ({
@@ -51,7 +51,7 @@ function setup(overrides: { isModuleComplete?: (moduleId: number) => boolean } =
   const onModuleComplete = vi.fn()
   const isModuleComplete = overrides.isModuleComplete ?? vi.fn(() => false)
 
-  render(
+  const utils = render(
     <ModuleLayout
       track={track}
       moduleIndex={0}
@@ -62,10 +62,12 @@ function setup(overrides: { isModuleComplete?: (moduleId: number) => boolean } =
     />
   )
 
-  return { onSelectModule, onBackToTracks, onModuleComplete }
+  return { onSelectModule, onBackToTracks, onModuleComplete, ...utils }
 }
 
 describe('ModuleLayout quiz', () => {
+  beforeEach(() => localStorage.clear())
+
   it('marks the chosen wrong answer and reveals the correct one, without calling onModuleComplete', async () => {
     const user = userEvent.setup()
     const { onModuleComplete } = setup()
@@ -131,6 +133,20 @@ describe('ModuleLayout quiz', () => {
 
     expect(screen.getByRole('button', { name: '3' })).not.toBeDisabled()
     expect(screen.getByRole('button', { name: '4' })).not.toBeDisabled()
+  })
+
+  it('keeps the learner\'s answers after leaving and returning to the module', async () => {
+    const user = userEvent.setup()
+    const { unmount } = setup()
+
+    await user.click(screen.getByRole('button', { name: '4' }))
+    expect(screen.getByText('Perfect, 1/1 correct!')).toBeInTheDocument()
+
+    unmount()
+    setup()
+
+    expect(screen.getByText('Perfect, 1/1 correct!')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '4✓' })).toBeDisabled()
   })
 
   it('disables "Previous" on the first module and "Next module" on the last', () => {

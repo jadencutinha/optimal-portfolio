@@ -58,17 +58,30 @@ class InvestSimulator:
         wanted = sorted({symbol.upper() for symbol in symbols if symbol})
         if not wanted:
             return {}
-        end = date.today() + timedelta(days=1)
-        start = end - timedelta(days=20)
-        data = await self._provider.get_prices(wanted, start, end)
+        # Prefer a live quote so holdings are marked at the current market price and
+        # profit and loss actually move. Anything without a quote falls back to the
+        # most recent close, which is also what fills use when the market is closed.
         prices: dict[str, float] = {}
-        for symbol in wanted:
-            series = data.get(symbol)
-            if series is None:
-                continue
-            clean = series.dropna()
-            if not clean.empty:
-                prices[symbol] = float(clean.iloc[-1])
+        try:
+            quotes = await self._provider.get_quotes(wanted)
+        except Exception:  # noqa: BLE001 - a quote outage must never block valuation
+            quotes = {}
+        for symbol, price in quotes.items():
+            if price and price > 0:
+                prices[symbol] = float(price)
+
+        missing = [symbol for symbol in wanted if symbol not in prices]
+        if missing:
+            end = date.today() + timedelta(days=1)
+            start = end - timedelta(days=20)
+            data = await self._provider.get_prices(missing, start, end)
+            for symbol in missing:
+                series = data.get(symbol)
+                if series is None:
+                    continue
+                clean = series.dropna()
+                if not clean.empty:
+                    prices[symbol] = float(clean.iloc[-1])
         return prices
 
     async def _get_or_create(self, session: AsyncSession, user_id: str) -> InvestAccount:

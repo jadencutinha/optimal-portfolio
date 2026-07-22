@@ -3,6 +3,7 @@ const COMPLETIONS_KEY = 'course_completions_v1'
 const MASTERY_KEY = 'course_mastery_v1'
 const STREAK_KEY = 'course_streak_v1'
 const KNOWN_FLASHCARDS_KEY = 'course_known_flashcards_v1'
+const QUIZ_STATE_KEY = 'course_quiz_state_v1'
 
 export type CourseProgress = Record<string, boolean>
 

@@ -3,10 +3,12 @@ import {
   ensureTrackCompletion,
   loadMastery,
   loadProgress,
+  loadQuizAttempt,
   loadStreak,
   moduleKey,
   recordMastery,
   saveProgress,
+  saveQuizAttempt,
   starsForRetakes,
   touchStreak,
 } from './courseProgress'
@@ -94,6 +96,29 @@ describe('recordMastery', () => {
     const stars = recordMastery(1, 1, 5) // a later, worse retake run: 1 star
     expect(stars).toBe(1) // the run itself is still reported as 1 star...
     expect(loadMastery()['1:1']).toBe(3) // ...but the stored best stays at 3
+  })
+})
+
+describe('quiz attempts', () => {
+  it('returns an empty attempt for a module that has never been answered', () => {
+    expect(loadQuizAttempt(1, 1)).toEqual({ answers: {}, retakes: 0 })
+  })
+
+  it('round-trips a saved attempt through localStorage', () => {
+    saveQuizAttempt(1, 2, { answers: { 0: 1, 1: 0 }, retakes: 1 })
+    expect(loadQuizAttempt(1, 2)).toEqual({ answers: { 0: 1, 1: 0 }, retakes: 1 })
+  })
+
+  it('keeps attempts for different modules independent', () => {
+    saveQuizAttempt(1, 1, { answers: { 0: 0 }, retakes: 0 })
+    saveQuizAttempt(1, 2, { answers: { 0: 1 }, retakes: 2 })
+    expect(loadQuizAttempt(1, 1)).toEqual({ answers: { 0: 0 }, retakes: 0 })
+    expect(loadQuizAttempt(1, 2)).toEqual({ answers: { 0: 1 }, retakes: 2 })
+  })
+
+  it('falls back to an empty attempt instead of throwing on invalid JSON', () => {
+    localStorage.setItem('course_quiz_state_v1', '{not valid json')
+    expect(loadQuizAttempt(1, 1)).toEqual({ answers: {}, retakes: 0 })
   })
 })
 

@@ -319,13 +319,16 @@ export function CoursePage({
   const isComplete = (trackId: number, moduleId: number) => Boolean(progress[moduleKey(trackId, moduleId)])
 
   const markComplete = (trackId: number, moduleId: number, retakes: number) => {
+    // Record mastery on every perfect clear, not only the first, so a module
+    // that was finished before stars existed can still earn them on a replay.
+    // recordMastery keeps the best score, so a weaker retake never downgrades it.
+    recordMastery(trackId, moduleId, retakes)
+    setMastery(loadMastery())
     setProgress((prev) => {
       const key = moduleKey(trackId, moduleId)
       if (prev[key]) return prev
       const next = { ...prev, [key]: true }
       saveProgress(next)
-      recordMastery(trackId, moduleId, retakes)
-      setMastery(loadMastery())
       setStreak(touchStreak())
       return next
     })
